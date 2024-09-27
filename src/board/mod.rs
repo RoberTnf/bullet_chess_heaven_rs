@@ -4,6 +4,9 @@ pub mod board_map;
 pub mod position;
 pub mod tile;
 
+#[cfg(test)]
+mod tests;
+
 pub struct BoardPlugin;
 
 impl Plugin for BoardPlugin {
