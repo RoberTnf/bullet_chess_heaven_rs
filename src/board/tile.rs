@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{board::position::Position, resources::spritesheet::SpriteSheetAtlas};
+use crate::{board::position::BoardPosition, globals, graphics::spritesheet::SpriteSheetAtlas};
 
 #[derive(Bundle)]
 pub struct TileBundle {
@@ -17,14 +17,14 @@ pub fn spawn_board(
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
 ) {
-    for x in 0..8 {
-        for y in 0..8 {
-            let position = Position::new(x, y);
+    for x in 0..globals::BOARD_SIZE {
+        for y in 0..globals::BOARD_SIZE {
+            let position = BoardPosition::new(x, y);
             commands.spawn((
                 TileBundle {
                     sprite: SpriteBundle {
                         texture: asset_server.load("custom/spritesheet.png"),
-                        transform: Transform::from_xyz(0.0, 0.0, 0.0),
+                        transform: Transform::from_xyz(0.0, 0.0, globals::BOARD_Z_INDEX),
                         ..default()
                     },
                     atlas: TextureAtlas {

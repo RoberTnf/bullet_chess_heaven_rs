@@ -1,9 +1,11 @@
 use bevy::{prelude::*, window::WindowResolution};
 mod board;
-mod camera;
+mod events;
 mod globals;
+mod graphics;
+mod input;
 mod pieces;
-mod resources;
+mod startup;
 
 fn main() {
     App::new()
@@ -26,10 +28,13 @@ fn main() {
                     ..default()
                 }),
         )
-        .init_resource::<resources::spritesheet::SpriteSheetAtlas>()
-        .add_systems(Startup, pieces::player::spawn_player)
-        .add_systems(Startup, camera::setup_camera)
-        .add_systems(Startup, board::tile::spawn_board)
-        .add_systems(Update, pieces::transforms::update_transforms)
+        .insert_resource(Msaa::Off)
+        .add_plugins((
+            graphics::GraphicsPlugin,
+            startup::StartupPlugin,
+            input::InputPlugin,
+            events::EventPlugin,
+            board::BoardPlugin,
+        ))
         .run();
 }
