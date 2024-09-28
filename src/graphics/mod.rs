@@ -1,7 +1,6 @@
 mod camera;
 pub mod spritesheet;
 mod transforms;
-
 use bevy::prelude::*;
 
 pub struct GraphicsPlugin;

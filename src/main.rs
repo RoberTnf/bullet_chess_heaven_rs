@@ -3,8 +3,8 @@
 // TODO: Entities should have a cleanup component
 // TODO: All entities should have a name
 
-
 use bevy::{log::LogPlugin, prelude::*, window::WindowResolution};
+use bevy_tweening::TweeningPlugin;
 mod board;
 mod events;
 mod globals;
@@ -39,12 +39,13 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(TweeningPlugin)
         .insert_resource(Msaa::Off)
         .add_plugins((
-            graphics::GraphicsPlugin,
             startup::StartupPlugin,
-            events::EventPlugin,
             board::BoardPlugin,
+            events::EventPlugin,
+            graphics::GraphicsPlugin,
         ))
         .run();
 }

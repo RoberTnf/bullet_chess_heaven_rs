@@ -1,4 +1,7 @@
 use bevy::{prelude::*, utils::HashSet};
+use std::time::Duration;
+
+use bevy_tweening::{lens::TransformScaleLens, Animator, EaseFunction, RepeatCount, Tween};
 
 use crate::{
     board::{
@@ -19,6 +22,17 @@ pub fn spawn_player(
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
 ) {
+    let tween = Tween::new(
+        EaseFunction::SineInOut,
+        Duration::from_secs(1),
+        TransformScaleLens {
+            start: Vec3::new(0.95, 0.95, 0.95),
+            end: Vec3::new(0.8, 0.8, 0.8),
+        },
+    )
+    .with_repeat_strategy(bevy_tweening::RepeatStrategy::MirroredRepeat)
+    .with_repeat_count(RepeatCount::Infinite);
+
     commands.spawn((
         CreatureBundle {
             sprite: SpriteBundle {
@@ -36,5 +50,6 @@ pub fn spawn_player(
             board_position: BoardPosition::new(4, 4),
         },
         Player,
+        Animator::new(tween),
     ));
 }
