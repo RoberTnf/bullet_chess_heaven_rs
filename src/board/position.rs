@@ -46,3 +46,59 @@ impl Sub<BoardPosition> for BoardPosition {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{board::position::BoardPosition, globals};
+
+    #[test]
+    fn test_new() {
+        let pos = BoardPosition::new(3, 4);
+        assert_eq!(pos.x, 3);
+        assert_eq!(pos.y, 4);
+    }
+
+    #[test]
+    fn test_update() {
+        let mut pos = BoardPosition::new(1, 1);
+        pos.update(5, 6);
+        assert_eq!(pos.x, 5);
+        assert_eq!(pos.y, 6);
+    }
+
+    #[test]
+    fn test_is_white() {
+        assert!(BoardPosition::new(0, 0).is_white());
+        assert!(!BoardPosition::new(0, 1).is_white());
+        assert!(!BoardPosition::new(1, 0).is_white());
+        assert!(BoardPosition::new(1, 1).is_white());
+    }
+
+    #[test]
+    fn test_from_global_position() {
+        let tile_size = globals::TILE_SIZE as f32;
+
+        assert_eq!(
+            BoardPosition::from_global_position(0.0, 0.0),
+            Some(BoardPosition::new(0, 0))
+        );
+        assert_eq!(
+            BoardPosition::from_global_position(tile_size, tile_size),
+            Some(BoardPosition::new(1, 1))
+        );
+        assert_eq!(
+            BoardPosition::from_global_position(tile_size * 2.5, tile_size * 3.5),
+            Some(BoardPosition::new(2, 3))
+        );
+        assert_eq!(BoardPosition::from_global_position(-1.0, 0.0), None);
+        assert_eq!(BoardPosition::from_global_position(0.0, -1.0), None);
+    }
+
+    #[test]
+    fn test_subtraction() {
+        let pos1 = BoardPosition::new(5, 7);
+        let pos2 = BoardPosition::new(2, 3);
+        let result = pos1 - pos2;
+        assert_eq!(result, BoardPosition::new(3, 4));
+    }
+}

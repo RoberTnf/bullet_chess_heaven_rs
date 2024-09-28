@@ -7,9 +7,6 @@ use super::creature::CreatureBundle;
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component)]
-pub struct Movable;
-
 pub fn spawn_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -30,6 +27,5 @@ pub fn spawn_player(
         },
         Player,
         BoardPosition::new(4, 4),
-        Movable,
     ));
 }

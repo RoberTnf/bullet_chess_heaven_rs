@@ -33,6 +33,11 @@ impl BoardMap {
             creatures: HashMap::new(),
         }
     }
+
+    pub fn move_entity(&mut self, old_pos: BoardPosition, new_pos: BoardPosition) {
+        let entity = self.remove_entity(old_pos).expect("Entity not found");
+        self.add_entity(new_pos, entity);
+    }
 }
 
 pub fn register_new_movement_blockers(
@@ -41,5 +46,92 @@ pub fn register_new_movement_blockers(
 ) {
     for (position, entity) in new_creatures.iter() {
         board_map.add_entity(BoardPosition::new(position.x, position.y), entity);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use bevy::prelude::*;
+
+    use crate::{
+        board::{
+            board_map::{register_new_movement_blockers, BoardMap},
+            position::BoardPosition,
+        },
+        globals,
+        pieces::creature::BlocksMovement,
+    };
+
+    #[test]
+    fn test_new_board_map_is_empty() {
+        let board_map = BoardMap::new();
+        assert!(board_map.creatures.is_empty());
+    }
+
+    #[test]
+    fn test_add_and_get_entity() {
+        let mut board_map = BoardMap::new();
+        let pos = BoardPosition::new(1, 1);
+        let entity = Entity::from_raw(1);
+
+        board_map.add_entity(pos, entity);
+        assert_eq!(board_map.get_entity_at(pos), Some(&entity));
+    }
+
+    #[test]
+    fn test_remove_entity() {
+        let mut board_map = BoardMap::new();
+        let pos = BoardPosition::new(1, 1);
+        let entity = Entity::from_raw(1);
+
+        board_map.add_entity(pos, entity);
+        let removed = board_map.remove_entity(pos);
+        assert_eq!(removed, Some(entity));
+        assert_eq!(board_map.get_entity_at(pos), None);
+    }
+
+    #[test]
+    fn test_is_movable() {
+        let mut board_map = BoardMap::new();
+        let pos_empty = BoardPosition::new(1, 1);
+        let pos_occupied = BoardPosition::new(2, 2);
+        let pos_off_limits = BoardPosition::new(globals::BOARD_SIZE, globals::BOARD_SIZE);
+
+        board_map.add_entity(pos_occupied, Entity::from_raw(1));
+
+        assert!(board_map.is_movable(pos_empty));
+        assert!(!board_map.is_movable(pos_occupied));
+        assert!(!board_map.is_movable(pos_off_limits));
+    }
+
+    #[test]
+    fn test_register_new_movement_blockers() {
+        let mut app = App::new();
+
+        let board_map = BoardMap::new();
+        app.insert_resource(board_map)
+            .add_systems(Update, register_new_movement_blockers);
+
+        let world = app.world_mut();
+
+        let entity1 = world.spawn((BoardPosition::new(1, 1), BlocksMovement)).id();
+        let entity2 = world.spawn((BoardPosition::new(2, 2), BlocksMovement)).id();
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .get_resource::<BoardMap>()
+                .unwrap()
+                .get_entity_at(BoardPosition::new(1, 1)),
+            Some(&entity1)
+        );
+        assert_eq!(
+            app.world()
+                .get_resource::<BoardMap>()
+                .unwrap()
+                .get_entity_at(BoardPosition::new(2, 2)),
+            Some(&entity2)
+        );
     }
 }

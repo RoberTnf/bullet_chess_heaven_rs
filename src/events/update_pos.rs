@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     board::{board_map::BoardMap, position::BoardPosition},
-    pieces::player::Movable,
+    pieces::creature::Movable,
 };
 
 #[derive(Event)]
@@ -18,10 +18,11 @@ pub fn update_position(
 ) {
     for event in events.read() {
         if board_map.is_movable(event.tile_pos) {
-            let mut piece = board_positions.get_mut(event.piece).unwrap();
-            board_map.remove_entity(BoardPosition::new(piece.x, piece.y));
+            let mut piece = board_positions
+                .get_mut(event.piece)
+                .expect("A UpdatePositionEvent was fired without a valid entity");
+            board_map.move_entity(piece.clone(), event.tile_pos);
             piece.update(event.tile_pos.x, event.tile_pos.y);
-            board_map.add_entity(event.tile_pos, event.piece);
         }
     }
 }
