@@ -37,7 +37,6 @@ fn main() {
         .add_plugins((
             graphics::GraphicsPlugin,
             startup::StartupPlugin,
-            input::InputPlugin,
             events::EventPlugin,
             board::BoardPlugin,
         ))
