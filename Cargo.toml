@@ -6,22 +6,35 @@ edition = "2021"
 [dependencies]
 bevy = { version = "0.14.2" }
 bevy_pixel_camera = "0.13.0"
+bevy_tweening = "0.11.0"
 
 [features]
-dev = ["bevy/dynamic_linking"]
+dev = ["bevy/dynamic_linking", "bevy/file_watcher", "bevy/asset_processor"]
+
+[profile.dev]
+debug = 0
+strip = "debuginfo"
+opt-level = 0 # Switch to 1 for more runtime performance
+# overflow-checks = false # Uncomment for better math performance
 
 # Enable a large amount of optimization in the dev profile for dependencies.
 [profile.dev.package."*"]
-opt-level = 3
+opt-level = 2
 
 # Enable more optimization in the release profile at the cost of compile time.
 [profile.release]
 # Compile the entire crate as one unit.
 # Slows compile times, marginal improvements.
-codegen-units = 1
-# Do a second optimization pass over the entire program, including dependencies.
-# Slows compile times, marginal improvements.
+opt-level = 3
+panic = "abort"
+debug = 0
+strip = "debuginfo"
+
+[profile.distribution]
+inherits = "release"
+strip = true
 lto = "thin"
+codegen-units = 1
 
 # Optimize for size in the wasm-release profile to reduce load times and bandwidth usage on web.
 [profile.wasm-release]

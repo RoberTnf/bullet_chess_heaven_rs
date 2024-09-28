@@ -1,3 +1,9 @@
+// TODO: Game states with cleanup
+// TOOD: All Update systems should be in a state
+// TODO: Entities should have a cleanup component
+// TODO: All entities should have a name
+
+
 use bevy::{log::LogPlugin, prelude::*, window::WindowResolution};
 mod board;
 mod events;
