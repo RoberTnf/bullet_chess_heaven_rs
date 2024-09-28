@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::WindowResolution};
+use bevy::{log::LogPlugin, prelude::*, window::WindowResolution};
 mod board;
 mod events;
 mod globals;
@@ -25,6 +25,11 @@ fn main() {
                         ),
                         ..default()
                     }),
+                    ..default()
+                })
+                .set(LogPlugin {
+                    filter: "bullet_chess_heaven_rs=debug".into(),
+                    level: bevy::log::Level::WARN,
                     ..default()
                 }),
         )

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 pub mod board_map;
+pub mod movement_types;
 pub mod position;
 pub mod tile;
 

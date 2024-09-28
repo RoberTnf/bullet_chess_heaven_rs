@@ -6,16 +6,16 @@ use crate::globals;
 
 #[derive(Component, PartialEq, Eq, Hash, Copy, Clone, Debug)]
 pub struct BoardPosition {
-    pub x: u32,
-    pub y: u32,
+    pub x: i32,
+    pub y: i32,
 }
 
 impl BoardPosition {
-    pub fn new(x: u32, y: u32) -> Self {
+    pub fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
 
-    pub fn update(&mut self, x: u32, y: u32) {
+    pub fn update(&mut self, x: i32, y: i32) {
         self.x = x;
         self.y = y;
     }
@@ -30,8 +30,8 @@ impl BoardPosition {
         }
 
         Some(Self {
-            x: (x / globals::TILE_SIZE as f32) as u32,
-            y: (y / globals::TILE_SIZE as f32) as u32,
+            x: (x / globals::TILE_SIZE as f32) as i32,
+            y: (y / globals::TILE_SIZE as f32) as i32,
         })
     }
 }

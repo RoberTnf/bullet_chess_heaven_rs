@@ -1,8 +1,15 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::HashSet};
 
-use crate::{board::position::BoardPosition, globals, graphics::spritesheet::SpriteSheetAtlas};
+use crate::{
+    board::{
+        movement_types::{MovementType, MovementTypes},
+        position::BoardPosition,
+    },
+    globals,
+    graphics::spritesheet::SpriteSheetAtlas,
+};
 
-use super::creature::CreatureBundle;
+use super::creature::{BlocksMovement, Creature, CreatureBundle};
 
 #[derive(Component)]
 pub struct Player;
@@ -23,9 +30,11 @@ pub fn spawn_player(
                 layout: atlas_layout.handle.clone(),
                 index: 0,
             },
-            ..default()
+            movement_types: MovementTypes(HashSet::from([MovementType::King])),
+            blocks_movement: BlocksMovement,
+            creature: Creature,
+            board_position: BoardPosition::new(4, 4),
         },
         Player,
-        BoardPosition::new(4, 4),
     ));
 }

@@ -16,7 +16,8 @@ impl BoardMap {
 
     pub fn is_movable(&self, pos: BoardPosition) -> bool {
         let is_empty = self.get_entity_at(pos).is_none();
-        let is_off_limits = pos.x >= globals::BOARD_SIZE || pos.y >= globals::BOARD_SIZE;
+        let is_off_limits =
+            pos.x >= globals::BOARD_SIZE || pos.y >= globals::BOARD_SIZE || pos.x < 0 || pos.y < 0;
         is_empty && !is_off_limits
     }
 
@@ -96,12 +97,14 @@ mod tests {
         let pos_empty = BoardPosition::new(1, 1);
         let pos_occupied = BoardPosition::new(2, 2);
         let pos_off_limits = BoardPosition::new(globals::BOARD_SIZE, globals::BOARD_SIZE);
+        let pos_off_limits_negative = BoardPosition::new(-1, -1);
 
         board_map.add_entity(pos_occupied, Entity::from_raw(1));
 
         assert!(board_map.is_movable(pos_empty));
         assert!(!board_map.is_movable(pos_occupied));
         assert!(!board_map.is_movable(pos_off_limits));
+        assert!(!board_map.is_movable(pos_off_limits_negative));
     }
 
     #[test]
