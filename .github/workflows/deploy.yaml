@@ -35,11 +35,11 @@ jobs:
 
       - name: Build
         run: |
-          cargo build --profile distribution --target wasm32-unknown-unknown
+          cargo build --release --target wasm32-unknown-unknown
 
       - name: Prepare package
         run: |
-          wasm-bindgen --no-typescript --out-name bevy_game --out-dir wasm --target web target/wasm32-unknown-unknown/release/${{ env.binary }}.wasm
+          wasm-bindgen --no-typescript --out-name bevy_game --out-dir wasm --target web target/wasm32-unknown-unknown/distribution/${{ env.binary }}.wasm
           cp -r assets wasm/ || true # Try to copy, but ignore if it can't copy if source directory does not exist
 
       - name: Package as a zip
@@ -83,12 +83,12 @@ jobs:
 
       - name: Build
         run: |
-          cargo build --profile distribution --target x86_64-unknown-linux-gnu
+          cargo build --release --target x86_64-unknown-linux-gnu
 
       - name: Prepare package
         run: |
           mkdir linux
-          cp target/x86_64-unknown-linux-gnu/release/${{ env.binary }} linux/
+          cp target/x86_64-unknown-linux-gnu/distribution/${{ env.binary }} linux/
           cp -r assets linux/ || true # Try to copy, but ignore if it can't copy if source directory does not exist
 
       - name: Package as a zip
@@ -129,12 +129,12 @@ jobs:
 
       - name: Build
         run: |
-          cargo build --profile distribution --target x86_64-pc-windows-msvc
+          cargo build --release --target x86_64-pc-windows-msvc
 
       - name: Prepare package
         run: |
           mkdir windows
-          cp target/x86_64-pc-windows-msvc/release/${{ env.binary }}.exe windows/
+          cp target/x86_64-pc-windows-msvc/distribution/${{ env.binary }}.exe windows/
           mkdir assets -ea 0 # create the assets directory if it does not exist, it will get ignored in the zip if empty
           cp -r assets windows/
 
@@ -179,12 +179,12 @@ jobs:
 
       - name: Build
         run: |
-          cargo build --profile distribution --target x86_64-apple-darwin
+          cargo build --release --target x86_64-apple-darwin
 
       - name: Prepare Package
         run: |
           mkdir -p ${{ env.binary }}.app/Contents/MacOS
-          cp target/x86_64-apple-darwin/release/${{ env.binary }} ${{ env.binary }}.app/Contents/MacOS/
+          cp target/x86_64-apple-darwin/distribution/${{ env.binary }} ${{ env.binary }}.app/Contents/MacOS/
           cp -r assets ${{ env.binary }}.app/Contents/MacOS/ || true # Try to copy, but ignore if it can't copy if source directory does not exist
           hdiutil create -fs HFS+ -volname "${{ env.binary }}" -srcfolder ${{ env.binary }}.app ${{ env.binary }}-macOS-intel.dmg
 
@@ -225,12 +225,12 @@ jobs:
 
       - name: Build
         run: |
-          cargo build --profile distribution --target aarch64-apple-darwin
+          cargo build --release --target aarch64-apple-darwin
 
       - name: Prepare Package
         run: |
           mkdir -p ${{ env.binary }}.app/Contents/MacOS
-          cp target/aarch64-apple-darwin/release/${{ env.binary }} ${{ env.binary }}.app/Contents/MacOS/
+          cp target/aarch64-apple-darwin/distribution/${{ env.binary }} ${{ env.binary }}.app/Contents/MacOS/
           cp -r assets ${{ env.binary }}.app/Contents/MacOS/ || true # Try to copy, but ignore if it can't copy if source directory does not exist
           hdiutil create -fs HFS+ -volname "${{ env.binary }}-macOS-apple-silicon" -srcfolder ${{ env.binary }}.app ${{ env.binary }}-macOS-apple-silicon.dmg
 
