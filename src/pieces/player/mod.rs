@@ -8,6 +8,7 @@ use crate::{
         movement_types::{MovementType, MovementTypes},
         position::BoardPosition,
     },
+    game_state::GameState,
     globals,
     graphics::spritesheet::SpriteSheetAtlas,
 };
@@ -51,5 +52,7 @@ pub fn spawn_player(
         },
         Player,
         Animator::new(tween),
+        Name::new("Player"),
+        StateScoped(GameState::Game),
     ));
 }

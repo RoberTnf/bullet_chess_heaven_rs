@@ -4,4 +4,5 @@ pub const TARGET_PIXEL_WIDTH: f32 = 320.0;
 pub const TILE_SIZE: u32 = 16;
 pub const PLAYER_Z_INDEX: f32 = 10.0;
 pub const BOARD_Z_INDEX: f32 = 1.0;
+pub const HIGHLIGHT_Z_INDEX: f32 = 2.0;
 pub const BOARD_SIZE: i32 = 8;

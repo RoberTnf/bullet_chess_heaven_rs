@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::{board::position::BoardPosition, globals, graphics::spritesheet::SpriteSheetAtlas};
+use crate::{
+    board::position::BoardPosition, game_state::GameState, globals,
+    graphics::spritesheet::SpriteSheetAtlas,
+};
 
 #[derive(Bundle)]
 pub struct TileBundle {
@@ -21,6 +24,8 @@ pub fn spawn_board(
         for y in 0..globals::BOARD_SIZE {
             let position = BoardPosition::new(x, y);
             commands.spawn((
+                Name::new(format!("Tile ({}, {})", x, y)),
+                StateScoped(GameState::Game),
                 TileBundle {
                     sprite: SpriteBundle {
                         texture: asset_server.load("custom/spritesheet.png"),

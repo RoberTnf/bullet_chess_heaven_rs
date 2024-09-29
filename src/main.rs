@@ -1,12 +1,9 @@
-// TODO: Game states with cleanup
-// TOOD: All Update systems should be in a state
-// TODO: Entities should have a cleanup component
-// TODO: All entities should have a name
-
 use bevy::{log::LogPlugin, prelude::*, window::WindowResolution};
 use bevy_tweening::TweeningPlugin;
+use game_state::{GamePauseState, GameState};
 mod board;
 mod events;
+mod game_state;
 mod globals;
 mod graphics;
 mod input;
@@ -40,12 +37,14 @@ fn main() {
                 }),
         )
         .add_plugins(TweeningPlugin)
-        .insert_resource(Msaa::Off)
         .add_plugins((
             startup::StartupPlugin,
             board::BoardPlugin,
             events::EventPlugin,
             graphics::GraphicsPlugin,
         ))
+        .insert_resource(Msaa::Off)
+        .enable_state_scoped_entities::<GameState>()
+        .enable_state_scoped_entities::<GamePauseState>()
         .run();
 }

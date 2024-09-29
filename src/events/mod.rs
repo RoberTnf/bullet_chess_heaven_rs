@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::input::player_movement;
+use crate::{
+    game_state::{GamePauseState, GameState},
+    input::player_movement,
+};
 pub mod click_tile;
 mod update_pos;
 
@@ -15,7 +18,9 @@ impl Plugin for EventPlugin {
                 click_tile::tile_clicked,
                 update_pos::update_position,
             )
-                .chain(),
+                .chain()
+                .run_if(in_state(GameState::Game))
+                .run_if(in_state(GamePauseState::Play)),
         )
         .add_event::<click_tile::TileClickedEvent>()
         .add_event::<update_pos::UpdatePositionEvent>();
