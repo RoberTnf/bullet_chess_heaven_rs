@@ -14,7 +14,7 @@ use crate::{
     graphics::spritesheet::SpriteSheetAtlas,
 };
 
-use super::creature::{BlocksMovement, Creature, CreatureBundle};
+use super::creature::{BlocksMovement, Creature, CreatureBundle, CreatureState};
 
 #[derive(Component)]
 pub struct Player;
@@ -53,6 +53,7 @@ pub fn spawn_player(
             blocks_movement: BlocksMovement,
             creature: Creature,
             board_position: player_start_pos,
+            creature_state: CreatureState::Initializing,
         },
         Player,
         Animator::new(tween),

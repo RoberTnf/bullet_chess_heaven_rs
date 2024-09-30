@@ -1,10 +1,6 @@
 use bevy::{prelude::*, utils::HashMap};
 
-use crate::{
-    events::update_pos::UpdatePositionEvent,
-    globals,
-    pieces::creature::BlocksMovement,
-};
+use crate::{events::update_pos::UpdatePositionEvent, globals, pieces::creature::BlocksMovement};
 
 use super::{
     movement_types::{cache::PossibleMovesCache, MovementTypes},
@@ -49,6 +45,13 @@ impl BoardMap {
             .remove_entity(old_pos)
             .expect("Move Entity: Entity not found");
         self.add_entity(new_pos, entity);
+    }
+
+    pub fn get_world_position(&self, pos: &BoardPosition) -> Vec2 {
+        Vec2::new(
+            (pos.x as f32 + 0.5) * globals::TILE_SIZE as f32,
+            (pos.y as f32 + 0.5) * globals::TILE_SIZE as f32,
+        )
     }
 }
 

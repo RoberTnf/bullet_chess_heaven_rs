@@ -31,6 +31,7 @@ impl Plugin for BoardPlugin {
                 .run_if(in_state(GameState::Game))
                 .run_if(in_state(GamePauseState::Play)),
         )
+        .add_systems(Update, transforms::animate_transforms)
         .insert_resource(board_map::BoardMap::new());
     }
 }

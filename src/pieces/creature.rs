@@ -8,6 +8,13 @@ pub struct BlocksMovement;
 #[derive(Component, Default)]
 pub struct Creature;
 
+#[derive(Component)]
+pub enum CreatureState {
+    Idle,
+    Initializing,
+    Moving,
+}
+
 #[derive(Bundle)]
 pub struct CreatureBundle {
     pub sprite: SpriteBundle,
@@ -16,4 +23,5 @@ pub struct CreatureBundle {
     pub creature: Creature,
     pub movement_types: MovementTypes,
     pub board_position: BoardPosition,
+    pub creature_state: CreatureState,
 }
