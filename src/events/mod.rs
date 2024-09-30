@@ -5,7 +5,7 @@ use crate::{
     input::player_movement,
 };
 pub mod click_tile;
-mod update_pos;
+pub mod update_pos;
 
 pub struct EventPlugin;
 

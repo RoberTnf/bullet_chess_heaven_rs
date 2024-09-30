@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
+    events::update_pos::UpdatePositionEvent,
     game_state::{GamePauseState, GameState},
     graphics::transforms,
 };
@@ -20,10 +21,12 @@ impl Plugin for BoardPlugin {
             (
                 board_map::register_new_movement_blockers,
                 (
+                    board_map::update_cache_on_move,
                     highlight::highlight_player_movable_positions,
-                    transforms::update_transforms,
                 )
+                    .run_if(on_event::<UpdatePositionEvent>())
                     .chain(),
+                transforms::update_transforms.after(highlight::highlight_player_movable_positions),
             )
                 .run_if(in_state(GameState::Game))
                 .run_if(in_state(GamePauseState::Play)),

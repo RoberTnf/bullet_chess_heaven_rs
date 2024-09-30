@@ -1,12 +1,20 @@
 use bevy::{prelude::*, utils::HashMap};
 
-use crate::{globals, pieces::creature::BlocksMovement};
+use crate::{
+    events::update_pos::UpdatePositionEvent,
+    globals,
+    pieces::creature::{BlocksMovement, Creature},
+};
 
-use super::position::BoardPosition;
+use super::{
+    movement_types::{cache::PossibleMovesCache, MovementType, MovementTypes},
+    position::BoardPosition,
+};
 
 #[derive(Resource)]
 pub struct BoardMap {
     pub creatures: HashMap<BoardPosition, Entity>,
+    pub possible_moves_cache: PossibleMovesCache,
 }
 
 impl BoardMap {
@@ -32,11 +40,14 @@ impl BoardMap {
     pub fn new() -> Self {
         Self {
             creatures: HashMap::new(),
+            possible_moves_cache: PossibleMovesCache::new(),
         }
     }
 
     pub fn move_entity(&mut self, old_pos: BoardPosition, new_pos: BoardPosition) {
-        let entity = self.remove_entity(old_pos).expect("Entity not found");
+        let entity = self
+            .remove_entity(old_pos)
+            .expect("Move Entity: Entity not found");
         self.add_entity(new_pos, entity);
     }
 }
@@ -47,6 +58,24 @@ pub fn register_new_movement_blockers(
 ) {
     for (position, entity) in new_creatures.iter() {
         board_map.add_entity(BoardPosition::new(position.x, position.y), entity);
+    }
+}
+
+pub fn update_cache_on_move(
+    mut board_map: ResMut<BoardMap>,
+    creatures: Query<(&BoardPosition, &MovementTypes, &Name)>,
+    mut update_position_event: EventReader<UpdatePositionEvent>,
+) {
+    for event in update_position_event.read() {
+        let (creature_pos, movement_types, name) =
+            creatures.get(event.piece).expect("Invalid entity");
+        debug!("Updating cache on for {name} at {:?}", creature_pos);
+        let possible_moves = movement_types.get_movement_tiles(creature_pos, &board_map);
+        board_map.possible_moves_cache.update_movement_tiles(
+            &event.tile_pos,
+            &event.old_tile_pos,
+            possible_moves,
+        );
     }
 }
 

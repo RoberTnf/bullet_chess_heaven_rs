@@ -8,6 +8,7 @@ use crate::{
         movement_types::{MovementType, MovementTypes},
         position::BoardPosition,
     },
+    events::update_pos::UpdatePositionEvent,
     game_state::GameState,
     globals,
     graphics::spritesheet::SpriteSheetAtlas,
@@ -22,6 +23,7 @@ pub fn spawn_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
+    mut update_position_event: EventWriter<UpdatePositionEvent>,
 ) {
     let tween = Tween::new(
         EaseFunction::SineInOut,
@@ -34,7 +36,9 @@ pub fn spawn_player(
     .with_repeat_strategy(bevy_tweening::RepeatStrategy::MirroredRepeat)
     .with_repeat_count(RepeatCount::Infinite);
 
-    commands.spawn((
+    let player_start_pos = BoardPosition::new(4, 4);
+
+    let entity = commands.spawn((
         CreatureBundle {
             sprite: SpriteBundle {
                 texture: asset_server.load("custom/spritesheet.png"),
@@ -48,11 +52,17 @@ pub fn spawn_player(
             movement_types: MovementTypes(HashSet::from([MovementType::King])),
             blocks_movement: BlocksMovement,
             creature: Creature,
-            board_position: BoardPosition::new(4, 4),
+            board_position: player_start_pos,
         },
         Player,
         Animator::new(tween),
         Name::new("Player"),
         StateScoped(GameState::Game),
     ));
+
+    update_position_event.send(UpdatePositionEvent {
+        tile_pos: player_start_pos,
+        old_tile_pos: player_start_pos,
+        piece: entity.id(),
+    });
 }

@@ -1,6 +1,7 @@
 use crate::board::{board_map::BoardMap, position::BoardPosition};
 use bevy::{prelude::Component, utils::HashSet};
 
+pub mod cache;
 pub mod king;
 
 #[derive(Component)]
