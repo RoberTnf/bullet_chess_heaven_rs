@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    board::{board_map::BoardMap, movement_types::MovementTypes, position::BoardPosition},
+    board::{board_map::BoardMap, position::BoardPosition},
     pieces::player::Player,
 };
 

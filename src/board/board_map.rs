@@ -3,11 +3,11 @@ use bevy::{prelude::*, utils::HashMap};
 use crate::{
     events::update_pos::UpdatePositionEvent,
     globals,
-    pieces::creature::{BlocksMovement, Creature},
+    pieces::creature::BlocksMovement,
 };
 
 use super::{
-    movement_types::{cache::PossibleMovesCache, MovementType, MovementTypes},
+    movement_types::{cache::PossibleMovesCache, MovementTypes},
     position::BoardPosition,
 };
 

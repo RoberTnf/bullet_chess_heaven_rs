@@ -3,9 +3,7 @@ use bevy::{
     utils::{HashMap, HashSet},
 };
 
-use crate::board::{board_map::BoardMap, position::BoardPosition};
-
-use super::MovementTypes;
+use crate::board::position::BoardPosition;
 
 #[derive(Resource)]
 pub struct PossibleMovesCache {

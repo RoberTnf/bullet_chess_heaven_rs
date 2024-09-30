@@ -10,7 +10,6 @@ use crate::{
 
 use super::{
     board_map::BoardMap,
-    movement_types::MovementTypes,
     position::BoardPosition,
     tile::{Tile, TileBundle},
 };
