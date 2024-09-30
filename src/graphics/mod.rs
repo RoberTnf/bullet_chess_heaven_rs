@@ -3,7 +3,6 @@ pub mod spritesheet;
 pub mod transforms;
 use bevy::prelude::*;
 
-
 pub struct GraphicsPlugin;
 
 impl Plugin for GraphicsPlugin {

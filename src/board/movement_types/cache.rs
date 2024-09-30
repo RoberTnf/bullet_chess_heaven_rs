@@ -25,7 +25,7 @@ impl PossibleMovesCache {
         possible_moves: HashSet<BoardPosition>,
     ) {
         self.movement_tiles.remove(old_position);
-        self.movement_tiles.insert(position.clone(), possible_moves);
+        self.movement_tiles.insert(*position, possible_moves);
     }
 
     pub fn new() -> Self {

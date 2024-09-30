@@ -6,9 +6,8 @@ use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween, 
 use crate::{
     board::{board_map::BoardMap, position::BoardPosition, tile::Tile},
     globals::{TWEEN_EVENT_MOVE_ANIMATION_FINISHED, TWEEN_MOVE_ANIMATION_DURATION},
-    pieces::creature::{CreatureState},
+    pieces::creature::CreatureState,
 };
-
 
 pub fn update_transforms(
     mut tiles: Query<(&BoardPosition, &mut Transform), With<Tile>>,
@@ -26,15 +25,12 @@ pub fn update_transforms(
     for (creature_pos, mut creature_transform, creature_entity, creature_state) in
         creatures.iter_mut()
     {
-        match creature_state {
-            CreatureState::Initializing => {
-                let pos = board_map.get_world_position(creature_pos);
+        if let CreatureState::Initializing = creature_state {
+            let pos = board_map.get_world_position(creature_pos);
 
-                creature_transform.translation.x = pos.x;
-                creature_transform.translation.y = pos.y;
-                commands.entity(creature_entity).insert(CreatureState::Idle);
-            }
-            _ => {}
+            creature_transform.translation.x = pos.x;
+            creature_transform.translation.y = pos.y;
+            commands.entity(creature_entity).insert(CreatureState::Idle);
         }
     }
 }

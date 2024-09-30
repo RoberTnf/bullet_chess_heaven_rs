@@ -21,7 +21,7 @@ pub fn update_position(
                 .expect("A UpdatePositionEvent was fired without a valid entity");
 
             if event.tile_pos != event.old_tile_pos {
-                board_map.move_entity(piece_pos.clone(), event.tile_pos);
+                board_map.move_entity(*piece_pos, event.tile_pos);
             } else {
                 board_map.add_entity(event.tile_pos, event.piece);
             }
