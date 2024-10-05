@@ -13,7 +13,7 @@
 					"build",
 					"--bin=bullet_chess_heaven_rs",
 					"--package=bullet_chess_heaven_rs",
-					"--features=dev"
+					// "--features=dev"
 				],
 				"filter": {
 					"name": "bullet_chess_heaven_rs",

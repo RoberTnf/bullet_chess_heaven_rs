@@ -12,7 +12,7 @@ pub struct Creature;
 pub enum CreatureState {
     Idle,
     Initializing,
-    Moving,
+    Moving { origin: Vec3, destination: Vec3 },
 }
 
 #[derive(Bundle)]

@@ -3,13 +3,16 @@ use bevy::{prelude::Component, utils::HashSet};
 
 pub mod cache;
 pub mod king;
+pub mod pawn;
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct MovementTypes(pub HashSet<MovementType>);
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum MovementType {
     King,
+    PawnWhite,
+    PawnBlack,
 }
 
 impl MovementTypes {
@@ -24,6 +27,12 @@ impl MovementTypes {
             match movement_type {
                 MovementType::King => {
                     movement_tiles.extend(king::get_movement_tiles(position, board_map));
+                }
+                MovementType::PawnWhite => {
+                    movement_tiles.extend(pawn::get_movement_tiles_white(position, board_map));
+                }
+                MovementType::PawnBlack => {
+                    movement_tiles.extend(pawn::get_movement_tiles_black(position, board_map));
                 }
             }
         }

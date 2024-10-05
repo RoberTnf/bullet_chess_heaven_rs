@@ -1,11 +1,8 @@
-use std::time::Duration;
-
 use bevy::prelude::*;
-use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween, TweenCompleted};
 
 use crate::{
     board::{board_map::BoardMap, position::BoardPosition, tile::Tile},
-    globals::{TWEEN_EVENT_MOVE_ANIMATION_FINISHED, TWEEN_MOVE_ANIMATION_DURATION},
+    globals::TWEEN_MOVE_ANIMATION_SPEED,
     pieces::creature::CreatureState,
 };
 
@@ -36,12 +33,12 @@ pub fn update_transforms(
 }
 
 pub fn animate_transforms(
-    creatures: Query<(&Transform, &CreatureState, &BoardPosition, Entity)>,
+    mut creatures: Query<(&mut Transform, &CreatureState, &BoardPosition, Entity)>,
     board_map: Res<BoardMap>,
     mut commands: Commands,
-    mut events: EventReader<TweenCompleted>,
+    time: Res<Time>,
 ) {
-    for (creature_transform, state, board_position, entity) in creatures.iter() {
+    for (mut creature_transform, state, board_position, entity) in creatures.iter_mut() {
         match state {
             CreatureState::Idle => {
                 let origin = Vec3::new(
@@ -57,29 +54,28 @@ pub fn animate_transforms(
                     continue;
                 }
 
-                debug!("Tweening creature from {:?} to {:?}", origin, destination);
-                let tween = Tween::new(
-                    EaseFunction::SineInOut,
-                    Duration::from_secs_f64(TWEEN_MOVE_ANIMATION_DURATION),
-                    TransformPositionLens {
-                        start: origin,
-                        end: destination,
-                    },
-                )
-                .with_completed_event(TWEEN_EVENT_MOVE_ANIMATION_FINISHED);
-
-                let animator = Animator::new(tween);
-
-                commands.entity(entity).insert(animator);
-                commands.entity(entity).insert(CreatureState::Moving);
+                commands.entity(entity).insert(CreatureState::Moving {
+                    origin,
+                    destination,
+                });
             }
             CreatureState::Initializing => {}
-            CreatureState::Moving => {
-                for ev in events.read() {
-                    debug!("Animation finished for {:?}", ev.entity);
-                    if ev.user_data == TWEEN_EVENT_MOVE_ANIMATION_FINISHED {
-                        commands.entity(entity).insert(CreatureState::Idle);
-                    }
+            CreatureState::Moving {
+                origin,
+                destination,
+            } => {
+                let current_pos = creature_transform.translation;
+                let lerp_value = TWEEN_MOVE_ANIMATION_SPEED * time.delta_seconds();
+                let distance = destination.distance(current_pos);
+                let original_distance = origin.distance(*destination);
+                let left_to_finish = distance / original_distance;
+
+                if left_to_finish <= 0.01 {
+                    commands.entity(entity).insert(CreatureState::Idle);
+                    creature_transform.translation = *destination;
+                } else {
+                    let new_pos = current_pos.lerp(*destination, lerp_value);
+                    creature_transform.translation = new_pos;
                 }
             }
         }

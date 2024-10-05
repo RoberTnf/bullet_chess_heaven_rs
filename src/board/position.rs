@@ -34,6 +34,10 @@ impl BoardPosition {
             y: (y / globals::TILE_SIZE as f32) as i32,
         })
     }
+
+    pub fn distance_squared(&self, other: &BoardPosition) -> i32 {
+        (self.x - other.x).pow(2) + (self.y - other.y).pow(2)
+    }
 }
 
 impl Sub<BoardPosition> for BoardPosition {

@@ -1,5 +1,4 @@
 use bevy::{log::LogPlugin, prelude::*, window::WindowResolution};
-use bevy_tweening::TweeningPlugin;
 use game_state::{GamePauseState, GameState};
 mod board;
 mod events;
@@ -9,7 +8,7 @@ mod graphics;
 mod input;
 mod pieces;
 mod startup;
-
+mod update;
 fn main() {
     App::new()
         .add_plugins(
@@ -36,13 +35,7 @@ fn main() {
                     ..default()
                 }),
         )
-        .add_plugins(TweeningPlugin)
-        .add_plugins((
-            startup::StartupPlugin,
-            board::BoardPlugin,
-            events::EventPlugin,
-            graphics::GraphicsPlugin,
-        ))
+        .add_plugins((startup::StartupPlugin, update::UpdatePlugin))
         .insert_resource(Msaa::Off)
         .enable_state_scoped_entities::<GameState>()
         .enable_state_scoped_entities::<GamePauseState>()

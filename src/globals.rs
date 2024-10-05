@@ -6,5 +6,5 @@ pub const PLAYER_Z_INDEX: f32 = 10.0;
 pub const BOARD_Z_INDEX: f32 = 1.0;
 pub const HIGHLIGHT_Z_INDEX: f32 = 2.0;
 pub const BOARD_SIZE: i32 = 8;
-pub const TWEEN_EVENT_MOVE_ANIMATION_FINISHED: u64 = 1;
-pub const TWEEN_MOVE_ANIMATION_DURATION: f64 = 0.2;
+pub const TWEEN_MOVE_ANIMATION_SPEED: f32 = 10.0;
+pub const PULSE_ANIMATION_SPEED: f32 = 4.0;

@@ -1,11 +1,11 @@
-use bevy::{prelude::*, utils::HashSet};
-pub mod animation;
+use bevy::prelude::*;
+use pawn::get_white_pawn_config;
+
+pub mod movement;
+pub mod pawn;
 
 use crate::{
-    board::{
-        movement_types::{MovementType, MovementTypes},
-        position::BoardPosition,
-    },
+    board::{movement_types::MovementTypes, position::BoardPosition},
     events::update_position::UpdatePositionEvent,
     game_state::GameState,
     globals,
@@ -15,23 +15,27 @@ use crate::{
 use super::creature::{BlocksMovement, Creature, CreatureBundle, CreatureState};
 
 #[derive(Component)]
-pub struct PulseSize {
-    pub start_size: f32,
-    pub final_size: f32,
-    pub progress: f32,
-    pub speed: f32,
-}
+pub struct Enemy;
 
 #[derive(Component)]
-pub struct Player;
+pub enum EnemyType {
+    WhitePawn,
+    BlackPawn,
+}
 
-pub fn spawn_player(
+pub struct PieceConfig {
+    sprite_tile_id: usize,
+    movement_set: MovementTypes,
+}
+
+pub fn spawn_enemy(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
     mut update_position_event: EventWriter<UpdatePositionEvent>,
 ) {
-    let player_start_pos = BoardPosition::new(4, 4);
+    let start_pos = BoardPosition::new(0, 6);
+    let piece_config = get_white_pawn_config();
 
     let entity = commands.spawn((
         CreatureBundle {
@@ -42,27 +46,22 @@ pub fn spawn_player(
             },
             atlas: TextureAtlas {
                 layout: atlas_layout.handle.clone(),
-                index: 0,
+                index: piece_config.sprite_tile_id,
             },
-            movement_types: MovementTypes(HashSet::from([MovementType::King])),
+            movement_types: piece_config.movement_set,
             blocks_movement: BlocksMovement,
             creature: Creature,
-            board_position: player_start_pos,
+            board_position: start_pos,
             creature_state: CreatureState::Initializing,
         },
-        Player,
-        Name::new("Player"),
+        Enemy,
+        Name::new("Enemy"),
         StateScoped(GameState::Game),
-        PulseSize {
-            start_size: 1.0,
-            final_size: 1.1,
-            progress: 0.0,
-            speed: globals::PULSE_ANIMATION_SPEED,
-        },
+        EnemyType::WhitePawn,
     ));
 
     update_position_event.send(UpdatePositionEvent {
-        tile_pos: player_start_pos,
+        tile_pos: start_pos,
         old_tile_pos: BoardPosition::new(-1, -1),
         piece: entity.id(),
     });

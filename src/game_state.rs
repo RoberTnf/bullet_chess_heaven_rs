@@ -11,3 +11,9 @@ pub enum GameState {
     // MainMenu,
     Game,
 }
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States)]
+pub enum TurnState {
+    Player,
+    Enemy,
+}

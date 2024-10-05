@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 
-use crate::board;
-use crate::game_state::{GamePauseState, GameState};
+use crate::board::{self, board_map};
+use crate::events::{click_tile, update_position};
+use crate::game_state::{GamePauseState, GameState, TurnState};
+use crate::graphics::{camera, spritesheet};
 use crate::pieces;
 
 pub struct StartupPlugin;
@@ -10,10 +12,20 @@ impl Plugin for StartupPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Startup,
-            (board::tile::spawn_board, pieces::player::spawn_player),
+            (
+                board::tile::spawn_board,
+                pieces::player::spawn_player,
+                pieces::enemies::spawn_enemy,
+                board::tile::spawn_board,
+                camera::setup_camera,
+            ),
         )
-        .add_systems(Startup, board::tile::spawn_board)
         .insert_state(GamePauseState::Play)
-        .insert_state(GameState::Game);
+        .insert_state(GameState::Game)
+        .insert_state(TurnState::Player)
+        .init_resource::<spritesheet::SpriteSheetAtlas>()
+        .insert_resource(board_map::BoardMap::new())
+        .add_event::<click_tile::TileClickedEvent>()
+        .add_event::<update_position::UpdatePositionEvent>();
     }
 }

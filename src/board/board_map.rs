@@ -1,6 +1,9 @@
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{
+    prelude::*,
+    utils::{HashMap, HashSet},
+};
 
-use crate::{events::update_pos::UpdatePositionEvent, globals, pieces::creature::BlocksMovement};
+use crate::{globals, pieces::creature::BlocksMovement};
 
 use super::{
     movement_types::{cache::PossibleMovesCache, MovementTypes},
@@ -53,6 +56,26 @@ impl BoardMap {
             (pos.y as f32 + 0.5) * globals::TILE_SIZE as f32,
         )
     }
+
+    pub fn get_possible_moves(
+        &mut self,
+        entity: &Entity,
+        movement_types: &MovementTypes,
+        pos: &BoardPosition,
+    ) -> HashSet<BoardPosition> {
+        if let None = self.possible_moves_cache.get_movement_tiles(entity) {
+            let possible_moves = movement_types.get_movement_tiles(pos, self);
+            self.possible_moves_cache
+                .add_entity(entity, possible_moves.clone());
+        }
+        self.possible_moves_cache
+            .get_movement_tiles(entity)
+            .unwrap()
+    }
+
+    pub fn refresh_cache(&mut self) {
+        self.possible_moves_cache.refresh_cache();
+    }
 }
 
 pub fn register_new_movement_blockers(
@@ -61,24 +84,6 @@ pub fn register_new_movement_blockers(
 ) {
     for (position, entity) in new_creatures.iter() {
         board_map.add_entity(BoardPosition::new(position.x, position.y), entity);
-    }
-}
-
-pub fn update_cache_on_move(
-    mut board_map: ResMut<BoardMap>,
-    creatures: Query<(&BoardPosition, &MovementTypes, &Name)>,
-    mut update_position_event: EventReader<UpdatePositionEvent>,
-) {
-    for event in update_position_event.read() {
-        let (creature_pos, movement_types, name) =
-            creatures.get(event.piece).expect("Invalid entity");
-        debug!("Updating cache on for {name} at {:?}", creature_pos);
-        let possible_moves = movement_types.get_movement_tiles(creature_pos, &board_map);
-        board_map.possible_moves_cache.update_movement_tiles(
-            &event.tile_pos,
-            &event.old_tile_pos,
-            possible_moves,
-        );
     }
 }
 
