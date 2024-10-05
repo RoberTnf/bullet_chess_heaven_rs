@@ -12,11 +12,7 @@ pub struct PossibleMovesCache {
 
 impl PossibleMovesCache {
     pub fn get_movement_tiles(&self, entity: &Entity) -> Option<HashSet<BoardPosition>> {
-        if let Some(entity) = self.movement_tiles.get(entity) {
-            Some(entity.clone())
-        } else {
-            None
-        }
+        self.movement_tiles.get(entity).cloned()
     }
 
     pub fn refresh_cache(&mut self) {

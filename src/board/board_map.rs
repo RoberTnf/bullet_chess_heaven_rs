@@ -63,7 +63,11 @@ impl BoardMap {
         movement_types: &MovementTypes,
         pos: &BoardPosition,
     ) -> HashSet<BoardPosition> {
-        if let None = self.possible_moves_cache.get_movement_tiles(entity) {
+        if self
+            .possible_moves_cache
+            .get_movement_tiles(entity)
+            .is_none()
+        {
             let possible_moves = movement_types.get_movement_tiles(pos, self);
             self.possible_moves_cache
                 .add_entity(entity, possible_moves.clone());
