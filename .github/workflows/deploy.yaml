@@ -54,6 +54,12 @@ jobs:
           name: wasm
           retention-days: 1
 
+      - name: Prepare artifact for github pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: wasm-gh-pages
+          path: ./wasm
+
       - name: Upload binaries to release
         if: ${{ env.add_binaries_to_github_release == 'true' }}
         uses: svenstaro/upload-release-action@v2
@@ -63,6 +69,11 @@ jobs:
           asset_name: ${{ env.binary }}-wasm-${{ steps.get_version.outputs.tag }}.zip
           tag: ${{ github.ref }}
           overwrite: true
+
+      - name: Upload to github pages
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: wasm-gh-pages
 
   # Build for Linux
   release-linux:
