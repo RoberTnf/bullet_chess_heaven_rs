@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::hashbrown::HashSet};
 
 use crate::{
     board::{board_map::BoardMap, movement_types::MovementTypes, position::BoardPosition},
@@ -24,11 +24,10 @@ pub fn tile_clicked(
         player.get_single_mut().expect("0 or 2+ players");
 
     for event in events.read() {
-        let movement_tiles = board_map
-            .get_possible_moves(&entity, movement_types, board_position)
-            .movement_tiles;
+        let possible_moves = board_map.get_possible_moves(&entity, movement_types, board_position);
+        let moves = possible_moves.movement_tiles;
 
-        if movement_tiles.contains(&event.tile_pos) {
+        if moves.contains(&event.tile_pos) {
             events_writer.send(UpdatePositionEvent {
                 tile_pos: event.tile_pos,
                 old_tile_pos: *board_position,

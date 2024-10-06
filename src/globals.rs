@@ -27,3 +27,7 @@ pub const PLAYER_DAMAGE: u64 = 1; // Damage of the player
 // Enemy settings
 pub const PAWN_HEALTH: u64 = 2; // Health of the enemy
 pub const PAWN_DAMAGE: u64 = 1; // Damage of the enemy
+
+// Spritesheet settings
+pub const HIGHLIGHT_ATLAS_INDEX: usize = 3; // Index of the highlight sprite in the spritesheet
+pub const HIGHLIGHT_ATTACK_ATLAS_INDEX: usize = 6; // Index of the highlight attack sprite in the spritesheet

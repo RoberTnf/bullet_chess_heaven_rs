@@ -10,6 +10,7 @@ pub fn get_movement_tiles_white(
 ) -> MovementTypesResponse {
     let directions: Vec<(i32, i32)> = vec![(0, 1)];
 
+    // TODO: fix pawn attack tiles
     from_directions_short(directions, position, board_map, MovementType::PawnWhite)
 }
 

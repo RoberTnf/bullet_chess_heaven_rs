@@ -16,56 +16,100 @@ use super::{
 };
 
 #[derive(Component)]
-pub struct Highlight;
+pub enum Highlight {
+    Movement,
+    Attack,
+}
 
 pub fn highlight_player_movable_positions(
     mut commands: Commands,
-    mut board_map: ResMut<BoardMap>, // Changed to ResMut to follow Bevy's system requirements
-    player_position: Query<(Entity, &BoardPosition, &MovementTypes), With<Player>>,
+    mut board_map: ResMut<BoardMap>,
+    player_query: Query<(Entity, &BoardPosition, &MovementTypes), With<Player>>,
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
-    query_highlights: Query<(Entity, &BoardPosition), With<Highlight>>, // Query to find existing highlights
-    mut update_position_event: EventReader<UpdatePositionEvent>,
+    highlight_query: Query<(Entity, &BoardPosition, &Highlight)>,
+    mut update_position_events: EventReader<UpdatePositionEvent>,
 ) {
-    let (player_entity, pos, movement_types) =
-        player_position.get_single().expect("0 or 2+ players");
+    let (player_entity, player_pos, movement_types) = player_query.single();
 
-    for event in update_position_event.read() {
-        debug!("Updating highlights for player at {:?}", event.tile_pos);
-        let player_movable_positions = board_map
-            .get_possible_moves(&player_entity, movement_types, pos)
-            .movement_tiles;
-        let old_highlight_positions: HashSet<BoardPosition> =
-            query_highlights.iter().map(|(_, pos)| *pos).collect();
+    for _ in update_position_events.read() {
+        let possible_moves =
+            board_map.get_possible_moves(&player_entity, movement_types, player_pos);
+        let moves: HashSet<_> = possible_moves.movement_tiles.into_iter().collect();
+        let attacks: HashSet<_> = possible_moves
+            .attack_tiles
+            .into_iter()
+            .map(|(pos, _)| pos.0)
+            .collect();
 
-        // Despawn old highlights that are not in the new ones
-        for (entity, pos) in query_highlights.iter() {
-            if !player_movable_positions.contains(pos) {
+        // Remove old highlights and collect current positions
+        let mut current_highlights = HashSet::new();
+        for (entity, pos, highlight) in highlight_query.iter() {
+            let should_keep = match highlight {
+                Highlight::Attack => attacks.contains(pos),
+                Highlight::Movement => moves.contains(pos),
+            };
+
+            if should_keep {
+                current_highlights.insert(*pos);
+            } else {
                 commands.entity(entity).despawn_recursive();
             }
         }
 
-        // Spawn new highlights that are not in the old ones
-        for pos in player_movable_positions.difference(&old_highlight_positions) {
-            commands.spawn((
-                Name::new(format!("Highlight ({}, {})", pos.x, pos.y)),
-                StateScoped(GameState::Game),
-                StateScoped(GamePauseState::Play),
-                TileBundle {
-                    sprite: SpriteBundle {
-                        texture: asset_server.load("custom/spritesheet.png"),
-                        transform: Transform::from_xyz(0.0, 0.0, globals::HIGHLIGHT_Z_INDEX),
-                        ..default()
-                    },
-                    atlas: TextureAtlas {
-                        layout: atlas_layout.handle.clone(),
-                        index: 3,
-                    },
-                    tile: Tile,
-                },
-                *pos,
-                Highlight,
-            ));
+        // Spawn new highlights
+        for pos in moves.union(&attacks) {
+            if !current_highlights.contains(pos) {
+                spawn_highlight(
+                    &mut commands,
+                    &asset_server,
+                    &atlas_layout,
+                    pos,
+                    attacks.contains(pos),
+                );
+            }
         }
     }
+}
+
+fn spawn_highlight(
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    atlas_layout: &Res<SpriteSheetAtlas>,
+    pos: &BoardPosition,
+    is_attack: bool,
+) {
+    let (name, index, component) = if is_attack {
+        (
+            format!("Highlight Attack({}, {})", pos.x, pos.y),
+            globals::HIGHLIGHT_ATTACK_ATLAS_INDEX,
+            Highlight::Attack,
+        )
+    } else {
+        (
+            format!("Highlight ({}, {})", pos.x, pos.y),
+            globals::HIGHLIGHT_ATLAS_INDEX,
+            Highlight::Movement,
+        )
+    };
+
+    commands.spawn((
+        Name::new(name),
+        StateScoped(GameState::Game),
+        StateScoped(GamePauseState::Play),
+        TileBundle {
+            sprite: SpriteBundle {
+                texture: asset_server.load("custom/spritesheet.png"),
+                transform: Transform::from_xyz(0.0, 0.0, globals::HIGHLIGHT_Z_INDEX),
+                ..default()
+            },
+            atlas: TextureAtlas {
+                layout: atlas_layout.handle.clone(),
+                index,
+            },
+            tile: Tile,
+        },
+        *pos,
+        component,
+    ));
 }
