@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::board::{self, board_map};
-use crate::events::{click_tile, update_position};
+use crate::events::{attack, click_tile, update_position};
 use crate::game_state::{GamePauseState, GameState, TurnState};
 use crate::graphics::{camera, spritesheet};
 use crate::pieces;
@@ -27,6 +27,7 @@ impl Plugin for StartupPlugin {
         .insert_resource(board_map::BoardMap::new())
         .insert_resource(ClearColor(Color::srgb(0.063, 0.063, 0.082)))
         .add_event::<click_tile::TileClickedEvent>()
-        .add_event::<update_position::UpdatePositionEvent>();
+        .add_event::<update_position::UpdatePositionEvent>()
+        .add_event::<attack::AttackEvent>();
     }
 }

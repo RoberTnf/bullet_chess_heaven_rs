@@ -18,10 +18,12 @@ pub enum MovementType {
     PawnBlack,
 }
 
+pub type AttackTiles = HashMap<(BoardPosition, MovementType), Entity>;
+
 #[derive(Debug, Clone)]
 pub struct MovementTypesResponse {
     pub movement_tiles: HashSet<BoardPosition>,
-    pub attack_tiles: HashMap<(BoardPosition, MovementType), Entity>,
+    pub attack_tiles: AttackTiles,
 }
 
 impl MovementTypes {
