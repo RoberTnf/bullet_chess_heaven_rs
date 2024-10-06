@@ -1,4 +1,4 @@
-# Dragonfly Business Source License 1.1
+# Business Source License 1.1
 
 <u>License</u>: Business Source License 1.1 [BSL 1.1](https://spdx.org/licenses/BUSL-1.1.html)
 
