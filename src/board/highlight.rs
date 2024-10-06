@@ -32,8 +32,9 @@ pub fn highlight_player_movable_positions(
 
     for event in update_position_event.read() {
         debug!("Updating highlights for player at {:?}", event.tile_pos);
-        let player_movable_positions =
-            board_map.get_possible_moves(&player_entity, movement_types, pos);
+        let player_movable_positions = board_map
+            .get_possible_moves(&player_entity, movement_types, pos)
+            .movement_tiles;
         let old_highlight_positions: HashSet<BoardPosition> =
             query_highlights.iter().map(|(_, pos)| *pos).collect();
 

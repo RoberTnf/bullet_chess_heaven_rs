@@ -2,6 +2,8 @@ use bevy::prelude::*;
 
 use crate::board::{movement_types::MovementTypes, position::BoardPosition};
 
+use super::{damage::Damage, health::Health};
+
 #[derive(Component, Default)]
 pub struct BlocksMovement;
 
@@ -24,4 +26,6 @@ pub struct CreatureBundle {
     pub movement_types: MovementTypes,
     pub board_position: BoardPosition,
     pub creature_state: CreatureState,
+    pub health: Health,
+    pub damage: Damage,
 }

@@ -6,7 +6,7 @@ use bevy::{
 use crate::{globals, pieces::creature::BlocksMovement};
 
 use super::{
-    movement_types::{cache::PossibleMovesCache, MovementTypes},
+    movement_types::{cache::PossibleMovesCache, MovementTypes, MovementTypesResponse},
     position::BoardPosition,
 };
 
@@ -62,10 +62,10 @@ impl BoardMap {
         entity: &Entity,
         movement_types: &MovementTypes,
         pos: &BoardPosition,
-    ) -> HashSet<BoardPosition> {
+    ) -> MovementTypesResponse {
         if self
             .possible_moves_cache
-            .get_movement_tiles(entity)
+            .get_movement_tiles(*entity)
             .is_none()
         {
             let possible_moves = movement_types.get_movement_tiles(pos, self);
@@ -73,7 +73,7 @@ impl BoardMap {
                 .add_entity(entity, possible_moves.clone());
         }
         self.possible_moves_cache
-            .get_movement_tiles(entity)
+            .get_movement_tiles(*entity)
             .unwrap()
     }
 

@@ -22,6 +22,7 @@ pub fn enemy_movement(
         let player_position = player.get_single().expect("0 or 2+ player found");
 
         let closest_move = possible_moves
+            .movement_tiles
             .iter()
             .min_by_key(|pos| pos.distance_squared(player_position));
 

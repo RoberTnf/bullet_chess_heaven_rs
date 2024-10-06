@@ -1,25 +1,22 @@
-use bevy::{
-    prelude::*,
-    utils::{HashMap, HashSet},
-};
+use bevy::{prelude::*, utils::HashMap};
 
-use crate::board::position::BoardPosition;
+use super::MovementTypesResponse;
 
 #[derive(Resource, Debug)]
 pub struct PossibleMovesCache {
-    pub movement_tiles: HashMap<Entity, HashSet<BoardPosition>>,
+    pub movement_tiles: HashMap<Entity, MovementTypesResponse>,
 }
 
 impl PossibleMovesCache {
-    pub fn get_movement_tiles(&self, entity: &Entity) -> Option<HashSet<BoardPosition>> {
-        self.movement_tiles.get(entity).cloned()
+    pub fn get_movement_tiles(&self, entity: Entity) -> Option<MovementTypesResponse> {
+        self.movement_tiles.get(&entity).cloned()
     }
 
     pub fn refresh_cache(&mut self) {
         self.movement_tiles.clear();
     }
 
-    pub fn add_entity(&mut self, entity: &Entity, possible_moves: HashSet<BoardPosition>) {
+    pub fn add_entity(&mut self, entity: &Entity, possible_moves: MovementTypesResponse) {
         self.movement_tiles.insert(*entity, possible_moves);
     }
 

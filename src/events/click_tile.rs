@@ -24,7 +24,9 @@ pub fn tile_clicked(
         player.get_single_mut().expect("0 or 2+ players");
 
     for event in events.read() {
-        let movement_tiles = board_map.get_possible_moves(&entity, movement_types, board_position);
+        let movement_tiles = board_map
+            .get_possible_moves(&entity, movement_types, board_position)
+            .movement_tiles;
 
         if movement_tiles.contains(&event.tile_pos) {
             events_writer.send(UpdatePositionEvent {

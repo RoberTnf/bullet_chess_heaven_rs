@@ -12,7 +12,11 @@ use crate::{
     graphics::spritesheet::SpriteSheetAtlas,
 };
 
-use super::creature::{BlocksMovement, Creature, CreatureBundle, CreatureState};
+use super::{
+    creature::{BlocksMovement, Creature, CreatureBundle, CreatureState},
+    damage::Damage,
+    health::Health,
+};
 
 #[derive(Component)]
 pub struct Enemy;
@@ -53,6 +57,8 @@ pub fn spawn_enemy(
             creature: Creature,
             board_position: start_pos,
             creature_state: CreatureState::Initializing,
+            health: Health::new(globals::PAWN_HEALTH),
+            damage: Damage::new(globals::PAWN_DAMAGE),
         },
         Enemy,
         Name::new("Enemy"),

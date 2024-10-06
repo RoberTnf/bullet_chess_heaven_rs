@@ -12,7 +12,11 @@ use crate::{
     graphics::spritesheet::SpriteSheetAtlas,
 };
 
-use super::creature::{BlocksMovement, Creature, CreatureBundle, CreatureState};
+use super::{
+    creature::{BlocksMovement, Creature, CreatureBundle, CreatureState},
+    damage::Damage,
+    health::Health,
+};
 
 #[derive(Component)]
 pub struct PulseSize {
@@ -49,6 +53,8 @@ pub fn spawn_player(
             creature: Creature,
             board_position: player_start_pos,
             creature_state: CreatureState::Initializing,
+            health: Health::new(globals::PLAYER_HEALTH),
+            damage: Damage::new(globals::PLAYER_DAMAGE),
         },
         Player,
         Name::new("Player"),
