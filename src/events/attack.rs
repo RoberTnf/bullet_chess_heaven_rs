@@ -27,6 +27,7 @@ pub fn attack_system(
         for ((_pos, movement_type), attacked_entity) in attack_tiles.iter() {
             let (mut health, name) = health_query.get_mut(*attacked_entity).unwrap();
             health.take_damage(damage.value);
+            // TODO: Add attack animation
             debug!(
                 "Attacking entity {:?} with movement type {:?}, damage {:?}, health left {:?}",
                 name, movement_type, damage.value, health.value

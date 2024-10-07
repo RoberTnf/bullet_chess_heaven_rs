@@ -8,7 +8,7 @@ pub mod cache;
 pub mod king;
 pub mod pawn;
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct MovementTypes(pub HashSet<MovementType>);
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]

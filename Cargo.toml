@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 bevy = { version = "0.14.2" }
 bevy_pixel_camera = "0.13.0"
+rand = "0.8.5"
 
 
 # Enable more optimization in the release profile at the cost of compile time.

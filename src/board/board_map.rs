@@ -2,11 +2,21 @@ use bevy::{
     prelude::*,
     utils::{HashMap, HashSet},
 };
+use rand::Rng;
 
-use crate::{globals, pieces::creature::BlocksMovement};
+use crate::{
+    globals,
+    pieces::{
+        creature::{BlocksMovement, CreatureState},
+        health::DeathAnimation,
+    },
+};
 
 use super::{
-    movement_types::{cache::PossibleMovesCache, MovementTypes, MovementTypesResponse},
+    movement_types::{
+        cache::{PossibleMovesCache, RefreshCacheEvent},
+        MovementTypes, MovementTypesResponse,
+    },
     position::BoardPosition,
 };
 
@@ -29,11 +39,19 @@ impl BoardMap {
     }
 
     pub fn remove_entity(&mut self, pos: BoardPosition) -> Option<Entity> {
-        self.creatures.remove(&pos)
+        if let Some(entity) = self.creatures.remove(&pos) {
+            debug!("Removing entity at {:?} from board map", pos);
+            Some(entity)
+        } else {
+            None
+        }
     }
 
     pub fn add_entity(&mut self, pos: BoardPosition, entity: Entity) {
-        self.creatures.insert(pos, entity);
+        if !self.creatures.contains_key(&pos) {
+            debug!("Adding entity {:?} to board map at {:?}", entity, pos);
+            self.creatures.insert(pos, entity);
+        }
     }
 
     pub fn new() -> Self {
@@ -44,6 +62,8 @@ impl BoardMap {
     }
 
     pub fn move_entity(&mut self, old_pos: BoardPosition, new_pos: BoardPosition) {
+        debug!("Moving entity from {:?} to {:?}", old_pos, new_pos);
+        debug!("Board map: {:?}", self.creatures);
         let entity = self
             .remove_entity(old_pos)
             .expect("Move Entity: Entity not found");
@@ -55,6 +75,21 @@ impl BoardMap {
             (pos.x as f32 + 0.5) * globals::TILE_SIZE as f32,
             (pos.y as f32 + 0.5) * globals::TILE_SIZE as f32,
         )
+    }
+
+    pub fn get_n_random_empty_tiles(&self, n: usize) -> Vec<BoardPosition> {
+        let mut empty_tiles = Vec::new();
+        let mut rng = rand::thread_rng();
+
+        while empty_tiles.len() < n {
+            let x = rng.gen_range(0..globals::BOARD_SIZE);
+            let y = rng.gen_range(0..globals::BOARD_SIZE);
+            let pos = BoardPosition::new(x, y);
+            if self.is_movable(pos) {
+                empty_tiles.push(pos);
+            }
+        }
+        empty_tiles
     }
 
     pub fn get_possible_moves(
@@ -77,17 +112,34 @@ impl BoardMap {
             .unwrap()
     }
 
-    pub fn refresh_cache(&mut self) {
+    pub fn refresh_cache(&mut self, event_writer: &mut EventWriter<RefreshCacheEvent>) {
+        debug!("Refreshing cache");
         self.possible_moves_cache.refresh_cache();
+        event_writer.send(RefreshCacheEvent);
     }
 }
 
 pub fn register_new_movement_blockers(
     mut board_map: ResMut<BoardMap>,
-    new_creatures: Query<(&BoardPosition, Entity), With<BlocksMovement>>,
+    creatures: Query<
+        (&BoardPosition, Entity, &CreatureState),
+        (With<BlocksMovement>, Without<DeathAnimation>),
+    >,
 ) {
-    for (position, entity) in new_creatures.iter() {
-        board_map.add_entity(BoardPosition::new(position.x, position.y), entity);
+    for (position, entity, creature_state) in creatures.iter() {
+        if let CreatureState::Initializing = creature_state {
+            // Check if the entity is already present in the board map
+            board_map.add_entity(BoardPosition::new(position.x, position.y), entity);
+        }
+    }
+}
+
+pub fn remove_dead_entities(
+    mut board_map: ResMut<BoardMap>,
+    dead_entities: Query<&BoardPosition, With<DeathAnimation>>,
+) {
+    for position in dead_entities.iter() {
+        board_map.remove_entity(*position);
     }
 }
 
@@ -101,7 +153,7 @@ mod tests {
             position::BoardPosition,
         },
         globals,
-        pieces::creature::BlocksMovement,
+        pieces::creature::{BlocksMovement, CreatureState},
     };
 
     #[test]
@@ -158,8 +210,20 @@ mod tests {
 
         let world = app.world_mut();
 
-        let entity1 = world.spawn((BoardPosition::new(1, 1), BlocksMovement)).id();
-        let entity2 = world.spawn((BoardPosition::new(2, 2), BlocksMovement)).id();
+        let entity1 = world
+            .spawn((
+                BoardPosition::new(1, 1),
+                BlocksMovement,
+                CreatureState::Initializing,
+            ))
+            .id();
+        let entity2 = world
+            .spawn((
+                BoardPosition::new(2, 2),
+                BlocksMovement,
+                CreatureState::Initializing,
+            ))
+            .id();
 
         app.update();
 

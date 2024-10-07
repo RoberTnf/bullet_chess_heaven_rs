@@ -1,17 +1,15 @@
 use bevy::prelude::*;
 
 use crate::{
-    board::{board_map, highlight},
-    events::{
-        attack, click_tile,
-        update_position::{self, UpdatePositionEvent},
-    },
+    board::{board_map, highlight, movement_types::cache::RefreshCacheEvent},
+    events::{attack, click_tile, update_position},
     game_state::{GamePauseState, GameState, TurnState},
     graphics::transforms,
     input::player_movement,
     pieces::{
+        self,
         enemies::{movement, pawn},
-        health,
+        health::{self},
         player::animation,
     },
 };
@@ -34,13 +32,11 @@ impl Plugin for UpdatePlugin {
                 Update,
                 (
                     // Board management
-                    board_map::register_new_movement_blockers,
+                    board_map::register_new_movement_blockers.after(pieces::enemies::spawn_enemies),
+                    board_map::remove_dead_entities,
                     // Position updates and highlighting
-                    // TODO: Remove caching as a system,
-                    // Instead, have a resource CacheStatus and make it dirty on each move
-                    // whenever we need a piece possible moves, check the cache status
-                    (highlight::highlight_player_movable_positions,)
-                        .run_if(on_event::<UpdatePositionEvent>())
+                    highlight::highlight_player_movable_positions
+                        .run_if(on_event::<RefreshCacheEvent>())
                         .after(update_position::update_position),
                     // Transform updates
                     transforms::update_transforms
@@ -49,6 +45,8 @@ impl Plugin for UpdatePlugin {
                     (player_movement::mouse_input, click_tile::tile_clicked)
                         .chain()
                         .run_if(in_state(TurnState::Player)),
+                    // Spawn enmies (environment turn)
+                    pieces::enemies::spawn_enemies.run_if(in_state(TurnState::Environment)),
                     // Enemy movement (only during enemy's turn)
                     movement::enemy_movement.run_if(in_state(TurnState::Enemy)),
                     // Position update (after player input and enemy movement)
@@ -61,8 +59,12 @@ impl Plugin for UpdatePlugin {
                         .after(movement::enemy_movement),
                     // Pawn promotion
                     pawn::promote_pawn.after(update_position::update_position),
-                    // Health system
+                    // Health systems
+                    health::animate_health_change,
+                    health::health_change_text_animation,
+                    // death systems
                     health::death_system.after(update_position::update_position),
+                    health::death_animation,
                 )
                     .run_if(in_state(GameState::Game))
                     .run_if(in_state(GamePauseState::Play)),

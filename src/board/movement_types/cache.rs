@@ -2,6 +2,9 @@ use bevy::{prelude::*, utils::HashMap};
 
 use super::MovementTypesResponse;
 
+#[derive(Event)]
+pub struct RefreshCacheEvent;
+
 #[derive(Resource, Debug)]
 pub struct PossibleMovesCache {
     pub movement_tiles: HashMap<Entity, MovementTypesResponse>,

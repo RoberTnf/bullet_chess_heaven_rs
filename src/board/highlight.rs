@@ -28,46 +28,43 @@ pub fn highlight_player_movable_positions(
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
     highlight_query: Query<(Entity, &BoardPosition, &Highlight)>,
-    mut update_position_events: EventReader<UpdatePositionEvent>,
 ) {
+    debug!("Highlighting player positions");
     let (player_entity, player_pos, movement_types) = player_query.single();
 
-    for _ in update_position_events.read() {
-        let possible_moves =
-            board_map.get_possible_moves(&player_entity, movement_types, player_pos);
-        let moves: HashSet<_> = possible_moves.movement_tiles.into_iter().collect();
-        let attacks: HashSet<_> = possible_moves
-            .attack_tiles
-            .into_iter()
-            .map(|(pos, _)| pos.0)
-            .collect();
+    let possible_moves = board_map.get_possible_moves(&player_entity, movement_types, player_pos);
+    let moves: HashSet<_> = possible_moves.movement_tiles.into_iter().collect();
+    let attacks: HashSet<_> = possible_moves
+        .attack_tiles
+        .into_iter()
+        .map(|(pos, _)| pos.0)
+        .collect();
 
-        // Remove old highlights and collect current positions
-        let mut current_highlights = HashSet::new();
-        for (entity, pos, highlight) in highlight_query.iter() {
-            let should_keep = match highlight {
-                Highlight::Attack => attacks.contains(pos),
-                Highlight::Movement => moves.contains(pos),
-            };
+    // Remove old highlights and collect current positions
+    let mut current_highlights = HashSet::new();
+    for (entity, pos, highlight) in highlight_query.iter() {
+        let should_keep = match highlight {
+            Highlight::Attack => attacks.contains(pos),
+            Highlight::Movement => moves.contains(pos),
+        };
 
-            if should_keep {
-                current_highlights.insert(*pos);
-            } else {
-                commands.entity(entity).despawn_recursive();
-            }
+        if should_keep {
+            current_highlights.insert(*pos);
+        } else {
+            commands.entity(entity).despawn_recursive();
         }
+    }
 
-        // Spawn new highlights
-        for pos in moves.union(&attacks) {
-            if !current_highlights.contains(pos) {
-                spawn_highlight(
-                    &mut commands,
-                    &asset_server,
-                    &atlas_layout,
-                    pos,
-                    attacks.contains(pos),
-                );
-            }
+    // Spawn new highlights
+    for pos in moves.union(&attacks) {
+        if !current_highlights.contains(pos) {
+            spawn_highlight(
+                &mut commands,
+                &asset_server,
+                &atlas_layout,
+                pos,
+                attacks.contains(pos),
+            );
         }
     }
 }

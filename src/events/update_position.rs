@@ -1,8 +1,10 @@
 use bevy::prelude::*;
 
-use crate::board::{board_map::BoardMap, position::BoardPosition};
+use crate::board::{
+    board_map::BoardMap, movement_types::cache::RefreshCacheEvent, position::BoardPosition,
+};
 
-#[derive(Event)]
+#[derive(Debug, Event)]
 pub struct UpdatePositionEvent {
     pub tile_pos: BoardPosition,
     pub old_tile_pos: BoardPosition,
@@ -13,8 +15,10 @@ pub fn update_position(
     mut events: EventReader<UpdatePositionEvent>,
     mut board_positions: Query<&mut BoardPosition>,
     mut board_map: ResMut<BoardMap>,
+    mut event_writer: EventWriter<RefreshCacheEvent>,
 ) {
     for event in events.read() {
+        debug!("Updating position for event {:?}", event);
         if event.tile_pos == event.old_tile_pos {
             panic!("UpdatePositionEvent was fired with the same tile_pos and old_tile_pos");
         }
@@ -31,7 +35,7 @@ pub fn update_position(
                 board_map.move_entity(*piece_pos, event.tile_pos);
             }
             piece_pos.update(event.tile_pos.x, event.tile_pos.y);
-            board_map.refresh_cache();
+            board_map.refresh_cache(&mut event_writer);
             debug!("Updated position for {:?}", event.piece);
         }
     }

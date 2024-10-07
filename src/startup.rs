@@ -15,9 +15,12 @@ impl Plugin for StartupPlugin {
             (
                 board::tile::spawn_board,
                 pieces::player::spawn_player,
-                pieces::enemies::spawn_enemy,
+                pieces::enemies::spawn_enemies,
                 board::tile::spawn_board,
                 camera::setup_camera,
+                board::highlight::highlight_player_movable_positions
+                    .after(pieces::player::spawn_player)
+                    .after(pieces::enemies::spawn_enemies),
             ),
         )
         .insert_state(GamePauseState::Play)
@@ -28,6 +31,8 @@ impl Plugin for StartupPlugin {
         .insert_resource(ClearColor(Color::srgb(0.063, 0.063, 0.082)))
         .add_event::<click_tile::TileClickedEvent>()
         .add_event::<update_position::UpdatePositionEvent>()
-        .add_event::<attack::AttackEvent>();
+        .add_event::<attack::AttackEvent>()
+        .add_event::<pieces::health::DeathEvent>()
+        .add_event::<board::movement_types::cache::RefreshCacheEvent>();
     }
 }

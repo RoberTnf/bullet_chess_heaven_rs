@@ -4,19 +4,23 @@ use crate::{
     board::{board_map::BoardMap, movement_types::MovementTypes, position::BoardPosition},
     events::update_position::UpdatePositionEvent,
     game_state::TurnState,
-    pieces::player::Player,
+    pieces::{health::DeathAnimation, player::Player},
 };
 
 use super::Enemy;
 
 pub fn enemy_movement(
     mut board_map: ResMut<BoardMap>,
-    enemies: Query<(&BoardPosition, Entity, &MovementTypes), With<Enemy>>,
+    enemies: Query<
+        (&BoardPosition, Entity, &MovementTypes),
+        (With<Enemy>, Without<DeathAnimation>),
+    >,
     player: Query<&BoardPosition, With<Player>>,
     mut event_writer: EventWriter<UpdatePositionEvent>,
     mut turn_state: ResMut<NextState<TurnState>>,
 ) {
     for (enemy_position, entity, movement_types) in &enemies {
+        debug!("Enemy movement: {:?}", entity);
         let possible_moves = board_map.get_possible_moves(&entity, movement_types, enemy_position);
 
         let player_position = player.get_single().expect("0 or 2+ player found");
@@ -37,5 +41,5 @@ pub fn enemy_movement(
         debug!("Enemy moved to {:?}", closest_move);
     }
 
-    turn_state.set(TurnState::Player);
+    turn_state.set(TurnState::Environment);
 }
