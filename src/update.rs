@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     board::{board_map, highlight},
     events::{
-        click_tile,
+        attack, click_tile,
         update_position::{self, UpdatePositionEvent},
     },
     game_state::{GamePauseState, GameState, TurnState},
@@ -11,6 +11,7 @@ use crate::{
     input::player_movement,
     pieces::{
         enemies::{movement, pawn},
+        health,
         player::animation,
     },
 };
@@ -54,8 +55,14 @@ impl Plugin for UpdatePlugin {
                     update_position::update_position
                         .after(click_tile::tile_clicked)
                         .after(movement::enemy_movement),
+                    // Attack system
+                    attack::attack_system
+                        .after(click_tile::tile_clicked)
+                        .after(movement::enemy_movement),
                     // Pawn promotion
                     pawn::promote_pawn.after(update_position::update_position),
+                    // Health system
+                    health::death_system.after(update_position::update_position),
                 )
                     .run_if(in_state(GameState::Game))
                     .run_if(in_state(GamePauseState::Play)),

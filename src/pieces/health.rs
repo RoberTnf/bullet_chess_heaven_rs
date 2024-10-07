@@ -5,6 +5,11 @@ pub struct Health {
     pub value: u64,
 }
 
+#[derive(Event)]
+pub struct DeathEvent {
+    pub entity: Entity,
+}
+
 impl Health {
     pub fn new(value: u64) -> Self {
         Health { value }
@@ -24,5 +29,18 @@ impl Health {
 
     pub fn set_health(&mut self, value: u64) {
         self.value = value;
+    }
+}
+
+pub fn death_system(
+    health_query: Query<(&Health, Entity)>,
+    mut commands: Commands,
+    mut death_event_writer: EventWriter<DeathEvent>,
+) {
+    for (health, entity) in health_query.iter() {
+        if health.is_dead() {
+            commands.entity(entity).despawn_recursive();
+            death_event_writer.send(DeathEvent { entity });
+        }
     }
 }
