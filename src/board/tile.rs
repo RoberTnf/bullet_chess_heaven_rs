@@ -24,7 +24,7 @@ pub fn spawn_board(
         for y in 0..globals::BOARD_SIZE {
             let tile_position = BoardPosition::new(x, y);
             let global_position = tile_position
-                .to_global_position()
+                .as_global_position()
                 .extend(globals::BOARD_Z_INDEX);
             commands.spawn((
                 Name::new(format!("Tile ({}, {})", x, y)),

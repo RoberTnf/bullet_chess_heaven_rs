@@ -30,7 +30,7 @@ pub fn spawn_player(
 ) {
     let tile_pos = BoardPosition::new(4, 4);
     let global_position = tile_pos
-        .to_global_position()
+        .as_global_position()
         .extend(globals::PLAYER_Z_INDEX);
 
     commands.spawn((

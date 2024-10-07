@@ -36,7 +36,7 @@ impl BoardPosition {
     }
 
     // gives you the TOP LEFT of the tile
-    pub fn to_global_position(&self) -> Vec2 {
+    pub fn as_global_position(&self) -> Vec2 {
         let center_offset = Vec2::splat(globals::TILE_SIZE as f32 / 2.0);
         Vec2::new(
             self.x as f32 * globals::TILE_SIZE as f32,

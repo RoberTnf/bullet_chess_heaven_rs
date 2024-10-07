@@ -27,7 +27,7 @@ pub fn move_piece(
         commands.entity(*entity).insert(PieceState::Moving {
             origin: transform.translation,
             destination: destination
-                .to_global_position()
+                .as_global_position()
                 .extend(transform.translation.z),
         });
     }
