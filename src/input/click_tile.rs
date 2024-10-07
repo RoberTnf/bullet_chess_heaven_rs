@@ -37,7 +37,10 @@ pub fn click_tile_update_player_position(
     } else {
         for ev in touch.read() {
             if ev.phase == TouchPhase::Ended {
-                let cursor = ev.position;
+                let cursor = camera
+                    .viewport_to_world_2d(camera_transform, ev.position)
+                    .unwrap();
+
                 if let Some(tile_position) = BoardPosition::from_world_position(cursor) {
                     event_writer.send(MovePiece {
                         destination: tile_position,
