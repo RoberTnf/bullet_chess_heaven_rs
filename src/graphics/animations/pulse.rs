@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::PulseSize;
+use crate::pieces::player::spawn::PulseSize;
 
 // Pulse animation for the player
 // Uses a sine wave to create a pulsing effect

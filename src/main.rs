@@ -1,16 +1,16 @@
 use bevy::{log::LogPlugin, prelude::*, window::WindowResolution};
-use game_state::{GamePauseState, GameState};
+
 mod board;
-mod events;
-mod game_state;
 mod globals;
 mod graphics;
 mod input;
 mod pieces;
-mod startup;
-mod update;
+mod plugins;
+mod states;
+
 fn main() {
     App::new()
+        // Config
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -35,9 +35,11 @@ fn main() {
                     ..default()
                 }),
         )
-        .add_plugins((startup::StartupPlugin, update::UpdatePlugin))
         .insert_resource(Msaa::Off)
-        .enable_state_scoped_entities::<GameState>()
-        .enable_state_scoped_entities::<GamePauseState>()
+        // Game
+        .add_plugins((
+            plugins::startup::StartupPlugin,
+            plugins::update::UpdatePlugin,
+        ))
         .run();
 }

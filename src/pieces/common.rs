@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::board::{movement_types::MovementTypes, position::BoardPosition};
+use crate::board::position::BoardPosition;
 
 use super::{damage::Damage, health::Health};
 
@@ -8,24 +8,23 @@ use super::{damage::Damage, health::Health};
 pub struct BlocksMovement;
 
 #[derive(Component, Default)]
-pub struct Creature;
+pub struct Piece;
 
 #[derive(Component)]
-pub enum CreatureState {
+pub enum PieceState {
     Idle,
-    Initializing,
     Moving { origin: Vec3, destination: Vec3 },
 }
 
 #[derive(Bundle)]
-pub struct CreatureBundle {
+pub struct PieceBundle {
     pub sprite: SpriteBundle,
     pub atlas: TextureAtlas,
-    pub blocks_movement: BlocksMovement,
-    pub creature: Creature,
-    pub movement_types: MovementTypes,
+    pub creature: Piece,
+    // pub movement_types: MovementTypes,
     pub board_position: BoardPosition,
-    pub creature_state: CreatureState,
     pub health: Health,
     pub damage: Damage,
+    pub blocks_movement: BlocksMovement,
+    pub state: PieceState,
 }

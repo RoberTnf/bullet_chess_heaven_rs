@@ -33,3 +33,6 @@ inherits = "release"
 opt-level = "s"
 # Strip all debugging information from the binary to slightly reduce file size.
 strip = "debuginfo"
+
+[lints]
+rust = { dead_code = "allow"}

@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
 use crate::{
-    board::position::BoardPosition, game_state::GameState, globals,
-    graphics::spritesheet::SpriteSheetAtlas,
+    board::position::BoardPosition, globals, graphics::spritesheet::SpriteSheetAtlas,
+    states::game_state::GameState,
 };
 
 #[derive(Bundle)]
@@ -22,23 +22,26 @@ pub fn spawn_board(
 ) {
     for x in 0..globals::BOARD_SIZE {
         for y in 0..globals::BOARD_SIZE {
-            let position = BoardPosition::new(x, y);
+            let tile_position = BoardPosition::new(x, y);
+            let global_position = tile_position
+                .to_global_position()
+                .extend(globals::BOARD_Z_INDEX);
             commands.spawn((
                 Name::new(format!("Tile ({}, {})", x, y)),
                 StateScoped(GameState::Game),
                 TileBundle {
                     sprite: SpriteBundle {
                         texture: asset_server.load("custom/spritesheet.png"),
-                        transform: Transform::from_xyz(0.0, 0.0, globals::BOARD_Z_INDEX),
+                        transform: Transform::from_translation(global_position),
                         ..default()
                     },
                     atlas: TextureAtlas {
                         layout: atlas_layout.handle.clone(),
-                        index: if position.is_white() { 2 } else { 1 },
+                        index: if tile_position.is_white() { 2 } else { 1 },
                     },
                     tile: Tile,
                 },
-                position,
+                tile_position,
             ));
         }
     }

@@ -24,15 +24,24 @@ impl BoardPosition {
         (self.x + self.y) % 2 == 0
     }
 
-    pub fn from_global_position(x: f32, y: f32) -> Option<Self> {
-        if x < 0.0 || y < 0.0 {
+    pub fn from_world_position(world_position: Vec2) -> Option<Self> {
+        if world_position.x < 0.0 || world_position.y < 0.0 {
             return None;
         }
 
         Some(Self {
-            x: (x / globals::TILE_SIZE as f32) as i32,
-            y: (y / globals::TILE_SIZE as f32) as i32,
+            x: (world_position.x / globals::TILE_SIZE as f32) as i32,
+            y: (world_position.y / globals::TILE_SIZE as f32) as i32,
         })
+    }
+
+    // gives you the TOP LEFT of the tile
+    pub fn to_global_position(&self) -> Vec2 {
+        let center_offset = Vec2::splat(globals::TILE_SIZE as f32 / 2.0);
+        Vec2::new(
+            self.x as f32 * globals::TILE_SIZE as f32,
+            self.y as f32 * globals::TILE_SIZE as f32,
+        ) + center_offset
     }
 
     pub fn distance_squared(&self, other: &BoardPosition) -> i32 {
@@ -53,6 +62,8 @@ impl Sub<BoardPosition> for BoardPosition {
 
 #[cfg(test)]
 mod tests {
+    use bevy::math::Vec2;
+
     use crate::{board::position::BoardPosition, globals};
 
     #[test]
@@ -83,19 +94,25 @@ mod tests {
         let tile_size = globals::TILE_SIZE as f32;
 
         assert_eq!(
-            BoardPosition::from_global_position(0.0, 0.0),
+            BoardPosition::from_world_position(Vec2::new(0.0, 0.0)),
             Some(BoardPosition::new(0, 0))
         );
         assert_eq!(
-            BoardPosition::from_global_position(tile_size, tile_size),
+            BoardPosition::from_world_position(Vec2::new(tile_size, tile_size)),
             Some(BoardPosition::new(1, 1))
         );
         assert_eq!(
-            BoardPosition::from_global_position(tile_size * 2.5, tile_size * 3.5),
+            BoardPosition::from_world_position(Vec2::new(tile_size * 2.5, tile_size * 3.5)),
             Some(BoardPosition::new(2, 3))
         );
-        assert_eq!(BoardPosition::from_global_position(-1.0, 0.0), None);
-        assert_eq!(BoardPosition::from_global_position(0.0, -1.0), None);
+        assert_eq!(
+            BoardPosition::from_world_position(Vec2::new(-1.0, 0.0)),
+            None
+        );
+        assert_eq!(
+            BoardPosition::from_world_position(Vec2::new(0.0, -1.0)),
+            None
+        );
     }
 
     #[test]
