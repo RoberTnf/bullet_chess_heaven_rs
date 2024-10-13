@@ -2,7 +2,7 @@ use std::ops::Sub;
 
 use bevy::prelude::*;
 
-use crate::globals;
+use crate::globals::{self, BOARD_SIZE};
 
 #[derive(Component, PartialEq, Eq, Hash, Copy, Clone, Debug)]
 pub struct BoardPosition {
@@ -29,10 +29,16 @@ impl BoardPosition {
             return None;
         }
 
-        Some(Self {
+        let pos = Self {
             x: (world_position.x / globals::TILE_SIZE as f32) as i32,
             y: (world_position.y / globals::TILE_SIZE as f32) as i32,
-        })
+        };
+
+        if pos.x < BOARD_SIZE && pos.y < BOARD_SIZE {
+            Some(pos)
+        } else {
+            None
+        }
     }
 
     // gives you the TOP LEFT of the tile
