@@ -11,8 +11,13 @@ pub struct BoardPosition {
 }
 
 impl BoardPosition {
-    pub fn new(x: i32, y: i32) -> Self {
-        Self { x, y }
+    pub fn new(x: i32, y: i32) -> Option<Self> {
+        let pos = Self { x, y };
+        if pos.is_valid() {
+            Some(pos)
+        } else {
+            None
+        }
     }
 
     pub fn update(&mut self, x: i32, y: i32) {
@@ -53,6 +58,10 @@ impl BoardPosition {
     pub fn distance_squared(&self, other: &BoardPosition) -> i32 {
         (self.x - other.x).pow(2) + (self.y - other.y).pow(2)
     }
+
+    pub fn is_valid(&self) -> bool {
+        self.x >= 0 && self.x < BOARD_SIZE as i32 && self.y >= 0 && self.y < BOARD_SIZE as i32
+    }
 }
 
 impl Sub<BoardPosition> for BoardPosition {
@@ -74,14 +83,14 @@ mod tests {
 
     #[test]
     fn test_new() {
-        let pos = BoardPosition::new(3, 4);
+        let pos = BoardPosition::new(3, 4).unwrap();
         assert_eq!(pos.x, 3);
         assert_eq!(pos.y, 4);
     }
 
     #[test]
     fn test_update() {
-        let mut pos = BoardPosition::new(1, 1);
+        let mut pos = BoardPosition::new(1, 1).unwrap();
         pos.update(5, 6);
         assert_eq!(pos.x, 5);
         assert_eq!(pos.y, 6);
@@ -89,10 +98,10 @@ mod tests {
 
     #[test]
     fn test_is_white() {
-        assert!(BoardPosition::new(0, 0).is_white());
-        assert!(!BoardPosition::new(0, 1).is_white());
-        assert!(!BoardPosition::new(1, 0).is_white());
-        assert!(BoardPosition::new(1, 1).is_white());
+        assert!(BoardPosition::new(0, 0).unwrap().is_white());
+        assert!(!BoardPosition::new(0, 1).unwrap().is_white());
+        assert!(!BoardPosition::new(1, 0).unwrap().is_white());
+        assert!(BoardPosition::new(1, 1).unwrap().is_white());
     }
 
     #[test]
@@ -101,15 +110,15 @@ mod tests {
 
         assert_eq!(
             BoardPosition::from_world_position(Vec2::new(0.0, 0.0)),
-            Some(BoardPosition::new(0, 0))
+            Some(BoardPosition::new(0, 0).unwrap())
         );
         assert_eq!(
             BoardPosition::from_world_position(Vec2::new(tile_size, tile_size)),
-            Some(BoardPosition::new(1, 1))
+            Some(BoardPosition::new(1, 1).unwrap())
         );
         assert_eq!(
             BoardPosition::from_world_position(Vec2::new(tile_size * 2.5, tile_size * 3.5)),
-            Some(BoardPosition::new(2, 3))
+            Some(BoardPosition::new(2, 3).unwrap())
         );
         assert_eq!(
             BoardPosition::from_world_position(Vec2::new(-1.0, 0.0)),
@@ -123,9 +132,9 @@ mod tests {
 
     #[test]
     fn test_subtraction() {
-        let pos1 = BoardPosition::new(5, 7);
-        let pos2 = BoardPosition::new(2, 3);
+        let pos1 = BoardPosition::new(5, 7).unwrap();
+        let pos2 = BoardPosition::new(2, 3).unwrap();
         let result = pos1 - pos2;
-        assert_eq!(result, BoardPosition::new(3, 4));
+        assert_eq!(result, BoardPosition::new(3, 4).unwrap());
     }
 }

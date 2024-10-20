@@ -5,9 +5,10 @@ use crate::{
     globals,
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
-        common::{BlocksMovement, Piece, PieceBundle, PieceState},
+        common::{BlocksMovement, MovementTypes, Piece, PieceBundle, PieceState, Team},
         damage::Damage,
         health::Health,
+        movement_type::MovementType,
     },
     states::game_state::GameState,
 };
@@ -28,7 +29,7 @@ pub fn spawn_player(
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
 ) {
-    let tile_pos = BoardPosition::new(4, 4);
+    let tile_pos = BoardPosition::new(4, 4).unwrap();
     let global_position = tile_pos
         .as_global_position()
         .extend(globals::PLAYER_Z_INDEX);
@@ -50,6 +51,8 @@ pub fn spawn_player(
             health: Health::new(globals::PLAYER_HEALTH),
             damage: Damage::new(globals::PLAYER_DAMAGE),
             state: PieceState::Idle,
+            movement_types: MovementTypes(vec![MovementType::King]),
+            team: Team::Player,
         },
         Player,
         Name::new("Player"),

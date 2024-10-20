@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::board::position::BoardPosition;
 
-use super::{damage::Damage, health::Health};
+use super::{damage::Damage, health::Health, movement_type::MovementType};
 
 #[derive(Component, Default)]
 pub struct BlocksMovement;
@@ -16,6 +16,15 @@ pub enum PieceState {
     Moving { origin: Vec3, destination: Vec3 },
 }
 
+#[derive(Component)]
+pub struct MovementTypes(pub Vec<MovementType>);
+
+#[derive(Component, Eq, PartialEq, Copy, Clone)]
+pub enum Team {
+    Player,
+    Enemy,
+}
+
 #[derive(Bundle)]
 pub struct PieceBundle {
     pub sprite: SpriteBundle,
@@ -27,4 +36,6 @@ pub struct PieceBundle {
     pub damage: Damage,
     pub blocks_movement: BlocksMovement,
     pub state: PieceState,
+    pub movement_types: MovementTypes,
+    pub team: Team,
 }

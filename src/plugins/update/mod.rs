@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+
+use crate::board::highlight;
 mod animation;
 mod input;
 pub mod movement;
@@ -10,6 +12,7 @@ impl Plugin for UpdatePlugin {
             animation::AnimationPlugin,
             input::InputPlugin,
             movement::MovementPlugin,
+            highlight::HighlightPlugin,
         ));
     }
 }

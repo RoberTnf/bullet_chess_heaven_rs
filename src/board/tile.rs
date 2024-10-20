@@ -22,7 +22,7 @@ pub fn spawn_board(
 ) {
     for x in 0..globals::BOARD_SIZE {
         for y in 0..globals::BOARD_SIZE {
-            let tile_position = BoardPosition::new(x, y);
+            let tile_position = BoardPosition::new(x, y).unwrap();
             let global_position = tile_position
                 .as_global_position()
                 .extend(globals::BOARD_Z_INDEX);

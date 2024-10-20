@@ -16,6 +16,7 @@ impl Plugin for StartupPlugin {
             .enable_state_scoped_entities::<states::game_state::GameState>()
             // Resources
             .init_resource::<graphics::spritesheet::SpriteSheetAtlas>()
+            .init_resource::<board::highlight::HighlightCache>()
             .insert_resource(ClearColor(Color::srgb(0.063, 0.063, 0.082)))
             // Events
             .add_event::<pieces::movement::MovePiece>()

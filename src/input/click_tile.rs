@@ -27,11 +27,7 @@ pub fn click_tile_update_player_position(
             .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
         {
             if let Some(tile_position) = BoardPosition::from_world_position(world_position) {
-                event_writer.send(MovePiece {
-                    destination: tile_position,
-                    entity: player_entity,
-                });
-                debug!("Clicked tile: {:?}", tile_position);
+                _send_event(&mut event_writer, tile_position, player_entity);
             }
         }
     } else {
@@ -42,13 +38,22 @@ pub fn click_tile_update_player_position(
                     .unwrap();
 
                 if let Some(tile_position) = BoardPosition::from_world_position(cursor) {
-                    event_writer.send(MovePiece {
-                        destination: tile_position,
-                        entity: player_entity,
-                    });
-                    debug!("Touched tile: {:?}", tile_position);
+                    _send_event(&mut event_writer, tile_position, player_entity);
                 }
             }
         }
     }
+}
+
+fn _send_event(
+    event_writer: &mut EventWriter<'_, MovePiece>,
+    tile_position: BoardPosition,
+    player_entity: Entity,
+) {
+    event_writer.send(MovePiece {
+        destination: tile_position,
+        entity: player_entity,
+        is_player: true,
+    });
+    debug!("Clicked tile: {:?}", tile_position);
 }
