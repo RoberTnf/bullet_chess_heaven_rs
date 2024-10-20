@@ -14,8 +14,8 @@ pub fn click_tile_update_player_position(
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<ButtonInput<MouseButton>>,
-    mut touch: EventReader<TouchInput>,
     player: Query<Entity, With<Player>>,
+    touches: Res<Touches>,
 ) {
     let window = windows.single();
     let (camera, camera_transform) = camera.single();
@@ -31,16 +31,8 @@ pub fn click_tile_update_player_position(
             }
         }
     } else {
-        for ev in touch.read() {
-            if ev.phase == TouchPhase::Ended {
-                let cursor = camera
-                    .viewport_to_world_2d(camera_transform, ev.position)
-                    .unwrap();
-
-                if let Some(tile_position) = BoardPosition::from_world_position(cursor) {
-                    _send_event(&mut event_writer, tile_position, player_entity);
-                }
-            }
+        for _ in touches.iter_just_pressed() {
+            todo!()
         }
     }
 }
