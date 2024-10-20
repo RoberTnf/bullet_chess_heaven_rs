@@ -137,4 +137,26 @@ mod tests {
         let result = pos1 - pos2;
         assert_eq!(result, BoardPosition::new(3, 4).unwrap());
     }
+
+    #[test]
+    fn test_board_position_validity() {
+        assert!(BoardPosition::new(0, 0).is_some());
+        assert!(BoardPosition::new(7, 7).is_some());
+        assert!(BoardPosition::new(8, 8).is_none());
+        assert!(BoardPosition::new(-1, 0).is_none());
+    }
+
+    #[test]
+    fn test_world_to_board_position_conversion() {
+        let tile_size = globals::TILE_SIZE as f32;
+        assert_eq!(
+            BoardPosition::from_world_position(Vec2::new(0.0, 0.0)),
+            Some(BoardPosition::new(0, 0).unwrap())
+        );
+
+        assert_eq!(
+            BoardPosition::from_world_position(Vec2::new(tile_size, tile_size)),
+            Some(BoardPosition::new(1, 1).unwrap())
+        );
+    }
 }

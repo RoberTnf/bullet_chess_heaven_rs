@@ -263,3 +263,63 @@ impl MovementType {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::pieces::common::MovementTypes;
+
+    use super::*;
+
+    #[test]
+    fn test_valid_moves_for_king() {
+        // Setup a mock board state
+        // Test king movement in various scenarios
+        let king_position = BoardPosition::new(4, 4).unwrap();
+        let other_positions = HashSet::from_iter(vec![
+            BoardPosition::new(3, 3).unwrap(),
+            BoardPosition::new(5, 5).unwrap(),
+        ]);
+        let enemies_positions = HashSet::from_iter(vec![BoardPosition::new(5, 5).unwrap()]);
+        let movement_types = MovementTypes(vec![MovementType::King]);
+        let valid_moves = movement_types.0[0].get_valid_moves(
+            &king_position,
+            &other_positions,
+            &enemies_positions,
+        );
+        assert_eq!(valid_moves.valid_moves.len(), 6);
+        assert_eq!(valid_moves.valid_attacks.len(), 1);
+    }
+
+    #[test]
+    fn test_valid_moves_for_pawn() {
+        // Test pawn movement in various scenarios
+        let pawn_position = BoardPosition::new(4, 4).unwrap();
+        let other_positions = HashSet::from_iter(vec![
+            BoardPosition::new(4, 7).unwrap(),
+            BoardPosition::new(5, 5).unwrap(),
+        ]);
+        let enemies_positions = HashSet::from_iter(vec![BoardPosition::new(5, 5).unwrap()]);
+        let movement_types = MovementTypes(vec![MovementType::WhitePawn]);
+        let valid_moves = movement_types.0[0].get_valid_moves(
+            &pawn_position,
+            &other_positions,
+            &enemies_positions,
+        );
+        assert_eq!(valid_moves.valid_moves.len(), 1);
+        assert_eq!(valid_moves.valid_attacks.len(), 1);
+        assert_eq!(
+            valid_moves.valid_moves[0],
+            BoardPosition::new(4, 5).unwrap()
+        );
+        assert_eq!(
+            valid_moves.valid_attacks[0],
+            BoardPosition::new(5, 5).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_collision_detection() {
+        // Setup a board with multiple pieces
+        // Ensure pieces can't move through each other
+    }
+}
