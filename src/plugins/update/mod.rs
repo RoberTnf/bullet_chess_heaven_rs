@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::board::highlight;
+use crate::{board::highlight, states::turn_state};
 mod animation;
 mod input;
 pub mod movement;
@@ -13,6 +13,7 @@ impl Plugin for UpdatePlugin {
             input::InputPlugin,
             movement::MovementPlugin,
             highlight::HighlightPlugin,
+            turn_state::TurnPlugin,
         ));
     }
 }

@@ -13,5 +13,6 @@ pub fn setup_camera(mut commands: Commands) {
             ..default()
         },
         Name::new("Camera"),
+        IsDefaultUiCamera,
     ));
 }

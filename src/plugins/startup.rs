@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{board, graphics, pieces, states};
+use crate::{board, graphics, pieces, states, ui::UiPlugin};
 
 pub struct StartupPlugin;
 
@@ -28,6 +28,8 @@ impl Plugin for StartupPlugin {
                     graphics::camera::setup_camera,
                     pieces::player::spawn::spawn_player,
                 ),
-            );
+            )
+            .add_plugins(UiPlugin)
+            .init_resource::<states::turn_state::TurnInfo>();
     }
 }

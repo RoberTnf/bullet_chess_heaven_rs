@@ -41,3 +41,7 @@ pub const HIGHLIGHT_ATTACK_ATLAS_INDEX: usize = 6; // Index of the highlight att
 // Spawner settings
 pub const TARGET_NUM_ENEMIES: usize = 10; // Max number of enemies on the board
 pub const PER_TURN_ENEMY_SPAWN_COUNT: usize = 1; // Number of enemies to spawn per turn
+
+// UI Settings
+pub const UI_FONT_SIZE: f32 = 4.0; // Font size for UI elements
+pub const UI_FONT: &str = "fonts/Press_Start_2P/PressStart2P-Regular.ttf"; // Font for UI elements
