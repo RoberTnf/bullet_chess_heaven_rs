@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use debug::{setup_debug_ui, update_debug_game_state_information, DebugPlugin};
+use debug::{setup_debug_ui, DebugPlugin};
 use game_info::{setup_game_info, update_turn_information};
 
 mod debug;

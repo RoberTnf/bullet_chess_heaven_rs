@@ -2,14 +2,10 @@ use bevy::prelude::*;
 
 use crate::{
     globals::{UI_FONT, UI_FONT_SIZE},
-    states::{
-        game_state::GameState,
-        pause_state::GamePauseState,
-        turn_state::{TurnInfo, TurnState},
-    },
+    states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
 };
 
-use super::{game_info, LeftUINode, RootUINode};
+use super::LeftUINode;
 
 #[derive(Component)]
 struct DebugUINode;

@@ -5,7 +5,7 @@ use crate::{
     states::turn_state::TurnInfo,
 };
 
-use super::{LeftUINode, RootUINode};
+use super::LeftUINode;
 
 #[derive(Component)]
 struct GameInfoNode;
