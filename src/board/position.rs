@@ -61,7 +61,7 @@ impl BoardPosition {
     }
 
     pub fn is_valid(&self) -> bool {
-        self.x >= 0 && self.x < BOARD_SIZE as i32 && self.y >= 0 && self.y < BOARD_SIZE as i32
+        self.x >= 0 && self.x < BOARD_SIZE && self.y >= 0 && self.y < BOARD_SIZE
     }
 
     pub fn get_random_empty_position(other_positions: &HashSet<BoardPosition>) -> Self {

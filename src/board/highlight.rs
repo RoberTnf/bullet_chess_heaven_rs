@@ -146,7 +146,7 @@ pub fn update_highlight_tiles(
                     layout: atlas_layout.handle.clone(),
                     index: 6,
                 },
-                board_position.clone(),
+                *board_position,
                 HighlightTileAttack,
             ));
         }
@@ -156,7 +156,7 @@ pub fn update_highlight_tiles(
             let global_position = board_position
                 .as_global_position()
                 .extend(globals::HIGHLIGHT_Z_INDEX);
-            commands.spawn((HighlightTileMove, board_position.clone()));
+            commands.spawn((HighlightTileMove, *board_position));
             if !present_tiles_attack.contains(board_position) {
                 commands.spawn((
                     Name::new(format!(
@@ -173,7 +173,7 @@ pub fn update_highlight_tiles(
                         layout: atlas_layout.handle.clone(),
                         index: 3,
                     },
-                    board_position.clone(),
+                    *board_position,
                     HighlightTileMove,
                 ));
             }

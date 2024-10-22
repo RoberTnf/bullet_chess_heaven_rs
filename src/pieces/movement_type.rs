@@ -128,13 +128,11 @@ impl MovementType {
             BoardPosition::new(position.x - 1, position.y + direction),
             BoardPosition::new(position.x + 1, position.y + direction),
         ];
-        for attack in possible_attacks {
-            if let Some(attack) = attack {
-                if enemies_positions.contains(&attack) {
-                    valid_attacks.push(attack);
-                }
+        possible_attacks.into_iter().flatten().for_each(|attack| {
+            if enemies_positions.contains(&attack) {
+                valid_attacks.push(attack);
             }
-        }
+        })
     }
 
     fn knight_moves(
@@ -156,15 +154,13 @@ impl MovementType {
             BoardPosition::new(position.x - 1, position.y + 2),
         ];
 
-        for move_pos in possible_moves {
-            if let Some(move_pos) = move_pos {
-                if enemies_positions.contains(&move_pos) {
-                    valid_attacks.push(move_pos);
-                } else if !other_pieces_positions.contains(&move_pos) {
-                    valid_moves.push(move_pos);
-                }
+        possible_moves.into_iter().flatten().for_each(|move_pos| {
+            if enemies_positions.contains(&move_pos) {
+                valid_attacks.push(move_pos);
+            } else if !other_pieces_positions.contains(&move_pos) {
+                valid_moves.push(move_pos);
             }
-        }
+        })
     }
 
     fn diagonal_moves(
