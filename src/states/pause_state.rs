@@ -3,14 +3,14 @@ use std::fmt;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States)]
 pub enum GamePauseState {
-    Play,
+    Playing,
     Paused,
 }
 
 impl fmt::Display for GamePauseState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            GamePauseState::Play => write!(f, "Play"),
+            GamePauseState::Playing => write!(f, "Play"),
             GamePauseState::Paused => write!(f, "Paused"),
         }
     }
@@ -19,7 +19,7 @@ impl fmt::Display for GamePauseState {
 impl GamePauseState {
     pub fn get_color(&self) -> Color {
         match self {
-            GamePauseState::Play => Color::srgb(0.0, 1.0, 0.0),
+            GamePauseState::Playing => Color::srgb(0.0, 1.0, 0.0),
             GamePauseState::Paused => Color::srgb(1.0, 0.0, 0.0),
         }
     }

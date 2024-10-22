@@ -1,6 +1,7 @@
 use std::ops::Sub;
 
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::HashSet};
+use rand::prelude::*;
 
 use crate::globals::{self, BOARD_SIZE};
 
@@ -60,7 +61,23 @@ impl BoardPosition {
     }
 
     pub fn is_valid(&self) -> bool {
-        self.x >= 0 && self.x < BOARD_SIZE as i32 && self.y >= 0 && self.y < BOARD_SIZE as i32
+        self.x >= 0 && self.x < BOARD_SIZE && self.y >= 0 && self.y < BOARD_SIZE
+    }
+
+    pub fn get_random_empty_position(other_positions: &HashSet<BoardPosition>) -> Self {
+        let mut rng = thread_rng();
+        loop {
+            let pos =
+                Self::new(rng.gen_range(0..BOARD_SIZE), rng.gen_range(0..BOARD_SIZE)).unwrap();
+            if !other_positions.contains(&pos) {
+                return pos;
+            }
+        }
+    }
+
+    pub fn distance(&self, other: BoardPosition) -> i32 {
+        // we take the max of the absolute differences in x and y
+        ((self.x - other.x).abs()).max((self.y - other.y).abs())
     }
 }
 
@@ -80,6 +97,19 @@ mod tests {
     use bevy::math::Vec2;
 
     use crate::{board::position::BoardPosition, globals};
+
+    #[test]
+    fn test_distance() {
+        let pos1 = BoardPosition::new(0, 0).unwrap();
+        let pos2 = BoardPosition::new(3, 4).unwrap();
+        assert_eq!(pos1.distance(pos2), 4);
+
+        let pos3 = BoardPosition::new(3, 0).unwrap();
+        assert_eq!(pos1.distance(pos3), 3);
+
+        let pos4 = BoardPosition::new(0, 4).unwrap();
+        assert_eq!(pos1.distance(pos4), 4);
+    }
 
     #[test]
     fn test_new() {

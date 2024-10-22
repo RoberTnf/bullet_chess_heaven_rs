@@ -14,7 +14,7 @@ impl Plugin for InputPlugin {
             click_tile_update_player_position
                 .run_if(in_state(GameState::Game))
                 .run_if(in_state(TurnState::PlayerInput))
-                .run_if(in_state(GamePauseState::Play)),
+                .run_if(in_state(GamePauseState::Playing)),
         );
     }
 }

@@ -14,12 +14,12 @@ pub fn click_tile_update_player_position(
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<ButtonInput<MouseButton>>,
-    player: Query<Entity, With<Player>>,
+    player: Query<(Entity, &BoardPosition), With<Player>>,
     touches: Res<Touches>,
 ) {
     let window = windows.single();
     let (camera, camera_transform) = camera.single();
-    let player_entity = player.single();
+    let (player_entity, player_position) = player.single();
 
     if mouse.just_pressed(MouseButton::Left) {
         if let Some(world_position) = window
@@ -27,7 +27,9 @@ pub fn click_tile_update_player_position(
             .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
         {
             if let Some(tile_position) = BoardPosition::from_world_position(world_position) {
-                _send_event(&mut event_writer, tile_position, player_entity);
+                if tile_position != *player_position {
+                    _send_event(&mut event_writer, tile_position, player_entity);
+                }
             }
         }
     } else {

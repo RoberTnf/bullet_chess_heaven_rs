@@ -16,7 +16,7 @@ pub enum PieceState {
     Moving { origin: Vec3, destination: Vec3 },
 }
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct MovementTypes(pub Vec<MovementType>);
 
 #[derive(Component, Eq, PartialEq, Copy, Clone)]

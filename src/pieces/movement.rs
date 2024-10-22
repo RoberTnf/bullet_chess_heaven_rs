@@ -8,6 +8,7 @@ use crate::{
 
 use super::{
     common::{MovementTypes, Piece, PieceState, Team},
+    enemies::Enemy,
     player::spawn::Player,
 };
 
@@ -118,10 +119,47 @@ pub fn move_player_animation(
         if distance < 1.0 {
             transform.translation = *destination;
             commands.entity(entity).insert(PieceState::Idle);
-            // TODO: Change to AI Turn
-            next_turn_state.set(TurnState::PlayerInput);
+            next_turn_state.set(TurnState::EnemyAI);
         } else {
             transform.translation = transform.translation.lerp(*destination, lerp_value);
         }
+    }
+}
+
+pub fn move_enemies_animation(
+    mut enemies: Query<(&mut Transform, &PieceState, Entity), With<Enemy>>,
+    time: Res<Time>,
+    mut commands: Commands,
+) {
+    for (mut transform, state, entity) in enemies.iter_mut() {
+        if let PieceState::Moving {
+            origin: _,
+            destination,
+        } = state
+        {
+            let current_position = transform.translation;
+            let lerp_value = TWEEN_MOVE_ANIMATION_SPEED * time.delta_seconds();
+            let distance = destination.distance_squared(current_position);
+
+            // if less than 1 pixel away, snap to destination
+            if distance < 1.0 {
+                transform.translation = *destination;
+                commands.entity(entity).insert(PieceState::Idle);
+            } else {
+                transform.translation = transform.translation.lerp(*destination, lerp_value);
+            }
+        }
+    }
+}
+
+pub fn all_enemies_moved(
+    enemies: Query<&PieceState, With<Enemy>>,
+    mut turn_state: ResMut<NextState<TurnState>>,
+) {
+    if enemies
+        .iter()
+        .all(|state| matches!(state, PieceState::Idle))
+    {
+        turn_state.set(TurnState::EnemySpawn);
     }
 }

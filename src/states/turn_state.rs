@@ -8,6 +8,7 @@ pub enum TurnState {
     PlayerAnimation,
     EnemyAI,
     EnemyAnimation,
+    EnemySpawn,
 }
 
 impl fmt::Display for TurnState {
@@ -17,6 +18,7 @@ impl fmt::Display for TurnState {
             TurnState::PlayerAnimation => write!(f, "PlayerAnimation"),
             TurnState::EnemyAI => write!(f, "EnemyAI"),
             TurnState::EnemyAnimation => write!(f, "EnemyAnimation"),
+            TurnState::EnemySpawn => write!(f, "EnemySpawn"),
         }
     }
 }
@@ -28,6 +30,7 @@ impl TurnState {
             TurnState::PlayerAnimation => Color::srgb(0.0, 1.0, 0.0),
             TurnState::EnemyAI => Color::srgb(0.0, 0.0, 1.0),
             TurnState::EnemyAnimation => Color::srgb(1.0, 1.0, 0.0),
+            TurnState::EnemySpawn => Color::srgb(0.0, 1.0, 1.0),
         }
     }
 }

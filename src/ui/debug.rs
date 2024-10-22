@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    globals::{UI_FONT, UI_FONT_SIZE},
+    globals::{UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
     states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
 };
 
@@ -30,7 +30,6 @@ pub fn setup_debug_ui(
             .spawn(NodeBundle {
                 style: Style {
                     width: Val::Percent(100.0),
-                    height: Val::Percent(30.0),
                     padding: UiRect::all(Val::Px(2.0)),
                     flex_direction: FlexDirection::Column,
                     ..default()
@@ -39,6 +38,14 @@ pub fn setup_debug_ui(
                 ..default()
             })
             .with_children(|p2| {
+                p2.spawn(TextBundle::from_section(
+                    "Debug Information",
+                    TextStyle {
+                        font_size: UI_HEADER_FONT_SIZE,
+                        font: asset_server.load(UI_FONT),
+                        ..default()
+                    },
+                ));
                 p2.spawn((
                     TextBundle::from_section(
                         "Game State:",
