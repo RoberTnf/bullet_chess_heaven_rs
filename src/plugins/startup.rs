@@ -19,7 +19,10 @@ impl Plugin for StartupPlugin {
             .init_resource::<board::highlight::HighlightCache>()
             .insert_resource(ClearColor(Color::srgb(0.063, 0.063, 0.082)))
             // Events
-            .add_event::<pieces::movement::MovePiece>()
+            .add_event::<pieces::movement::MovePieceEvent>()
+            .add_event::<pieces::attack::AttackPieceEvent>()
+            .add_event::<pieces::health::PieceHealthChangeEvent>()
+            .add_event::<pieces::health::PieceDeathEvent>()
             // One off systems
             .add_systems(
                 Startup,

@@ -4,14 +4,14 @@ use crate::{
     board::position::BoardPosition,
     pieces::{
         common::{MovementTypes, Piece, Team},
-        movement::MovePiece,
+        movement::MovePieceEvent,
     },
     states::turn_state::TurnState,
 };
 
 pub fn ai_system(
     pieces: Query<(&BoardPosition, &MovementTypes, &Team, Entity), With<Piece>>,
-    mut move_events: EventWriter<MovePiece>,
+    mut move_events: EventWriter<MovePieceEvent>,
     mut turn_state: ResMut<NextState<TurnState>>,
 ) {
     let enemy_pieces = pieces.iter().filter(|(_, _, &team, _)| team == Team::Enemy);
@@ -21,8 +21,7 @@ pub fn ai_system(
             .filter(|(_, _, &team, _)| team == Team::Player)
             .map(|(pos, _, _, _)| *pos),
     );
-    let all_pieces_positions = HashSet::from_iter(pieces.iter().map(|(pos, _, _, _)| *pos));
-
+    let mut all_pieces_positions = HashSet::from_iter(pieces.iter().map(|(pos, _, _, _)| *pos));
     for (enemy_pos, enemy_movement_types, _, enemy_entity) in enemy_pieces {
         // we make the assumption that there will be enemies with more than one movement type
         let mut moves = HashSet::new();
@@ -43,22 +42,23 @@ pub fn ai_system(
             }
             // no attacks, so we move
             // we select the move that minimizes distance to any player piece
-            let best_move = moves
-                .iter()
-                .min_by_key(|pos| {
-                    player_pieces_positions
-                        .iter()
-                        .map(|player_pos| pos.distance(*player_pos))
-                        .min()
-                        .unwrap()
-                })
-                .unwrap();
-
-            move_events.send(MovePiece {
-                entity: enemy_entity,
-                is_player: false,
-                destination: *best_move,
+            let best_move = moves.iter().min_by_key(|pos| {
+                player_pieces_positions
+                    .iter()
+                    .map(|player_pos| pos.distance(*player_pos))
+                    .min()
+                    .unwrap()
             });
+
+            if let Some(best_move) = best_move {
+                // mark origin as available, remove destination
+                all_pieces_positions.insert(*best_move);
+                all_pieces_positions.remove(enemy_pos);
+                move_events.send(MovePieceEvent {
+                    entity: enemy_entity,
+                    destination: *best_move,
+                });
+            }
         } else {
             // we attack
         }

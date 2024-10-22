@@ -4,8 +4,10 @@ use crate::{
     globals,
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
+        attack::attack_piece_system,
         common::{MovementTypes, Piece, Team},
-        movement::MovePiece,
+        health::DeathAnimation,
+        movement::{move_piece, MovePieceEvent},
         player::spawn::Player,
     },
     states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
@@ -42,7 +44,10 @@ impl HighlightCache {
 // system that updates the highlight cache
 pub fn update_highlight_cache(
     mut highlight: ResMut<HighlightCache>,
-    other_pieces: Query<(&BoardPosition, &Team), (With<Piece>, Without<Player>)>,
+    other_pieces: Query<
+        (&BoardPosition, &Team),
+        (With<Piece>, Without<Player>, Without<DeathAnimation>),
+    >,
     player: Query<(&BoardPosition, &MovementTypes, &Team), (With<Piece>, With<Player>)>,
 ) {
     let (player_board_position, player_movement_types, player_team) = player.single();
@@ -90,7 +95,7 @@ pub fn despawn_highlight_tiles(
 // invalidate cache if piece moved
 pub fn invalidate_highlight_cache_on_move(
     mut highlight: ResMut<HighlightCache>,
-    mut piece_moved: EventReader<MovePiece>,
+    mut piece_moved: EventReader<MovePieceEvent>,
 ) {
     piece_moved.read().for_each(|_| {
         highlight.invalidate();
@@ -188,7 +193,10 @@ impl Plugin for HighlightPlugin {
         app.add_systems(
             Update,
             (
-                (update_highlight_tiles, update_highlight_cache)
+                (update_highlight_cache, update_highlight_tiles)
+                    .chain()
+                    .before(move_piece)
+                    .before(attack_piece_system)
                     .run_if(in_state(TurnState::PlayerInput))
                     .run_if(in_state(GameState::Game))
                     .run_if(in_state(GamePauseState::Playing)),

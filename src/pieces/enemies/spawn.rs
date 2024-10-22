@@ -45,11 +45,11 @@ pub fn spawn_enemies(
     debug!("Spawning enemies");
     let num_enemies = enemies.iter().count();
     let enemies_to_spawn = (TARGET_NUM_ENEMIES - num_enemies).clamp(0, PER_TURN_ENEMY_SPAWN_COUNT);
+    let mut occupied_positions = HashSet::from_iter(piece_position_query.iter().copied());
 
     for _ in 0..enemies_to_spawn {
-        let tile_pos = BoardPosition::get_random_empty_position(&HashSet::from_iter(
-            piece_position_query.iter().copied(),
-        ));
+        let tile_pos = BoardPosition::get_random_empty_position(&occupied_positions);
+        occupied_positions.insert(tile_pos);
 
         let global_position = tile_pos.as_global_position().extend(ENEMY_Z_INDEX);
         let piece_info = get_random_piece_info();

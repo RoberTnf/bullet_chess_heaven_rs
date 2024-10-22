@@ -25,7 +25,7 @@ pub const HEALTH_CHANGE_TEXT_ANIMATION_SPEED: f32 = 30.0; // Speed of health cha
 
 // Animation durations
 pub const HEALTH_CHANGE_TEXT_ANIMATION_DURATION: f32 = 0.2; // Duration of health change text animations
-pub const DEATH_ANIMATION_DURATION: f32 = 0.3; // Duration of death animations
+pub const DEATH_ANIMATION_DURATION: f32 = 0.5; // Duration of death animations
 
 // Player settings
 pub const PLAYER_HEALTH: u64 = 100; // Health of the player

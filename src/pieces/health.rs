@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::{board::highlight::HighlightCache, globals::DEATH_ANIMATION_DURATION};
+
 #[derive(Component)]
 pub struct Health {
     pub value: u64,
@@ -7,7 +9,7 @@ pub struct Health {
 }
 
 #[derive(Event)]
-pub struct DeathEvent {
+pub struct PieceDeathEvent {
     pub entity: Entity,
 }
 
@@ -52,7 +54,13 @@ pub struct HealthChangeTextAnimation {
 
 #[derive(Component)]
 pub struct DeathAnimation {
-    timer: Timer,
+    pub timer: Timer,
+}
+
+#[derive(Event)]
+pub struct PieceHealthChangeEvent {
+    pub entity: Entity,
+    pub change: i64,
 }
 
 // pub fn animate_health_change(
@@ -106,46 +114,53 @@ pub struct DeathAnimation {
 //     }
 // }
 
-// pub fn death_system(
-//     health_query: Query<(&Health, Entity, &BoardPosition, &Name), Without<DeathAnimation>>,
-//     mut commands: Commands,
-//     mut death_event_writer: EventWriter<DeathEvent>,
-//     mut board_map: ResMut<BoardMap>,
-//     mut event_writer: EventWriter<RefreshCacheEvent>,
-// ) {
-//     for (health, entity, board_position, name) in health_query.iter() {
-//         if health.is_dead() {
-//             // Add delay before despawn
-//             debug!("Entity {} ({}) is dead", entity, name);
-//             commands.entity(entity).insert(DeathAnimation {
-//                 timer: Timer::from_seconds(globals::DEATH_ANIMATION_DURATION, TimerMode::Once),
-//             });
-//             death_event_writer.send(DeathEvent { entity });
-//             // remove entity from board map even before animation
-//             board_map
-//                 .remove_entity(*board_position)
-//                 .expect("Entity to remove from board map not found, this should never happen");
-//             board_map.refresh_cache(&mut event_writer);
-//         }
-//     }
-// }
+pub fn health_change_system(
+    mut health_change_event_reader: EventReader<PieceHealthChangeEvent>,
+    mut health_query: Query<&mut Health>,
+) {
+    for event in health_change_event_reader.read() {
+        health_query
+            .get_mut(event.entity)
+            .unwrap()
+            .take_damage(event.change as u64);
+    }
+}
 
-// pub fn death_animation(
-//     mut death_animation_query: Query<(&mut DeathAnimation, Entity, &Name)>,
-//     time: Res<Time>,
-//     mut commands: Commands,
-// ) {
-//     for (mut death_animation, entity, name) in death_animation_query.iter_mut() {
-//         death_animation.timer.tick(time.delta());
-//         if death_animation.timer.just_finished() {
-//             commands.entity(entity).despawn_recursive();
-//             debug!(
-//                 "Entity {} ({}) death animation finished, despawned",
-//                 entity, name
-//             );
-//         }
-//     }
-// }
+pub fn death_system(
+    health_query: Query<(&Health, Entity, &Name), Without<DeathAnimation>>,
+    mut commands: Commands,
+    mut death_event_writer: EventWriter<PieceDeathEvent>,
+) {
+    for (health, entity, name) in health_query.iter() {
+        if health.is_dead() {
+            // Add delay before despawn
+            debug!("Entity {} ({}) is dead", entity, name);
+            commands.entity(entity).insert(DeathAnimation {
+                timer: Timer::from_seconds(DEATH_ANIMATION_DURATION, TimerMode::Once),
+            });
+            death_event_writer.send(PieceDeathEvent { entity });
+        }
+    }
+}
+
+pub fn death_animation(
+    mut death_animation_query: Query<(&mut DeathAnimation, Entity, &Name)>,
+    time: Res<Time>,
+    mut commands: Commands,
+    mut highlight_cache: ResMut<HighlightCache>,
+) {
+    for (mut death_animation, entity, name) in death_animation_query.iter_mut() {
+        death_animation.timer.tick(time.delta());
+        if death_animation.timer.just_finished() {
+            commands.entity(entity).despawn_recursive();
+            highlight_cache.invalidate();
+            debug!(
+                "Entity {} ({}) death animation finished, despawned",
+                entity, name
+            );
+        }
+    }
+}
 
 // pub fn health_change_text_animation(
 //     mut health_change_text_query: Query<(&mut Transform, &mut HealthChangeTextAnimation, Entity)>,
