@@ -13,7 +13,7 @@ impl Plugin for AnimationPlugin {
             Update,
             graphics::animations::pulse::animate_pulse_scale
                 .run_if(in_state(GameState::Game))
-                .run_if(in_state(GamePauseState::Play)),
+                .run_if(in_state(GamePauseState::Playing)),
         );
     }
 }

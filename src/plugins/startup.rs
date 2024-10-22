@@ -9,7 +9,7 @@ impl Plugin for StartupPlugin {
         app
             // Set up states
             .insert_state(states::game_state::GameState::Game)
-            .insert_state(states::pause_state::GamePauseState::Play)
+            .insert_state(states::pause_state::GamePauseState::Playing)
             .insert_state(states::turn_state::TurnState::PlayerInput)
             .enable_state_scoped_entities::<states::pause_state::GamePauseState>()
             .enable_state_scoped_entities::<states::turn_state::TurnState>()

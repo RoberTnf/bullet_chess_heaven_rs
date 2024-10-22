@@ -23,8 +23,6 @@ pub fn setup_game_info(
         parent
             .spawn(NodeBundle {
                 style: Style {
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(30.0),
                     padding: UiRect::all(Val::Px(2.0)),
                     flex_direction: FlexDirection::Column,
                     ..default()

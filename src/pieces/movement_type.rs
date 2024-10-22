@@ -1,6 +1,7 @@
 use crate::board::position::BoardPosition;
 use bevy::utils::HashSet;
 
+#[derive(Clone, Eq, PartialEq)]
 pub enum MovementType {
     WhitePawn,
     BlackPawn,

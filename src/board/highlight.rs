@@ -191,7 +191,7 @@ impl Plugin for HighlightPlugin {
                 (update_highlight_tiles, update_highlight_cache)
                     .run_if(in_state(TurnState::PlayerInput))
                     .run_if(in_state(GameState::Game))
-                    .run_if(in_state(GamePauseState::Play)),
+                    .run_if(in_state(GamePauseState::Playing)),
                 despawn_highlight_tiles
                     .run_if(in_state(TurnState::PlayerAnimation))
                     .run_if(in_state(GameState::Game)),

@@ -9,7 +9,8 @@ pub const TARGET_PIXEL_WIDTH: f32 = 320.0; // Target pixel width for scaling
 pub const TILE_SIZE: u32 = 16; // Size of each tile in pixels
 
 // Z-index settings for rendering order
-pub const PLAYER_Z_INDEX: f32 = 10.0; // Z-index for player entities
+pub const PLAYER_Z_INDEX: f32 = 20.0; // Z-index for player entities
+pub const ENEMY_Z_INDEX: f32 = 19.0; // Z-index for enemy entities
 pub const BOARD_Z_INDEX: f32 = 1.0; // Z-index for the game board
 pub const HIGHLIGHT_Z_INDEX: f32 = 2.0; // Z-index for highlighted tiles
 pub const HEALTH_Z_INDEX: f32 = 15.0; // Z-index for health bars
@@ -40,8 +41,9 @@ pub const HIGHLIGHT_ATTACK_ATLAS_INDEX: usize = 6; // Index of the highlight att
 
 // Spawner settings
 pub const TARGET_NUM_ENEMIES: usize = 10; // Max number of enemies on the board
-pub const PER_TURN_ENEMY_SPAWN_COUNT: usize = 1; // Number of enemies to spawn per turn
+pub const PER_TURN_ENEMY_SPAWN_COUNT: usize = 2; // Number of enemies to spawn per turn
 
 // UI Settings
 pub const UI_FONT_SIZE: f32 = 4.0; // Font size for UI elements
 pub const UI_FONT: &str = "fonts/Press_Start_2P/PressStart2P-Regular.ttf"; // Font for UI elements
+pub const UI_HEADER_FONT_SIZE: f32 = UI_FONT_SIZE * 1.2; // Font size for UI headers
