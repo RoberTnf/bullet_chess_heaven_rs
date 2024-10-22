@@ -37,3 +37,4 @@ strip = "debuginfo"
 
 [lints]
 rust = { dead_code = "allow"}
+clippy = { type_complexity = "allow" }

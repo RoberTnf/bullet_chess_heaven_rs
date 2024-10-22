@@ -1,5 +1,3 @@
-#![allow(clippy::type_complexity)]
-
 use bevy::{log::LogPlugin, prelude::*, window::WindowResolution};
 
 mod board;
