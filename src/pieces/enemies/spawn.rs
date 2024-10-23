@@ -5,7 +5,13 @@ use crate::{
     pieces::{
         common::{BlocksMovement, Piece, PieceBundle, PieceState, Team},
         damage::Damage,
-        enemies::king::{BLACK_KING_INFO, WHITE_KING_INFO},
+        enemies::{
+            bishop::{BLACK_BISHOP_INFO, WHITE_BISHOP_INFO},
+            king::{BLACK_KING_INFO, WHITE_KING_INFO},
+            knight::{BLACK_KNIGHT_INFO, WHITE_KNIGHT_INFO},
+            queen::{BLACK_QUEEN_INFO, WHITE_QUEEN_INFO},
+            rook::{BLACK_ROOK_INFO, WHITE_ROOK_INFO},
+        },
         health::Health,
         healthbar::spawn_healthbar,
         movement_type::MovementType,
@@ -29,6 +35,14 @@ fn get_random_piece_info(turn_info: &Res<TurnInfo>) -> PieceInfo {
         BLACK_PAWN_INFO.clone(),
         WHITE_KING_INFO.clone(),
         BLACK_KING_INFO.clone(),
+        WHITE_QUEEN_INFO.clone(),
+        BLACK_QUEEN_INFO.clone(),
+        WHITE_ROOK_INFO.clone(),
+        BLACK_ROOK_INFO.clone(),
+        WHITE_BISHOP_INFO.clone(),
+        BLACK_BISHOP_INFO.clone(),
+        WHITE_KNIGHT_INFO.clone(),
+        BLACK_KNIGHT_INFO.clone(),
     ];
     let total_weight = pieces
         .iter()

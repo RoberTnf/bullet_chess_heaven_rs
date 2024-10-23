@@ -40,6 +40,17 @@ pub const ENEMY_BASE_DAMAGE: u64 = 1; // Damage of the enemy
 
 // Enemy spawn settings
 pub const KING_SPAWN_TURN: u32 = 5; // Turn number to spawn kings
+pub const QUEEN_SPAWN_TURN: u32 = 5; // Turn number to spawn queens
+pub const ROOK_SPAWN_TURN: u32 = 5; // Turn number to spawn rooks
+pub const BISHOP_SPAWN_TURN: u32 = 5; // Turn number to spawn bishops
+pub const KNIGHT_SPAWN_TURN: u32 = 5; // Turn number to spawn knights
+
+pub const KING_SPAWN_WEIGHT: f64 = 1.0; // Weight of the king spawn
+pub const QUEEN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the queen spawn
+pub const ROOK_SPAWN_WEIGHT: f64 = 1.0; // Weight of the rook spawn
+pub const BISHOP_SPAWN_WEIGHT: f64 = 1.0; // Weight of the bishop spawn
+pub const KNIGHT_SPAWN_WEIGHT: f64 = 1.0; // Weight of the knight spawn
+pub const PAWN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the pawn spawn
 
 // Spritesheet settings
 pub const HIGHLIGHT_ATLAS_INDEX: usize = 3; // Index of the highlight sprite in the spritesheet

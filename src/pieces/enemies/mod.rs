@@ -5,8 +5,12 @@ use crate::states::{game_state::GameState, pause_state::GamePauseState, turn_sta
 
 use super::common::MovementTypes;
 pub mod ai;
+pub mod bishop;
 pub mod king;
+pub mod knight;
 pub mod pawn;
+pub mod queen;
+pub mod rook;
 pub mod spawn;
 
 #[derive(Component)]

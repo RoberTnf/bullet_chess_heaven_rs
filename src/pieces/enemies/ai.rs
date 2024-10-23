@@ -51,24 +51,36 @@ pub fn ai_system(
                 continue;
             }
             // no attacks, so we move
-            // we select the move that minimizes distance to any player piece
-            let best_move = moves.iter().min_by_key(|pos| {
-                player_pieces_positions
-                    .iter()
-                    .map(|player_pos| pos.distance(*player_pos))
-                    .min()
-                    .unwrap()
-            });
+            // we select the move that enables a potential attack next turn or minimizes distance
+            let best_move = moves
+                .iter()
+                .min_by_key(|pos| {
+                    let enables_attack = enemy_movement_types.0.iter().any(|movement_type| {
+                        !movement_type
+                            .get_valid_moves(pos, &all_pieces_positions, &player_pieces_positions)
+                            .valid_attacks
+                            .is_empty()
+                    });
 
-            if let Some(best_move) = best_move {
-                // mark origin as available, remove destination
-                all_pieces_positions.insert(*best_move);
-                all_pieces_positions.remove(enemy_pos);
-                move_events.send(MovePieceEvent {
-                    entity: enemy_entity,
-                    destination: *best_move,
-                });
-            }
+                    if enables_attack {
+                        0
+                    } else {
+                        player_pieces_positions
+                            .iter()
+                            .map(|player_pos| pos.distance(*player_pos))
+                            .min()
+                            .unwrap()
+                    }
+                })
+                .expect("There should be at least one valid move");
+
+            // mark origin as available, remove destination
+            all_pieces_positions.insert(*best_move);
+            all_pieces_positions.remove(enemy_pos);
+            move_events.send(MovePieceEvent {
+                entity: enemy_entity,
+                destination: *best_move,
+            });
         } else {
             let attack_position = attacks.iter().next().unwrap();
             attack_events.send(AttackPieceEvent {
