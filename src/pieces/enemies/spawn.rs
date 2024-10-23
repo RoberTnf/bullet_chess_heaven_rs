@@ -114,28 +114,22 @@ pub fn spawn_enemies(
 
 fn get_spawn_position(
     piece_info: &PieceInfo,
-    occupied_positions: &bevy::utils::hashbrown::HashSet<BoardPosition>,
-    all_positions: &Vec<PositionAvailable>,
+    occupied_positions: &HashSet<BoardPosition>,
+    all_positions: &[PositionAvailable],
 ) -> BoardPosition {
     if piece_info
         .movement_types
         .0
         .contains(&MovementType::WhitePawn)
     {
-        return BoardPosition::get_random_position_limited(
-            occupied_positions,
-            &[PositionAvailable::Bottom],
-        );
+        BoardPosition::get_random_position_limited(occupied_positions, &[PositionAvailable::Bottom])
     } else if piece_info
         .movement_types
         .0
         .contains(&MovementType::BlackPawn)
     {
-        return BoardPosition::get_random_position_limited(
-            occupied_positions,
-            &[PositionAvailable::Top],
-        );
+        BoardPosition::get_random_position_limited(occupied_positions, &[PositionAvailable::Top])
     } else {
-        return BoardPosition::get_random_position_limited(occupied_positions, all_positions);
+        BoardPosition::get_random_position_limited(occupied_positions, all_positions)
     }
 }
