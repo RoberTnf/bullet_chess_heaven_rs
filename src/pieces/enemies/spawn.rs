@@ -6,6 +6,7 @@ use crate::{
         common::{BlocksMovement, Piece, PieceBundle, PieceState, Team},
         damage::Damage,
         health::Health,
+        healthbar::spawn_healthbar,
     },
     states::{game_state::GameState, turn_state::TurnState},
 };
@@ -54,30 +55,35 @@ pub fn spawn_enemies(
         let global_position = tile_pos.as_global_position().extend(ENEMY_Z_INDEX);
         let piece_info = get_random_piece_info();
 
-        commands.spawn((
-            PieceBundle {
-                sprite: SpriteBundle {
-                    texture: asset_server.load("custom/spritesheet.png"),
-                    transform: Transform::from_translation(global_position),
-                    ..default()
+        let enemy = commands
+            .spawn((
+                PieceBundle {
+                    sprite: SpriteBundle {
+                        texture: asset_server.load("custom/spritesheet.png"),
+                        transform: Transform::from_translation(global_position),
+                        ..default()
+                    },
+                    atlas: TextureAtlas {
+                        layout: atlas_layout.handle.clone(),
+                        index: piece_info.sprite_index,
+                    },
+                    blocks_movement: BlocksMovement,
+                    creature: Piece,
+                    board_position: tile_pos,
+                    health: Health::new(piece_info.health),
+                    damage: Damage::new(piece_info.damage),
+                    state: PieceState::Idle,
+                    movement_types: piece_info.movement_types,
+                    team: Team::Enemy,
                 },
-                atlas: TextureAtlas {
-                    layout: atlas_layout.handle.clone(),
-                    index: piece_info.sprite_index,
-                },
-                blocks_movement: BlocksMovement,
-                creature: Piece,
-                board_position: tile_pos,
-                health: Health::new(piece_info.health),
-                damage: Damage::new(piece_info.damage),
-                state: PieceState::Idle,
-                movement_types: piece_info.movement_types,
-                team: Team::Enemy,
-            },
-            Enemy,
-            Name::new("Enemy"),
-            StateScoped(GameState::Game),
-        ));
+                Enemy,
+                Name::new("Enemy"),
+                StateScoped(GameState::Game),
+            ))
+            .id();
+
+        let healthbars = spawn_healthbar(&mut commands, &asset_server, &atlas_layout.handle);
+        commands.entity(enemy).push_children(&healthbars);
     }
     next_turn_state.set(TurnState::PlayerInput);
 }

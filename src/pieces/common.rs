@@ -2,7 +2,9 @@ use bevy::prelude::*;
 
 use crate::board::position::BoardPosition;
 
-use super::{damage::Damage, health::Health, movement_type::MovementType};
+use super::{
+    attack::AttackPieceAnimationState, damage::Damage, health::Health, movement_type::MovementType,
+};
 
 #[derive(Component, Default)]
 pub struct BlocksMovement;
@@ -13,7 +15,15 @@ pub struct Piece;
 #[derive(Component)]
 pub enum PieceState {
     Idle,
-    Moving { origin: Vec3, destination: Vec3 },
+    Moving {
+        origin: Vec3,
+        destination: Vec3,
+    },
+    Attacking {
+        destination: BoardPosition,
+        origin: BoardPosition,
+        animation_state: AttackPieceAnimationState,
+    },
 }
 
 #[derive(Component, Clone)]

@@ -48,41 +48,12 @@ pub fn move_piece(
     }
 }
 
-pub fn move_player_animation(
-    mut player: Query<(&mut Transform, &PieceState, Entity), With<Player>>,
-    time: Res<Time>,
-    mut commands: Commands,
-    mut next_turn_state: ResMut<NextState<TurnState>>,
-) {
-    let (mut transform, state, entity) = player.single_mut();
-    if let PieceState::Moving {
-        origin: _,
-        destination,
-    } = state
-    {
-        let current_position = transform.translation;
-        let lerp_value = TWEEN_MOVE_ANIMATION_SPEED * time.delta_seconds();
-        let distance = destination.distance_squared(current_position);
-
-        // if less than 1 pixel away, snap to destination
-        if distance < 1.0 {
-            transform.translation = *destination;
-            commands.entity(entity).insert(PieceState::Idle);
-            next_turn_state.set(TurnState::EnemyAI);
-        } else {
-            transform.translation = transform.translation.lerp(*destination, lerp_value);
-        }
-    } else {
-        next_turn_state.set(TurnState::EnemyAI);
-    }
-}
-
-pub fn move_enemies_animation(
-    mut enemies: Query<(&mut Transform, &PieceState, Entity), With<Enemy>>,
+pub fn move_pieces_animation(
+    mut pieces: Query<(&mut Transform, &PieceState, Entity)>,
     time: Res<Time>,
     mut commands: Commands,
 ) {
-    for (mut transform, state, entity) in enemies.iter_mut() {
+    for (mut transform, state, entity) in pieces.iter_mut() {
         if let PieceState::Moving {
             origin: _,
             destination,
@@ -103,14 +74,20 @@ pub fn move_enemies_animation(
     }
 }
 
-pub fn all_enemies_moved(
-    enemies: Query<&PieceState, With<Enemy>>,
+pub fn all_enemies_idle(
+    moves: Query<&PieceState, With<Enemy>>,
     mut turn_state: ResMut<NextState<TurnState>>,
 ) {
-    if enemies
-        .iter()
-        .all(|state| matches!(state, PieceState::Idle))
-    {
+    if moves.iter().all(|state| matches!(state, PieceState::Idle)) {
         turn_state.set(TurnState::EnemySpawn);
+    }
+}
+
+pub fn player_idle(
+    moves: Query<&PieceState, With<Player>>,
+    mut turn_state: ResMut<NextState<TurnState>>,
+) {
+    if moves.iter().all(|state| matches!(state, PieceState::Idle)) {
+        turn_state.set(TurnState::EnemyAI);
     }
 }

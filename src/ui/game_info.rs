@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    globals::{UI_FONT, UI_FONT_SIZE},
+    globals::{UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
     states::turn_state::TurnInfo,
 };
 
@@ -24,6 +24,7 @@ pub fn setup_game_info(
             .spawn(NodeBundle {
                 style: Style {
                     padding: UiRect::all(Val::Px(2.0)),
+                    row_gap: Val::Px(2.0),
                     flex_direction: FlexDirection::Column,
                     ..default()
                 },
@@ -31,6 +32,14 @@ pub fn setup_game_info(
                 ..default()
             })
             .with_children(|parent| {
+                parent.spawn(TextBundle::from_section(
+                    "Game",
+                    TextStyle {
+                        font_size: UI_HEADER_FONT_SIZE,
+                        font: asset_server.load(UI_FONT),
+                        ..default()
+                    },
+                ));
                 parent.spawn((
                     TextBundle::from_section(
                         "Turn: 1",

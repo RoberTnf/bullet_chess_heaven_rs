@@ -30,6 +30,7 @@ pub fn setup_debug_ui(
             .spawn(NodeBundle {
                 style: Style {
                     width: Val::Percent(100.0),
+                    row_gap: Val::Px(2.0),
                     padding: UiRect::all(Val::Px(2.0)),
                     flex_direction: FlexDirection::Column,
                     ..default()
@@ -39,7 +40,7 @@ pub fn setup_debug_ui(
             })
             .with_children(|p2| {
                 p2.spawn(TextBundle::from_section(
-                    "Debug Information",
+                    "Debug",
                     TextStyle {
                         font_size: UI_HEADER_FONT_SIZE,
                         font: asset_server.load(UI_FONT),

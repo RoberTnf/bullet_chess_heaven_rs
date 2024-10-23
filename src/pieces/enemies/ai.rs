@@ -3,26 +3,36 @@ use bevy::{prelude::*, utils::HashSet};
 use crate::{
     board::position::BoardPosition,
     pieces::{
+        attack::AttackPieceEvent,
         common::{MovementTypes, Piece, Team},
+        damage::Damage,
         movement::MovePieceEvent,
     },
     states::turn_state::TurnState,
 };
 
 pub fn ai_system(
-    pieces: Query<(&BoardPosition, &MovementTypes, &Team, Entity), With<Piece>>,
+    pieces: Query<(&BoardPosition, &MovementTypes, &Team, &Damage, Entity), With<Piece>>,
     mut move_events: EventWriter<MovePieceEvent>,
     mut turn_state: ResMut<NextState<TurnState>>,
+    mut attack_events: EventWriter<AttackPieceEvent>,
 ) {
-    let enemy_pieces = pieces.iter().filter(|(_, _, &team, _)| team == Team::Enemy);
-    let player_pieces_positions = HashSet::from_iter(
+    let enemy_pieces = pieces
+        .iter()
+        .filter(|(_, _, &team, _, _)| team == Team::Enemy);
+    let player_pieces_positions_and_entities = HashSet::from_iter(
         pieces
             .iter()
-            .filter(|(_, _, &team, _)| team == Team::Player)
-            .map(|(pos, _, _, _)| *pos),
+            .filter(|(_, _, &team, _, _)| team == Team::Player)
+            .map(|(pos, _, _, _, entity)| (entity, *pos)),
     );
-    let mut all_pieces_positions = HashSet::from_iter(pieces.iter().map(|(pos, _, _, _)| *pos));
-    for (enemy_pos, enemy_movement_types, _, enemy_entity) in enemy_pieces {
+    let player_pieces_positions = HashSet::from_iter(
+        player_pieces_positions_and_entities
+            .iter()
+            .map(|(_, pos)| *pos),
+    );
+    let mut all_pieces_positions = HashSet::from_iter(pieces.iter().map(|(pos, _, _, _, _)| *pos));
+    for (enemy_pos, enemy_movement_types, _, enemy_damage, enemy_entity) in enemy_pieces {
         // we make the assumption that there will be enemies with more than one movement type
         let mut moves = HashSet::new();
         let mut attacks = HashSet::new();
@@ -60,7 +70,17 @@ pub fn ai_system(
                 });
             }
         } else {
-            // we attack
+            let attack_position = attacks.iter().next().unwrap();
+            attack_events.send(AttackPieceEvent {
+                attacker: enemy_entity,
+                target: player_pieces_positions_and_entities
+                    .iter()
+                    .find(|(_, pos)| pos == attack_position)
+                    .unwrap()
+                    .0,
+                damage: enemy_damage.value,
+                destination: *attack_position,
+            });
         }
     }
     turn_state.set(TurnState::EnemyAnimation);

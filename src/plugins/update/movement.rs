@@ -1,9 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    pieces::movement::{
-        all_enemies_moved, move_enemies_animation, move_piece, move_player_animation,
-    },
+    pieces::movement::{all_enemies_idle, move_piece, move_pieces_animation, player_idle},
     states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
 };
 
@@ -17,13 +15,12 @@ impl Plugin for MovementPlugin {
                 move_piece
                     .run_if(in_state(GameState::Game))
                     .run_if(in_state(GamePauseState::Playing)),
-                move_player_animation
-                    .run_if(in_state(TurnState::PlayerAnimation))
-                    .run_if(in_state(GameState::Game))
-                    .run_if(in_state(GamePauseState::Playing)),
-                (move_enemies_animation, all_enemies_moved)
+                (
+                    move_pieces_animation,
+                    all_enemies_idle.run_if(in_state(TurnState::EnemyAnimation)),
+                    player_idle.run_if(in_state(TurnState::PlayerAnimation)),
+                )
                     .after(move_piece)
-                    .run_if(in_state(TurnState::EnemyAnimation))
                     .run_if(in_state(GameState::Game))
                     .run_if(in_state(GamePauseState::Playing)),
             ),
