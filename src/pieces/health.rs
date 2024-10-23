@@ -5,7 +5,7 @@ use crate::{
     board::highlight::HighlightCache,
     globals::{
         DEATH_ANIMATION_DURATION, HEALTH_CHANGE_TEXT_ANIMATION_DURATION,
-        HEALTH_CHANGE_TEXT_ANIMATION_SPEED, HEALTH_CHANGE_TEXT_Z_INDEX, HEALTH_Z_INDEX, TILE_SIZE,
+        HEALTH_CHANGE_TEXT_ANIMATION_SPEED, HEALTH_CHANGE_TEXT_Z_INDEX,
     },
     states::game_state::GameState,
 };
@@ -87,12 +87,10 @@ pub fn spawn_health_change_text(
                 } else {
                     Color::srgba(0.0, 1.0, 0.0, 1.0)
                 }
+            } else if *team == Team::Player {
+                Color::srgba(0.0, 1.0, 0.0, 1.0)
             } else {
-                if *team == Team::Player {
-                    Color::srgba(0.0, 1.0, 0.0, 1.0)
-                } else {
-                    Color::srgba(1.0, 0.0, 0.0, 1.0)
-                }
+                Color::srgba(1.0, 0.0, 0.0, 1.0)
             };
 
             let mut rng = rand::thread_rng();
@@ -104,7 +102,7 @@ pub fn spawn_health_change_text(
                         format!("{}", change),
                         TextStyle {
                             font_size: 14.0,
-                            color: color,
+                            color,
                             ..default()
                         },
                     ),
@@ -123,7 +121,7 @@ pub fn spawn_health_change_text(
                         HEALTH_CHANGE_TEXT_ANIMATION_DURATION,
                         TimerMode::Once,
                     ),
-                    direction: direction,
+                    direction,
                     speed: HEALTH_CHANGE_TEXT_ANIMATION_SPEED,
                 },
                 StateScoped(GameState::Game),

@@ -35,7 +35,7 @@ pub fn update_healthbars(
 ) {
     for (entity, mut healthbar, mut transform, parent) in query.iter_mut() {
         match parent_query.get(parent.get()) {
-            Ok((parent_entity, Some(parent_health))) => {
+            Ok((_, Some(parent_health))) => {
                 let new_fraction = parent_health.value as f64 / parent_health.max_value as f64;
                 if new_fraction != healthbar.fraction {
                     healthbar.fraction = new_fraction;
