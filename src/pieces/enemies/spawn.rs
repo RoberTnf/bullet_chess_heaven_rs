@@ -1,14 +1,19 @@
 use crate::{
-    board::position::BoardPosition,
+    board::position::{BoardPosition, PositionAvailable},
     globals::{ENEMY_Z_INDEX, PER_TURN_ENEMY_SPAWN_COUNT, TARGET_NUM_ENEMIES},
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
         common::{BlocksMovement, Piece, PieceBundle, PieceState, Team},
         damage::Damage,
+        enemies::king::{BLACK_KING_INFO, WHITE_KING_INFO},
         health::Health,
         healthbar::spawn_healthbar,
+        movement_type::MovementType,
     },
-    states::{game_state::GameState, turn_state::TurnState},
+    states::{
+        game_state::GameState,
+        turn_state::{TurnInfo, TurnState},
+    },
 };
 use bevy::{prelude::*, utils::HashSet};
 use rand::prelude::*;
@@ -18,9 +23,23 @@ use super::{
     Enemy, PieceInfo,
 };
 
-fn get_random_piece_info() -> PieceInfo {
-    let pieces = [WHITE_PAWN_INFO.clone(), BLACK_PAWN_INFO.clone()];
-    let total_weight = pieces.iter().map(|p| p.spawn_weight).sum::<f64>();
+fn get_random_piece_info(turn_info: &Res<TurnInfo>) -> PieceInfo {
+    let pieces = [
+        WHITE_PAWN_INFO.clone(),
+        BLACK_PAWN_INFO.clone(),
+        WHITE_KING_INFO.clone(),
+        BLACK_KING_INFO.clone(),
+    ];
+    let total_weight = pieces
+        .iter()
+        .map(|p| {
+            if turn_info.number >= p.spawn_turn {
+                p.spawn_weight
+            } else {
+                0.0
+            }
+        })
+        .sum::<f64>();
     let mut random_value = rand::thread_rng().gen_range(0.0..total_weight);
 
     for piece in pieces.iter() {
@@ -42,19 +61,24 @@ pub fn spawn_enemies(
     atlas_layout: Res<SpriteSheetAtlas>,
     piece_position_query: Query<&BoardPosition, With<Piece>>,
     mut next_turn_state: ResMut<NextState<TurnState>>,
+    turn_info: Res<TurnInfo>,
 ) {
     debug!("Spawning enemies");
     let num_enemies = enemies.iter().count();
     let enemies_to_spawn = (TARGET_NUM_ENEMIES - num_enemies).clamp(0, PER_TURN_ENEMY_SPAWN_COUNT);
     let mut occupied_positions = HashSet::from_iter(piece_position_query.iter().copied());
-
+    let all_positions = vec![
+        PositionAvailable::Top,
+        PositionAvailable::Bottom,
+        PositionAvailable::Left,
+        PositionAvailable::Right,
+    ];
     for _ in 0..enemies_to_spawn {
-        let tile_pos = BoardPosition::get_random_empty_position(&occupied_positions);
+        let piece_info = get_random_piece_info(&turn_info);
+        let tile_pos = get_spawn_position(&piece_info, &occupied_positions, &all_positions);
+
         occupied_positions.insert(tile_pos);
-
         let global_position = tile_pos.as_global_position().extend(ENEMY_Z_INDEX);
-        let piece_info = get_random_piece_info();
-
         let enemy = commands
             .spawn((
                 PieceBundle {
@@ -86,4 +110,32 @@ pub fn spawn_enemies(
         commands.entity(enemy).push_children(&healthbars);
     }
     next_turn_state.set(TurnState::PlayerInput);
+}
+
+fn get_spawn_position(
+    piece_info: &PieceInfo,
+    occupied_positions: &bevy::utils::hashbrown::HashSet<BoardPosition>,
+    all_positions: &Vec<PositionAvailable>,
+) -> BoardPosition {
+    if piece_info
+        .movement_types
+        .0
+        .contains(&MovementType::WhitePawn)
+    {
+        return BoardPosition::get_random_position_limited(
+            occupied_positions,
+            &[PositionAvailable::Bottom],
+        );
+    } else if piece_info
+        .movement_types
+        .0
+        .contains(&MovementType::BlackPawn)
+    {
+        return BoardPosition::get_random_position_limited(
+            occupied_positions,
+            &[PositionAvailable::Top],
+        );
+    } else {
+        return BoardPosition::get_random_position_limited(occupied_positions, all_positions);
+    }
 }

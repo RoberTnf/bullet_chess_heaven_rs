@@ -11,6 +11,14 @@ pub struct BoardPosition {
     pub y: i32,
 }
 
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum PositionAvailable {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
 impl BoardPosition {
     pub fn new(x: i32, y: i32) -> Option<Self> {
         let pos = Self { x, y };
@@ -70,6 +78,34 @@ impl BoardPosition {
             let pos =
                 Self::new(rng.gen_range(0..BOARD_SIZE), rng.gen_range(0..BOARD_SIZE)).unwrap();
             if !other_positions.contains(&pos) {
+                return pos;
+            }
+        }
+    }
+
+    pub fn get_random_position_limited(
+        other_positions: &HashSet<BoardPosition>,
+        side_available: &[PositionAvailable],
+    ) -> Self {
+        let mut rng = thread_rng();
+        loop {
+            let pos =
+                Self::new(rng.gen_range(0..BOARD_SIZE), rng.gen_range(0..BOARD_SIZE)).unwrap();
+
+            if other_positions.contains(&pos) {
+                continue;
+            }
+
+            if side_available.contains(&PositionAvailable::Top) && pos.y == BOARD_SIZE - 1 {
+                return pos;
+            }
+            if side_available.contains(&PositionAvailable::Bottom) && pos.y == 0 {
+                return pos;
+            }
+            if side_available.contains(&PositionAvailable::Left) && pos.x == 0 {
+                return pos;
+            }
+            if side_available.contains(&PositionAvailable::Right) && pos.x == BOARD_SIZE - 1 {
                 return pos;
             }
         }

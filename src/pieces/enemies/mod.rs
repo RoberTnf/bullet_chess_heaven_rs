@@ -5,6 +5,7 @@ use crate::states::{game_state::GameState, pause_state::GamePauseState, turn_sta
 
 use super::common::MovementTypes;
 pub mod ai;
+pub mod king;
 pub mod pawn;
 pub mod spawn;
 
@@ -18,6 +19,7 @@ pub struct PieceInfo {
     pub sprite_index: usize,
     pub movement_types: MovementTypes,
     pub spawn_weight: f64,
+    pub spawn_turn: u32,
 }
 
 pub struct EnemyPlugin;

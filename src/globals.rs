@@ -35,8 +35,11 @@ pub const PLAYER_HEALTH: u64 = 100; // Health of the player
 pub const PLAYER_DAMAGE: u64 = 1; // Damage of the player
 
 // Enemy settings
-pub const PAWN_HEALTH: u64 = 2; // Health of the enemy
-pub const PAWN_DAMAGE: u64 = 1; // Damage of the enemy
+pub const ENEMY_BASE_HEALTH: u64 = 2; // Health of the enemy
+pub const ENEMY_BASE_DAMAGE: u64 = 1; // Damage of the enemy
+
+// Enemy spawn settings
+pub const KING_SPAWN_TURN: u32 = 5; // Turn number to spawn kings
 
 // Spritesheet settings
 pub const HIGHLIGHT_ATLAS_INDEX: usize = 3; // Index of the highlight sprite in the spritesheet
