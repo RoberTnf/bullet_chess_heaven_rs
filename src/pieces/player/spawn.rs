@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     board::position::BoardPosition,
-    globals,
+    globals::{self, PLAYER_ATLAS_INDEX},
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
         common::{BlocksMovement, MovementTypes, Piece, PieceBundle, PieceState, Team},
@@ -45,7 +45,7 @@ pub fn spawn_player(
                 },
                 atlas: TextureAtlas {
                     layout: atlas_layout.handle.clone(),
-                    index: 0,
+                    index: PLAYER_ATLAS_INDEX,
                 },
                 blocks_movement: BlocksMovement,
                 creature: Piece,

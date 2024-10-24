@@ -5,12 +5,13 @@ use crate::{
     board::highlight::HighlightCache,
     globals::{
         DEATH_ANIMATION_DURATION, HEALTH_CHANGE_TEXT_ANIMATION_DURATION,
-        HEALTH_CHANGE_TEXT_ANIMATION_SPEED, HEALTH_CHANGE_TEXT_Z_INDEX,
+        HEALTH_CHANGE_TEXT_ANIMATION_SPEED, HEALTH_CHANGE_TEXT_FONT_SIZE,
+        HEALTH_CHANGE_TEXT_Z_INDEX, UI_FONT,
     },
     states::game_state::GameState,
 };
 
-use super::common::Team;
+use super::{common::Team, player::spawn::Player};
 
 #[derive(Component)]
 pub struct Health {
@@ -78,6 +79,7 @@ pub struct PieceHealthChangeEvent {
 pub fn spawn_health_change_text(
     mut health_query: Query<(&mut Health, &Transform, &Team)>,
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
 ) {
     for (mut health, transform, team) in health_query.iter_mut() {
         for change in health.changes.iter() {
@@ -101,9 +103,9 @@ pub fn spawn_health_change_text(
                     text: Text::from_section(
                         format!("{}", change),
                         TextStyle {
-                            font_size: 14.0,
+                            font_size: HEALTH_CHANGE_TEXT_FONT_SIZE,
                             color,
-                            ..default()
+                            font: asset_server.load(UI_FONT),
                         },
                     ),
                     transform: Transform {
@@ -151,8 +153,9 @@ pub fn health_change_system(
     }
 }
 
+// death of player is handled by game logic
 pub fn death_system(
-    health_query: Query<(&Health, Entity, &Name), Without<DeathAnimation>>,
+    health_query: Query<(&Health, Entity, &Name), (Without<DeathAnimation>, Without<Player>)>,
     mut commands: Commands,
     mut death_event_writer: EventWriter<PieceDeathEvent>,
 ) {

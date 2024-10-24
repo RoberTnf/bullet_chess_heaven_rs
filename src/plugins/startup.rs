@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 
-use crate::{board, graphics, pieces, states, ui::UiPlugin};
+use crate::{
+    board, graphics, pieces,
+    states::{self, game_state::GameState, turn_state::reset_turn},
+    ui::UiPlugin,
+};
 
 pub struct StartupPlugin;
 
@@ -23,13 +27,14 @@ impl Plugin for StartupPlugin {
             .add_event::<pieces::attack::AttackPieceEvent>()
             .add_event::<pieces::health::PieceHealthChangeEvent>()
             .add_event::<pieces::health::PieceDeathEvent>()
+            .add_systems(Startup, graphics::camera::setup_camera)
             // One off systems
             .add_systems(
-                Startup,
+                OnEnter(GameState::Game),
                 (
                     board::tile::spawn_board,
-                    graphics::camera::setup_camera,
                     pieces::player::spawn::spawn_player,
+                    reset_turn,
                 ),
             )
             .add_plugins(UiPlugin)

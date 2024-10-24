@@ -14,11 +14,11 @@ pub fn promotion_system(
 ) {
     for (mut movement_types, pos, mut atlas) in pieces.iter_mut() {
         if pos.y == 7 && movement_types.0 == vec![MovementType::WhitePawn] {
-            debug!("Promoting white pawn to black pawn");
+            debug!("Promoting white pawn to black king");
             *movement_types = MovementTypes(vec![MovementType::King]);
             atlas.index = BLACK_KING_INFO.sprite_index;
         } else if pos.y == 0 && movement_types.0 == vec![MovementType::BlackPawn] {
-            debug!("Promoting black pawn to white pawn");
+            debug!("Promoting black pawn to white king");
             *movement_types = MovementTypes(vec![MovementType::King]);
             atlas.index = WHITE_KING_INFO.sprite_index;
         }

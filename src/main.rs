@@ -1,6 +1,7 @@
 use bevy::{log::LogPlugin, prelude::*, window::WindowResolution};
 
 mod board;
+mod game_logic;
 mod globals;
 mod graphics;
 mod input;

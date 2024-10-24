@@ -5,6 +5,7 @@ use std::fmt;
 pub enum GameState {
     MainMenu,
     Game,
+    Defeat,
 }
 
 impl fmt::Display for GameState {
@@ -12,6 +13,7 @@ impl fmt::Display for GameState {
         match self {
             GameState::MainMenu => write!(f, "MainMenu"),
             GameState::Game => write!(f, "Game"),
+            GameState::Defeat => write!(f, "Defeat"),
         }
     }
 }
@@ -21,6 +23,7 @@ impl GameState {
         match self {
             GameState::MainMenu => Color::srgb(1.0, 0.0, 0.0),
             GameState::Game => Color::srgb(0.0, 1.0, 0.0),
+            GameState::Defeat => Color::srgb(0.0, 0.0, 1.0),
         }
     }
 }

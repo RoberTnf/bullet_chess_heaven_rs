@@ -51,3 +51,7 @@ impl Plugin for TurnPlugin {
         app.add_systems(OnEnter(TurnState::PlayerInput), increment_turn);
     }
 }
+
+pub fn reset_turn(mut turn_info: ResMut<TurnInfo>) {
+    turn_info.number = 1;
+}

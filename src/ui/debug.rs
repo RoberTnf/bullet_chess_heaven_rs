@@ -5,7 +5,7 @@ use crate::{
     states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
 };
 
-use super::LeftUINode;
+use super::{setup_ui, LeftUINode};
 
 #[derive(Component)]
 struct DebugUINode;
@@ -141,5 +141,7 @@ impl Plugin for DebugPlugin {
                 update_debug_pause_state_information.run_if(state_changed::<GamePauseState>),
             ),
         );
+
+        app.add_systems(Startup, setup_debug_ui.after(setup_ui));
     }
 }
