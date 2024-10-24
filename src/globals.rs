@@ -46,12 +46,12 @@ pub const BISHOP_SPAWN_TURN: u32 = 75; // Turn number to spawn bishops
 pub const ROOK_SPAWN_TURN: u32 = 100; // Turn number to spawn rooks
 pub const QUEEN_SPAWN_TURN: u32 = 125; // Turn number to spawn queens
 
-pub const KING_SPAWN_WEIGHT: f64 = 0.5; // Weight of the king spawn
-pub const PAWN_SPAWN_WEIGHT: f64 = 5.0; // Weight of the pawn spawn
-pub const KNIGHT_SPAWN_WEIGHT: f64 = 50.0; // Weight of the knight spawn
-pub const BISHOP_SPAWN_WEIGHT: f64 = 500.0; // Weight of the bishop spawn
-pub const ROOK_SPAWN_WEIGHT: f64 = 5000.0; // Weight of the rook spawn
-pub const QUEEN_SPAWN_WEIGHT: f64 = 50000.0; // Weight of the queen spawn
+pub const KING_SPAWN_WEIGHT: f64 = 1.0; // Weight of the king spawn
+pub const PAWN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the pawn spawn
+pub const KNIGHT_SPAWN_WEIGHT: f64 = 1.0; // Weight of the knight spawn
+pub const BISHOP_SPAWN_WEIGHT: f64 = 1.0; // Weight of the bishop spawn
+pub const ROOK_SPAWN_WEIGHT: f64 = 1.0; // Weight of the rook spawn
+pub const QUEEN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the queen spawn
 
 // Spritesheet settings
 pub const HIGHLIGHT_ATLAS_INDEX: usize = 3; // Index of the highlight sprite in the spritesheet
