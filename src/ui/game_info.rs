@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
+    game_logic::score::GameScore,
     globals::{UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
     pieces::experience::PlayerLevel,
     states::turn_state::TurnInfo,
@@ -19,6 +20,9 @@ pub struct LevelUILabel;
 
 #[derive(Component)]
 pub struct ExpUILabel;
+
+#[derive(Component)]
+pub struct ScoreUILabel;
 
 pub fn setup_game_info(
     mut commands: Commands,
@@ -80,11 +84,22 @@ pub fn setup_game_info(
                     ),
                     ExpUILabel,
                 ));
+                parent.spawn((
+                    TextBundle::from_section(
+                        "ScorePlaceholder",
+                        TextStyle {
+                            font_size: UI_FONT_SIZE,
+                            font: asset_server.load(UI_FONT),
+                            ..default()
+                        },
+                    ),
+                    ScoreUILabel,
+                ));
             });
     });
 }
 
-pub fn update_turn_information(
+fn update_turn_information(
     turn_info: Res<TurnInfo>,
     mut query: Query<&mut Text, With<TurnUILabel>>,
 ) {
@@ -92,7 +107,7 @@ pub fn update_turn_information(
     text.sections[0].value = format!("Turn: {}", turn_info.number);
 }
 
-pub fn update_level_information(
+fn update_level_information(
     mut level_query: Query<&mut Text, (With<LevelUILabel>, Without<ExpUILabel>)>,
     mut exp_query: Query<&mut Text, (With<ExpUILabel>, Without<LevelUILabel>)>,
     level: Res<PlayerLevel>,
@@ -108,11 +123,26 @@ pub fn update_level_information(
     );
 }
 
+fn update_score_information(
+    score: Res<GameScore>,
+    mut query: Query<&mut Text, With<ScoreUILabel>>,
+) {
+    let mut text = query.get_single_mut().unwrap();
+    text.sections[0].value = format!("Score: {}", score.0);
+}
+
 pub struct GameInfoPlugin;
 
 impl Plugin for GameInfoPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (update_turn_information, update_level_information))
-            .add_systems(Startup, setup_game_info.after(setup_ui));
+        app.add_systems(
+            Update,
+            (
+                update_turn_information,
+                update_level_information,
+                update_score_information,
+            ),
+        )
+        .add_systems(Startup, setup_game_info.after(setup_ui));
     }
 }

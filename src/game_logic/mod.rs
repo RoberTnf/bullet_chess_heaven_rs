@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use defeat::check_defeat;
 
 pub mod defeat;
+pub mod score;
 
 pub struct GameLogicPlugin;
 

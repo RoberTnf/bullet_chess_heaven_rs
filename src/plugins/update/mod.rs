@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     board::highlight,
-    game_logic::GameLogicPlugin,
+    game_logic::{score::GameScorePlugin, GameLogicPlugin},
     pieces::{experience::ExperiencePlugin, plugin::PiecePlugin},
     states::turn_state,
 };
@@ -23,6 +23,7 @@ impl Plugin for UpdatePlugin {
             GameLogicPlugin,
             // ResolutionPlugin,
             ExperiencePlugin,
+            GameScorePlugin,
         ));
     }
 }
