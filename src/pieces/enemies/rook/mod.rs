@@ -13,6 +13,7 @@ pub static WHITE_ROOK_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     movement_types: MovementTypes(vec![MovementType::Rook]),
     spawn_weight: globals::ROOK_SPAWN_WEIGHT,
     spawn_turn: globals::ROOK_SPAWN_TURN,
+    value: 5,
 });
 
 pub static BLACK_ROOK_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
@@ -22,4 +23,5 @@ pub static BLACK_ROOK_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     movement_types: MovementTypes(vec![MovementType::Rook]),
     spawn_weight: globals::ROOK_SPAWN_WEIGHT,
     spawn_turn: globals::ROOK_SPAWN_TURN,
+    value: 5,
 });

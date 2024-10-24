@@ -1,7 +1,11 @@
 use bevy::prelude::*;
 
 use crate::{
-    board::highlight, game_logic::GameLogicPlugin, pieces::plugin::PiecePlugin, states::turn_state,
+    board::highlight,
+    game_logic::GameLogicPlugin,
+    graphics::resolution::ResolutionPlugin,
+    pieces::{experience::ExperiencePlugin, plugin::PiecePlugin},
+    states::turn_state,
 };
 mod animation;
 mod input;
@@ -18,6 +22,8 @@ impl Plugin for UpdatePlugin {
             turn_state::TurnPlugin,
             PiecePlugin,
             GameLogicPlugin,
+            ResolutionPlugin,
+            ExperiencePlugin,
         ));
     }
 }

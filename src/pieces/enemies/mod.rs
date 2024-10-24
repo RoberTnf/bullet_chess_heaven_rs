@@ -24,6 +24,7 @@ pub struct PieceInfo {
     pub movement_types: MovementTypes,
     pub spawn_weight: f64,
     pub spawn_turn: u32,
+    pub value: u64,
 }
 
 pub struct EnemyPlugin;

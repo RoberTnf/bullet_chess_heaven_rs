@@ -14,6 +14,7 @@ pub static WHITE_PAWN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     movement_types: MovementTypes(vec![MovementType::WhitePawn]),
     spawn_weight: globals::PAWN_SPAWN_WEIGHT,
     spawn_turn: 1,
+    value: 1,
 });
 
 pub static BLACK_PAWN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
@@ -23,4 +24,5 @@ pub static BLACK_PAWN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     movement_types: MovementTypes(vec![MovementType::BlackPawn]),
     spawn_weight: globals::PAWN_SPAWN_WEIGHT,
     spawn_turn: 1,
+    value: 1,
 });

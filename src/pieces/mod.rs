@@ -3,6 +3,7 @@ pub mod common;
 pub mod damage;
 pub mod enemies;
 pub mod events;
+pub mod experience;
 pub mod health;
 pub mod healthbar;
 pub mod movement;

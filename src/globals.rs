@@ -4,6 +4,7 @@ pub const WINDOW_HEIGHT: f32 = 720.0; // Height of the window
 
 // Target pixel settings
 pub const TARGET_PIXEL_WIDTH: f32 = 320.0; // Target pixel width for scaling
+pub const TARGET_PIXEL_HEIGHT: f32 = 180.0; // Target pixel height for scaling
 
 // Tile settings
 pub const TILE_SIZE: u32 = 20; // Size of each tile in pixels
@@ -39,18 +40,18 @@ pub const ENEMY_BASE_HEALTH: u64 = 2; // Health of the enemy
 pub const ENEMY_BASE_DAMAGE: u64 = 1; // Damage of the enemy
 
 // Enemy spawn settings
-pub const KING_SPAWN_TURN: u32 = 5; // Turn number to spawn kings
-pub const QUEEN_SPAWN_TURN: u32 = 5; // Turn number to spawn queens
-pub const ROOK_SPAWN_TURN: u32 = 5; // Turn number to spawn rooks
-pub const BISHOP_SPAWN_TURN: u32 = 5; // Turn number to spawn bishops
-pub const KNIGHT_SPAWN_TURN: u32 = 5; // Turn number to spawn knights
+pub const KING_SPAWN_TURN: u32 = 25; // Turn number to spawn kings
+pub const KNIGHT_SPAWN_TURN: u32 = 50; // Turn number to spawn knights
+pub const BISHOP_SPAWN_TURN: u32 = 75; // Turn number to spawn bishops
+pub const ROOK_SPAWN_TURN: u32 = 100; // Turn number to spawn rooks
+pub const QUEEN_SPAWN_TURN: u32 = 125; // Turn number to spawn queens
 
-pub const KING_SPAWN_WEIGHT: f64 = 1.0; // Weight of the king spawn
-pub const QUEEN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the queen spawn
-pub const ROOK_SPAWN_WEIGHT: f64 = 1.0; // Weight of the rook spawn
-pub const BISHOP_SPAWN_WEIGHT: f64 = 1.0; // Weight of the bishop spawn
-pub const KNIGHT_SPAWN_WEIGHT: f64 = 1.0; // Weight of the knight spawn
-pub const PAWN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the pawn spawn
+pub const KING_SPAWN_WEIGHT: f64 = 0.5; // Weight of the king spawn
+pub const PAWN_SPAWN_WEIGHT: f64 = 5.0; // Weight of the pawn spawn
+pub const KNIGHT_SPAWN_WEIGHT: f64 = 50.0; // Weight of the knight spawn
+pub const BISHOP_SPAWN_WEIGHT: f64 = 500.0; // Weight of the bishop spawn
+pub const ROOK_SPAWN_WEIGHT: f64 = 5000.0; // Weight of the rook spawn
+pub const QUEEN_SPAWN_WEIGHT: f64 = 50000.0; // Weight of the queen spawn
 
 // Spritesheet settings
 pub const HIGHLIGHT_ATLAS_INDEX: usize = 3; // Index of the highlight sprite in the spritesheet
@@ -67,3 +68,6 @@ pub const UI_FONT_SIZE: f32 = 8.0; // Font size for UI elements
 pub const UI_FONT: &str = "fonts/monogram/ttf/monogram-extended.ttf"; // Font for UI elements
 pub const UI_HEADER_FONT_SIZE: f32 = 12.0; // Font size for UI headers
 pub const HEALTH_CHANGE_TEXT_FONT_SIZE: f32 = 16.0; // Font size for health change text
+
+// EXP settings
+// pub const EXP

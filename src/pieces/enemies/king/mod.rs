@@ -13,6 +13,7 @@ pub static WHITE_KING_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     movement_types: MovementTypes(vec![MovementType::King]),
     spawn_weight: 1.0,
     spawn_turn: KING_SPAWN_TURN,
+    value: 3,
 });
 
 pub static BLACK_KING_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
@@ -22,4 +23,5 @@ pub static BLACK_KING_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     movement_types: MovementTypes(vec![MovementType::King]),
     spawn_weight: 1.0,
     spawn_turn: KING_SPAWN_TURN,
+    value: 3,
 });

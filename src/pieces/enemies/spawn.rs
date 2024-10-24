@@ -12,6 +12,7 @@ use crate::{
             queen::{BLACK_QUEEN_INFO, WHITE_QUEEN_INFO},
             rook::{BLACK_ROOK_INFO, WHITE_ROOK_INFO},
         },
+        experience::PieceValue,
         health::Health,
         healthbar::spawn_healthbar,
         movement_type::MovementType,
@@ -44,19 +45,16 @@ fn get_random_piece_info(turn_info: &Res<TurnInfo>) -> PieceInfo {
         WHITE_KNIGHT_INFO.clone(),
         BLACK_KNIGHT_INFO.clone(),
     ];
-    let total_weight = pieces
+
+    let spawnable_pieces = pieces
         .iter()
-        .map(|p| {
-            if turn_info.number >= p.spawn_turn {
-                p.spawn_weight
-            } else {
-                0.0
-            }
-        })
-        .sum::<f64>();
+        .filter(|p| turn_info.number >= p.spawn_turn)
+        .collect::<Vec<_>>();
+
+    let total_weight = spawnable_pieces.iter().map(|p| p.spawn_weight).sum::<f64>();
     let mut random_value = rand::thread_rng().gen_range(0.0..total_weight);
 
-    for piece in pieces.iter() {
+    for &piece in spawnable_pieces.iter() {
         if random_value < piece.spawn_weight {
             return piece.clone();
         }
@@ -117,6 +115,9 @@ pub fn spawn_enemies(
                 Enemy,
                 Name::new("Enemy"),
                 StateScoped(GameState::Game),
+                PieceValue {
+                    value: piece_info.value,
+                },
             ))
             .id();
 
