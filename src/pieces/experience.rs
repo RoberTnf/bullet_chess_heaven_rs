@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::states::game_state::GameState;
 
-use super::health::PieceDeathEvent;
+use super::{common::Team, health::PieceDeathEvent};
 
 #[derive(Component)]
 pub struct PieceValue {
@@ -57,12 +57,15 @@ impl PlayerLevel {
 
 pub fn add_experience_on_death(
     mut piece_death_events: EventReader<PieceDeathEvent>,
-    piece_value_query: Query<&PieceValue>,
+    piece_value_query: Query<(&PieceValue, &Team)>,
     mut player_level: ResMut<PlayerLevel>,
     mut player_level_up_events: EventWriter<PlayerLevelUpEvent>,
 ) {
     for event in piece_death_events.read() {
-        let piece_value = piece_value_query.get(event.entity).unwrap();
+        let (piece_value, team) = piece_value_query.get(event.entity).unwrap();
+        if *team != Team::Enemy {
+            return;
+        }
         player_level.add_experience(piece_value.value);
         if player_level.level_up() {
             player_level_up_events.send(PlayerLevelUpEvent {
