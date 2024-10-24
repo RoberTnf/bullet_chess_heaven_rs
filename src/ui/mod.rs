@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use debug::DebugPlugin;
-use game_info::{setup_game_info, update_turn_information};
+use game_info::GameInfoPlugin;
 
 mod debug;
 mod game_info;
@@ -50,11 +50,8 @@ pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, (setup_ui, setup_game_info).chain())
-            .add_systems(
-                Update,
-                (update_turn_information.run_if(resource_changed::<TurnInfo>),),
-            );
+        app.add_systems(Startup, setup_ui)
+            .add_plugins(GameInfoPlugin);
 
         #[cfg(debug_assertions)]
         app.add_plugins(DebugPlugin);

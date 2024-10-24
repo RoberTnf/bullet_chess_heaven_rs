@@ -2,16 +2,23 @@ use bevy::prelude::*;
 
 use crate::{
     globals::{UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
+    pieces::experience::PlayerLevel,
     states::turn_state::TurnInfo,
 };
 
-use super::LeftUINode;
+use super::{setup_ui, LeftUINode};
 
 #[derive(Component)]
 struct GameInfoNode;
 
 #[derive(Component)]
 pub struct TurnUILabel;
+
+#[derive(Component)]
+pub struct LevelUILabel;
+
+#[derive(Component)]
+pub struct ExpUILabel;
 
 pub fn setup_game_info(
     mut commands: Commands,
@@ -42,7 +49,7 @@ pub fn setup_game_info(
                 ));
                 parent.spawn((
                     TextBundle::from_section(
-                        "Turn: 1",
+                        "TurnPlaceholder",
                         TextStyle {
                             font_size: UI_FONT_SIZE,
                             font: asset_server.load(UI_FONT),
@@ -50,6 +57,28 @@ pub fn setup_game_info(
                         },
                     ),
                     TurnUILabel,
+                ));
+                parent.spawn((
+                    TextBundle::from_section(
+                        "LevelPlaceholder",
+                        TextStyle {
+                            font_size: UI_FONT_SIZE,
+                            font: asset_server.load(UI_FONT),
+                            ..default()
+                        },
+                    ),
+                    LevelUILabel,
+                ));
+                parent.spawn((
+                    TextBundle::from_section(
+                        "ExpPlaceholder",
+                        TextStyle {
+                            font_size: UI_FONT_SIZE,
+                            font: asset_server.load(UI_FONT),
+                            ..default()
+                        },
+                    ),
+                    ExpUILabel,
                 ));
             });
     });
@@ -61,4 +90,29 @@ pub fn update_turn_information(
 ) {
     let mut text = query.get_single_mut().unwrap();
     text.sections[0].value = format!("Turn: {}", turn_info.number);
+}
+
+pub fn update_level_information(
+    mut level_query: Query<&mut Text, (With<LevelUILabel>, Without<ExpUILabel>)>,
+    mut exp_query: Query<&mut Text, (With<ExpUILabel>, Without<LevelUILabel>)>,
+    level: Res<PlayerLevel>,
+) {
+    let mut level_text = level_query.get_single_mut().unwrap();
+    level_text.sections[0].value = format!("Level: {}", level.level);
+
+    let mut exp_text = exp_query.get_single_mut().unwrap();
+    exp_text.sections[0].value = format!(
+        "Exp: {} / {}",
+        level.experience,
+        level.get_exp_to_next_level()
+    );
+}
+
+pub struct GameInfoPlugin;
+
+impl Plugin for GameInfoPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, (update_turn_information, update_level_information))
+            .add_systems(Startup, setup_game_info.after(setup_ui));
+    }
 }

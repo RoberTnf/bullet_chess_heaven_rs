@@ -41,8 +41,8 @@ impl PlayerLevel {
 
     pub fn level_up(&mut self) -> bool {
         if self.experience >= self.get_exp_to_next_level() {
+            self.experience = self.experience.saturating_sub(self.get_exp_to_next_level());
             self.level += 1;
-            self.experience = 0;
             debug!("Leveled up to {}", self.level);
             true
         } else {
