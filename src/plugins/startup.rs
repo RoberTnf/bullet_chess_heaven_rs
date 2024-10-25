@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     board, graphics, pieces,
-    states::{self, game_state::GameState, turn_state::reset_turn},
+    states::{self, game_state::GameState},
     ui::UiPlugin,
 };
 
@@ -34,7 +34,6 @@ impl Plugin for StartupPlugin {
                 (
                     board::tile::spawn_board,
                     pieces::player::spawn::spawn_player,
-                    reset_turn,
                 ),
             )
             .add_plugins(UiPlugin)

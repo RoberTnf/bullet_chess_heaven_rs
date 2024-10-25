@@ -4,7 +4,7 @@ use crate::{
     board::highlight,
     game_logic::{score::GameScorePlugin, GameLogicPlugin},
     pieces::{experience::ExperiencePlugin, plugin::PiecePlugin},
-    states::turn_state,
+    states::{game_state::GameStatePlugin, turn_state},
 };
 mod animation;
 mod input;
@@ -24,6 +24,7 @@ impl Plugin for UpdatePlugin {
             // ResolutionPlugin,
             ExperiencePlugin,
             GameScorePlugin,
+            GameStatePlugin,
         ));
     }
 }

@@ -48,7 +48,7 @@ pub struct TurnPlugin;
 
 impl Plugin for TurnPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(TurnState::PlayerInput), increment_turn);
+        app.add_systems(OnExit(TurnState::PlayerAnimation), increment_turn);
     }
 }
 

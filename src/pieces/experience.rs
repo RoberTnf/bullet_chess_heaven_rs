@@ -75,17 +75,17 @@ pub fn add_experience_on_death(
     }
 }
 
-pub fn init_player_level(mut commands: Commands) {
-    commands.init_resource::<PlayerLevel>();
+pub fn reset_player_level(mut player_level: ResMut<PlayerLevel>) {
+    *player_level = PlayerLevel::new();
 }
 
 pub struct ExperiencePlugin;
 
 impl Plugin for ExperiencePlugin {
     fn build(&self, app: &mut App) {
-        // app.init_resource::<PlayerLevel>();
+        app.init_resource::<PlayerLevel>();
         app.add_event::<PlayerLevelUpEvent>();
-        app.add_systems(OnEnter(GameState::Game), init_player_level);
+        app.add_systems(OnEnter(GameState::Game), reset_player_level);
         app.add_systems(
             Update,
             add_experience_on_death.run_if(in_state(GameState::Game)),
