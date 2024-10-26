@@ -54,7 +54,11 @@ pub fn spawn_player(
                 health: Health::new(globals::PLAYER_HEALTH),
                 damage: Damage::new(globals::PLAYER_DAMAGE),
                 state: PieceState::Idle,
-                movement_types: MovementTypes(vec![MovementType::Queen, MovementType::Knight]),
+                movement_types: MovementTypes(vec![
+                    MovementType::King,
+                    MovementType::Queen,
+                    MovementType::Knight,
+                ]),
                 team: Team::Player,
             },
             Player,

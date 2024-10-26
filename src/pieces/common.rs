@@ -3,7 +3,10 @@ use bevy::prelude::*;
 use crate::board::position::BoardPosition;
 
 use super::{
-    attack::AttackPieceAnimationState, damage::Damage, health::Health, movement_type::MovementType,
+    attack::AttackPieceAnimationState,
+    damage::Damage,
+    health::{Health, PieceHealthChangeEvent},
+    movement_type::MovementType,
 };
 
 #[derive(Component, Default)]
@@ -24,6 +27,7 @@ pub enum PieceState {
         destination: BoardPosition,
         origin: BoardPosition,
         animation_state: AttackPieceAnimationState,
+        event: PieceHealthChangeEvent,
     },
     AttackingWithNewSprite,
 }

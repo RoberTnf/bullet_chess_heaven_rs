@@ -6,7 +6,7 @@ use crate::{
     globals::{
         DEATH_ANIMATION_DURATION, HEALTH_CHANGE_TEXT_ANIMATION_DURATION,
         HEALTH_CHANGE_TEXT_ANIMATION_SPEED, HEALTH_CHANGE_TEXT_FONT_SIZE,
-        HEALTH_CHANGE_TEXT_Z_INDEX, UI_FONT,
+        HEALTH_CHANGE_TEXT_Z_INDEX, PLAYER_COLOR, UI_FONT,
     },
     states::game_state::GameState,
 };
@@ -70,7 +70,7 @@ pub struct DeathAnimation {
     pub timer: Timer,
 }
 
-#[derive(Event)]
+#[derive(Event, Copy, Clone)]
 pub struct PieceHealthChangeEvent {
     pub entity: Entity,
     pub change: i64,
@@ -87,12 +87,12 @@ pub fn spawn_health_change_text(
                 if *team == Team::Player {
                     Color::srgba(1.0, 0.0, 0.0, 1.0)
                 } else {
-                    Color::srgba(0.0, 1.0, 0.0, 1.0)
+                    PLAYER_COLOR
                 }
             } else if *team == Team::Player {
                 Color::srgba(0.0, 1.0, 0.0, 1.0)
             } else {
-                Color::srgba(1.0, 0.0, 0.0, 1.0)
+                PLAYER_COLOR
             };
 
             let mut rng = rand::thread_rng();

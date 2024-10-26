@@ -99,21 +99,23 @@ fn send_move_event(
 
 pub fn send_attack_event(
     event_writer: &mut EventWriter<AttackPieceEvent>,
-    tile_position: BoardPosition,
+    tile_position: &BoardPosition,
     player_entity: Entity,
     target_entity: Entity,
     damage: u64,
     movement_type: &MovementType,
+    delay: Option<f32>,
 ) {
     debug!(
         "Clicked tile: {:?}, attacking target: {:?}, with damage: {}",
         tile_position, target_entity, damage
     );
     event_writer.send(AttackPieceEvent {
-        destination: tile_position,
+        destination: *tile_position,
         attacker: player_entity,
         target: target_entity,
         damage,
         sprite_index: Some(movement_type.sprite_index() + SPRITESHEET_WIDTH),
+        delay,
     });
 }

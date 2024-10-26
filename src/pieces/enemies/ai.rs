@@ -97,6 +97,7 @@ pub fn ai_system(
                 damage: enemy_damage.value,
                 destination: *attack_position,
                 sprite_index: None,
+                delay: None,
             });
         }
     }

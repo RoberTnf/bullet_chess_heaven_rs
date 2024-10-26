@@ -1,3 +1,5 @@
+use bevy::prelude::*;
+
 // Window dimensions
 pub const WINDOW_WIDTH: f32 = 1280.0; // Width of the window
 pub const WINDOW_HEIGHT: f32 = 720.0; // Height of the window
@@ -34,9 +36,10 @@ pub const ATTACK_ANIMATION_DURATION: f32 = 0.5; // Duration of attack animations
 // Player settings
 pub const PLAYER_HEALTH: u64 = 10; // Health of the player
 pub const PLAYER_DAMAGE: u64 = 1; // Damage of the player
+pub const PLAYER_COLOR: Color = Color::srgba(94.0 / 255.0, 205.0 / 255.0, 228.0 / 255.0, 1.0);
 
 // Enemy settings
-pub const ENEMY_BASE_HEALTH: u64 = 2; // Health of the enemy
+pub const ENEMY_BASE_HEALTH: u64 = 3; // Health of the enemy
 pub const ENEMY_BASE_DAMAGE: u64 = 1; // Damage of the enemy
 
 // Enemy spawn settings
@@ -69,7 +72,7 @@ pub const SPRITESHEET_HEIGHT: usize = 20; // Height of the spritesheet
 pub const UI_FONT_SIZE: f32 = 8.0; // Font size for UI elements
 pub const UI_FONT: &str = "fonts/monogram/ttf/monogram-extended.ttf"; // Font for UI elements
 pub const UI_HEADER_FONT_SIZE: f32 = 12.0; // Font size for UI headers
-pub const HEALTH_CHANGE_TEXT_FONT_SIZE: f32 = 16.0; // Font size for health change text
+pub const HEALTH_CHANGE_TEXT_FONT_SIZE: f32 = 12.0; // Font size for health change text
 
 // EXP settings
 // pub const EXP

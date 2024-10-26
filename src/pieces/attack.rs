@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::{prelude::*, utils::HashSet};
 
 use crate::{
@@ -23,11 +25,14 @@ pub struct AttackPieceEvent {
     pub target: Entity,
     pub damage: u64,
     pub sprite_index: Option<usize>,
+    pub delay: Option<f32>,
 }
+#[derive(Eq, PartialEq, Copy, Clone)]
 pub enum AttackPieceAnimationState {
     Start,
     Backwards,
     Forwards,
+    Finished,
 }
 
 #[derive(Component)]
@@ -39,20 +44,16 @@ pub struct AttackingWithNewSprite {
     pub origin: BoardPosition,
     pub sprite_index: usize,
     pub animation_state: AttackPieceAnimationState,
+    pub timer: Timer,
+    pub piece_health_change_event: PieceHealthChangeEvent,
 }
 
 pub fn attack_piece_system(
     mut attack_event_reader: EventReader<AttackPieceEvent>,
-    mut health_event_writer: EventWriter<PieceHealthChangeEvent>,
     mut pieces: Query<(&BoardPosition, &mut PieceState), With<Piece>>,
     mut commands: Commands,
 ) {
     for event in attack_event_reader.read() {
-        health_event_writer.send(PieceHealthChangeEvent {
-            entity: event.target,
-            change: -(event.damage as i64),
-        });
-
         let (attacker_pos, mut attacker_state) = pieces.get_mut(event.attacker).unwrap();
 
         if let Some(sprite_index) = event.sprite_index {
@@ -64,6 +65,14 @@ pub fn attack_piece_system(
                         origin: *attacker_pos,
                         sprite_index,
                         animation_state: AttackPieceAnimationState::Start,
+                        timer: Timer::new(
+                            Duration::from_secs_f32(event.delay.unwrap_or(0.0)),
+                            TimerMode::Once,
+                        ),
+                        piece_health_change_event: PieceHealthChangeEvent {
+                            entity: event.target,
+                            change: -(event.damage as i64),
+                        },
                     },
                     TransformBundle::default(),
                 ))
@@ -75,6 +84,10 @@ pub fn attack_piece_system(
                 destination: event.destination,
                 origin: *attacker_pos,
                 animation_state: AttackPieceAnimationState::Forwards,
+                event: PieceHealthChangeEvent {
+                    entity: event.target,
+                    change: -(event.damage as i64),
+                },
             };
         }
     }
@@ -83,12 +96,14 @@ pub fn attack_piece_system(
 pub fn attack_piece_animation_system(
     mut query: Query<(&mut Transform, &mut PieceState), (With<Piece>, Without<Player>)>,
     time: Res<Time>,
+    mut event_writer: EventWriter<PieceHealthChangeEvent>,
 ) {
     for (mut transform, mut piece_state) in query.iter_mut() {
         if let PieceState::Attacking {
             destination,
             origin,
             animation_state,
+            event,
         } = &mut *piece_state
         {
             // TODO: If this becomes slow, store this variables in the animation component
@@ -111,6 +126,7 @@ pub fn attack_piece_animation_system(
 
                     if pixel_distance < TILE_SIZE as f32 / 1.5 {
                         *animation_state = AttackPieceAnimationState::Backwards;
+                        event_writer.send(*event);
                     }
                 }
                 AttackPieceAnimationState::Backwards => {
@@ -126,6 +142,7 @@ pub fn attack_piece_animation_system(
                     }
                 }
                 AttackPieceAnimationState::Start => {}
+                AttackPieceAnimationState::Finished => {}
             }
         }
     }
@@ -136,48 +153,73 @@ struct AttackingSprite;
 
 fn attacking_with_new_sprite_animation_system(
     asset_server: Res<AssetServer>,
-    mut piece_query: Query<(&mut PieceState, &Transform)>,
+    mut piece_query: Query<&Transform, With<PieceState>>,
     mut attacking_sprite_query: Query<(&mut AttackingWithNewSprite, &Parent, Entity)>,
     mut sprite_query: Query<&mut Transform, (With<AttackingSprite>, Without<PieceState>)>,
     mut commands: Commands,
     atlas_layout: Res<SpriteSheetAtlas>,
     time: Res<Time>,
     children_query: Query<&Children>,
+    mut event_writer: EventWriter<PieceHealthChangeEvent>,
 ) {
     for (mut attacking_sprite, parent, entity) in attacking_sprite_query.iter_mut() {
-        let (mut piece_state, piece_transform) = match piece_query.get_mut(parent.get()) {
-            Ok(result) => result,
-            Err(_) => continue,
+        let Ok(piece_transform) = piece_query.get_mut(parent.get()) else {
+            continue;
         };
 
         match attacking_sprite.animation_state {
             AttackPieceAnimationState::Start => {
-                spawn_attack_sprite(
-                    &mut commands,
-                    entity,
-                    &asset_server,
-                    &atlas_layout,
-                    attacking_sprite.sprite_index,
-                );
-                attacking_sprite.animation_state = AttackPieceAnimationState::Forwards;
+                attacking_sprite.timer.tick(time.delta());
+                if attacking_sprite.timer.finished() {
+                    spawn_attack_sprite(
+                        &mut commands,
+                        entity,
+                        &asset_server,
+                        &atlas_layout,
+                        attacking_sprite.sprite_index,
+                    );
+                    attacking_sprite.animation_state = AttackPieceAnimationState::Forwards;
+                }
             }
             AttackPieceAnimationState::Forwards => {
-                let sprites_still_active = update_sprite_positions(
+                update_sprite_positions(
                     &children_query,
                     entity,
                     &mut sprite_query,
                     &mut commands,
                     piece_transform,
-                    &attacking_sprite,
+                    attacking_sprite.as_mut(),
                     time.delta_seconds(),
+                    &mut event_writer,
                 );
-
-                if !sprites_still_active {
-                    *piece_state = PieceState::Idle;
-                    commands.entity(entity).despawn_recursive();
-                }
             }
-            AttackPieceAnimationState::Backwards => (), // Sprite is already despawned
+            AttackPieceAnimationState::Backwards => (),
+            AttackPieceAnimationState::Finished => {}
+        }
+    }
+}
+
+fn piece_idle_if_all_animations_finished(
+    mut piece_query: Query<(&mut PieceState, &Children)>,
+    children_query: Query<&AttackingWithNewSprite>,
+    mut commands: Commands,
+) {
+    for (mut piece_state, children) in piece_query.iter_mut() {
+        let mut finished = true;
+        let mut children_to_despawn = Vec::new();
+        for child in children.iter() {
+            if let Ok(attacking_sprite) = children_query.get(*child) {
+                if attacking_sprite.animation_state != AttackPieceAnimationState::Finished {
+                    finished = false;
+                }
+                children_to_despawn.push(*child);
+            }
+        }
+        if finished && !children_to_despawn.is_empty() {
+            *piece_state = PieceState::Idle;
+            for child in children_to_despawn.iter() {
+                commands.entity(*child).despawn_recursive();
+            }
         }
     }
 }
@@ -209,14 +251,14 @@ fn update_sprite_positions(
     sprite_query: &mut Query<&mut Transform, (With<AttackingSprite>, Without<PieceState>)>,
     commands: &mut Commands,
     piece_transform: &Transform,
-    attacking_sprite: &Mut<AttackingWithNewSprite>,
+    attacking_sprite: &mut AttackingWithNewSprite,
     delta_time: f32,
-) -> bool {
+    event_writer: &mut EventWriter<PieceHealthChangeEvent>,
+) {
     let Ok(children) = children_query.get(parent) else {
-        return false;
+        return;
     };
 
-    let mut active_sprites = false;
     for sprite in children.iter() {
         let Ok(mut sprite_transform) = sprite_query.get_mut(*sprite) else {
             continue;
@@ -232,13 +274,13 @@ fn update_sprite_positions(
 
         if (current_pos - destination).length() < TILE_SIZE as f32 / 2.0 {
             commands.entity(*sprite).despawn_recursive();
+            attacking_sprite.animation_state = AttackPieceAnimationState::Finished;
+            event_writer.send(attacking_sprite.piece_health_change_event);
         } else {
             sprite_transform.translation = (sprite_transform.translation.truncate() + movement)
                 .extend(sprite_transform.translation.z);
-            active_sprites = true;
         }
     }
-    active_sprites
 }
 
 pub fn attack_from_tile(
@@ -253,6 +295,7 @@ pub fn attack_from_tile(
     next_state: &mut ResMut<NextState<TurnState>>,
 ) -> bool {
     let mut attack = false;
+    let mut delay = 0.0;
     movement_types.0.iter().for_each(|movement_type| {
         let valid_attacks = movement_type
             .get_valid_moves(
@@ -262,11 +305,11 @@ pub fn attack_from_tile(
             )
             .valid_attacks;
 
-        for attack_position in valid_attacks {
+        for attack_position in valid_attacks.iter() {
             attack = true;
             let enemy_entity = pieces_query
                 .iter()
-                .find(|(_, &pos, _)| pos == attack_position)
+                .find(|(_, &pos, _)| pos == *attack_position)
                 .map(|(entity, _, _)| entity)
                 .unwrap();
 
@@ -277,8 +320,12 @@ pub fn attack_from_tile(
                 enemy_entity,
                 damage.value,
                 movement_type,
+                Some(delay),
             );
             next_state.set(TurnState::PlayerAnimation);
+        }
+        if !valid_attacks.is_empty() {
+            delay += ATTACK_ANIMATION_DURATION / 3.0;
         }
     });
     attack
@@ -354,10 +401,11 @@ impl Plugin for AttackPlugin {
             Update,
             (
                 on_move_animation_end_attack_system,
-                attack_piece_system
-                    .run_if(in_state(GameState::Game))
-                    .run_if(in_state(GamePauseState::Playing)),
-            ),
+                attack_piece_system,
+                piece_idle_if_all_animations_finished,
+            )
+                .run_if(in_state(GameState::Game))
+                .run_if(in_state(GamePauseState::Playing)),
         );
     }
 }
