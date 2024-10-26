@@ -117,10 +117,8 @@ fn update_movement_types_information(
         }
         // Spawn all labels
         for movement_type in movement_types.0.iter() {
-            debug!(
-                "Spawning movement type in UI: {}",
-                movement_type.sprite_index()
-            );
+            let player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
+            debug!("Spawning movement type in UI: {}", player_sprite_index);
             commands.entity(container_entity).with_children(|parent| {
                 parent.spawn((
                     ImageBundle {
@@ -134,10 +132,10 @@ fn update_movement_types_information(
                     },
                     TextureAtlas {
                         layout: atlas_layout.handle.clone(),
-                        index: movement_type.sprite_index(),
+                        index: player_sprite_index,
                     },
                     MovementTypesUILabel {
-                        sprite_index: movement_type.sprite_index() + SPRITESHEET_WIDTH,
+                        sprite_index: player_sprite_index,
                     },
                 ));
             });
@@ -146,14 +144,15 @@ fn update_movement_types_information(
         for ((_, mut atlas, label), movement_type) in
             text_query.iter_mut().zip(movement_types.0.iter())
         {
+            let player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
             // Update the text if the sprite index has changed5
-            if label.sprite_index != movement_type.sprite_index() {
+            if label.sprite_index != player_sprite_index {
                 debug!(
                     "Updating movement type in UI: {} -> {}",
                     label.sprite_index,
                     movement_type.sprite_index()
                 );
-                atlas.index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
+                atlas.index = player_sprite_index;
             }
         }
     }
