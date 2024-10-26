@@ -1,11 +1,11 @@
 # TODO:
 
-- Multiple attacks for player
-- Different animation per attack type
-- Level up Rewards
+- Progression system
 
 # Done
 
+- Different animation per attack type
+- Multiple attacks for player
 - Experience
 - Experience UI
 - Score
