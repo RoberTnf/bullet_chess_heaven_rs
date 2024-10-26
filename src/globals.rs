@@ -34,7 +34,7 @@ pub const DEATH_ANIMATION_DURATION: f32 = 0.5; // Duration of death animations
 pub const ATTACK_ANIMATION_DURATION: f32 = 0.5; // Duration of attack animations
 
 // Player settings
-pub const PLAYER_HEALTH: u64 = 1; // Health of the player
+pub const PLAYER_HEALTH: u64 = 5; // Health of the player
 pub const PLAYER_DAMAGE: u64 = 1; // Damage of the player
 pub const PRIMARY_COLOR: Color = Color::srgba(94.0 / 255.0, 205.0 / 255.0, 228.0 / 255.0, 1.0);
 pub const SECONDARY_COLOR: Color = Color::srgba(0.674, 0.192, 0.192, 1.0);
