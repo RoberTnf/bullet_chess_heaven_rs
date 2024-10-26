@@ -4,6 +4,7 @@ use crate::{
     globals::{SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{common::MovementTypes, health::Health, player::spawn::Player},
+    states::game_state::GameState,
 };
 
 use super::{game_info::setup_game_info, setup_ui, LeftUINode};
@@ -163,7 +164,8 @@ fn update_health_information(
     mut query: Query<&mut Text, With<HealthUILabel>>,
 ) {
     let mut text = query.get_single_mut().unwrap();
-    text.sections[0].value = format!("Health: {}", health.single().value);
+    let health = health.single();
+    text.sections[0].value = format!("Health: {} / {}", health.value, health.max_value);
 }
 
 pub struct CharacterInfoPlugin;
@@ -172,7 +174,8 @@ impl Plugin for CharacterInfoPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (update_health_information, update_movement_types_information),
+            (update_health_information, update_movement_types_information)
+                .run_if(in_state(GameState::Game)),
         )
         .add_systems(
             Startup,

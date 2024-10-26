@@ -32,7 +32,7 @@ pub const DEATH_ANIMATION_DURATION: f32 = 0.5; // Duration of death animations
 pub const ATTACK_ANIMATION_DURATION: f32 = 0.5; // Duration of attack animations
 
 // Player settings
-pub const PLAYER_HEALTH: u64 = 100; // Health of the player
+pub const PLAYER_HEALTH: u64 = 10; // Health of the player
 pub const PLAYER_DAMAGE: u64 = 1; // Damage of the player
 
 // Enemy settings
@@ -40,11 +40,11 @@ pub const ENEMY_BASE_HEALTH: u64 = 2; // Health of the enemy
 pub const ENEMY_BASE_DAMAGE: u64 = 1; // Damage of the enemy
 
 // Enemy spawn settings
-pub const KING_SPAWN_TURN: u32 = 25; // Turn number to spawn kings
-pub const KNIGHT_SPAWN_TURN: u32 = 50; // Turn number to spawn knights
-pub const BISHOP_SPAWN_TURN: u32 = 75; // Turn number to spawn bishops
-pub const ROOK_SPAWN_TURN: u32 = 100; // Turn number to spawn rooks
-pub const QUEEN_SPAWN_TURN: u32 = 125; // Turn number to spawn queens
+pub const KING_SPAWN_TURN: u32 = 15; // Turn number to spawn kings
+pub const KNIGHT_SPAWN_TURN: u32 = 30; // Turn number to spawn knights
+pub const BISHOP_SPAWN_TURN: u32 = 45; // Turn number to spawn bishops
+pub const ROOK_SPAWN_TURN: u32 = 60; // Turn number to spawn rooks
+pub const QUEEN_SPAWN_TURN: u32 = 75; // Turn number to spawn queens
 
 pub const KING_SPAWN_WEIGHT: f64 = 1.0; // Weight of the king spawn
 pub const PAWN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the pawn spawn
