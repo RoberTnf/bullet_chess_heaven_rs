@@ -1,11 +1,14 @@
 use bevy::prelude::*;
+use button::ButtonPlugin;
 use character_info::CharacterInfoPlugin;
 #[cfg(debug_assertions)]
 use debug::DebugPlugin;
+use defeat::DefeatPlugin;
 use game_info::GameInfoPlugin;
-
+mod button;
 mod character_info;
 mod debug;
+mod defeat;
 mod game_info;
 use crate::{globals::TILE_SIZE, states::turn_state::TurnInfo};
 
@@ -54,7 +57,9 @@ pub struct UiPlugin;
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_ui)
-            .add_plugins((GameInfoPlugin, CharacterInfoPlugin));
+            .add_plugins((GameInfoPlugin, CharacterInfoPlugin))
+            .add_plugins(DefeatPlugin)
+            .add_plugins(ButtonPlugin);
 
         #[cfg(debug_assertions)]
         app.add_plugins(DebugPlugin);

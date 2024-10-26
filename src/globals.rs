@@ -34,10 +34,17 @@ pub const DEATH_ANIMATION_DURATION: f32 = 0.5; // Duration of death animations
 pub const ATTACK_ANIMATION_DURATION: f32 = 0.5; // Duration of attack animations
 
 // Player settings
-pub const PLAYER_HEALTH: u64 = 10; // Health of the player
+pub const PLAYER_HEALTH: u64 = 1; // Health of the player
 pub const PLAYER_DAMAGE: u64 = 1; // Damage of the player
-pub const PLAYER_COLOR: Color = Color::srgba(94.0 / 255.0, 205.0 / 255.0, 228.0 / 255.0, 1.0);
+pub const PRIMARY_COLOR: Color = Color::srgba(94.0 / 255.0, 205.0 / 255.0, 228.0 / 255.0, 1.0);
+pub const SECONDARY_COLOR: Color = Color::srgba(0.674, 0.192, 0.192, 1.0);
 
+pub const DARKER_PRIMARY_COLOR: Color = Color::srgba(
+    94.0 * 0.9 / 255.0,
+    205.0 * 0.9 / 255.0,
+    228.0 * 0.9 / 255.0,
+    1.0,
+);
 // Enemy settings
 pub const ENEMY_BASE_HEALTH: u64 = 3; // Health of the enemy
 pub const ENEMY_BASE_DAMAGE: u64 = 1; // Damage of the enemy
@@ -74,5 +81,6 @@ pub const UI_FONT: &str = "fonts/monogram/ttf/monogram-extended.ttf"; // Font fo
 pub const UI_HEADER_FONT_SIZE: f32 = 12.0; // Font size for UI headers
 pub const HEALTH_CHANGE_TEXT_FONT_SIZE: f32 = 12.0; // Font size for health change text
 
-// EXP settings
-// pub const EXP
+// UI Defeat
+pub const DEFEAT_HEADER_FONT_SIZE: f32 = 36.0; // Font size for defeat text
+pub const DEFEAT_SCORE_FONT_SIZE: f32 = 24.0; // Font size for score text
