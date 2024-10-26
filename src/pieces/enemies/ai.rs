@@ -6,13 +6,17 @@ use crate::{
         attack::AttackPieceEvent,
         common::{MovementTypes, Piece, Team},
         damage::Damage,
+        health::DeathAnimation,
         movement::MovePieceEvent,
     },
     states::turn_state::TurnState,
 };
 
 pub fn ai_system(
-    pieces: Query<(&BoardPosition, &MovementTypes, &Team, &Damage, Entity), With<Piece>>,
+    pieces: Query<
+        (&BoardPosition, &MovementTypes, &Team, &Damage, Entity),
+        (With<Piece>, Without<DeathAnimation>),
+    >,
     mut move_events: EventWriter<MovePieceEvent>,
     mut turn_state: ResMut<NextState<TurnState>>,
     mut attack_events: EventWriter<AttackPieceEvent>,
@@ -92,6 +96,7 @@ pub fn ai_system(
                     .0,
                 damage: enemy_damage.value,
                 destination: *attack_position,
+                sprite_index: None,
             });
         }
     }

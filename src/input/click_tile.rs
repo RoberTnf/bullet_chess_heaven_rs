@@ -1,12 +1,14 @@
-use bevy::{prelude::*, utils::HashSet, window::PrimaryWindow};
+use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::{
     board::position::BoardPosition,
+    globals::SPRITESHEET_WIDTH,
     pieces::{
-        attack::AttackPieceEvent,
+        attack::{attack_from_tile, AttackPieceEvent},
         common::{MovementTypes, Piece, Team},
         damage::Damage,
         movement::MovePieceEvent,
+        movement_type::MovementType,
         player::spawn::Player,
     },
     states::turn_state::TurnState,
@@ -43,42 +45,39 @@ pub fn click_tile_update_player_position(
             .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
         {
             if let Some(tile_position) = BoardPosition::from_world_position(world_position) {
-                let mut valid_moves = HashSet::new();
-                let mut valid_attacks = HashSet::new();
-
+                let mut current_tile_position = player_position;
+                let mut moved = false;
+                // First, move the player to the tile if possible
                 movement_types.0.iter().for_each(|movement_type| {
                     let response = movement_type.get_valid_moves(
                         player_position,
                         &all_pieces_positions,
                         &enemy_pieces_positions,
                     );
-                    valid_moves.extend(response.valid_moves);
-                    valid_attacks.extend(response.valid_attacks);
+                    if response.valid_moves.contains(&tile_position) {
+                        send_move_event(&mut move_event_writer, tile_position, player_entity);
+                        current_tile_position = &tile_position;
+                        moved = true;
+                    }
                 });
 
-                if valid_moves.contains(&tile_position) {
-                    send_move_event(
-                        &mut move_event_writer,
-                        tile_position,
-                        player_entity,
-                        &mut next_state,
-                    );
-                } else if valid_attacks.contains(&tile_position) {
-                    let enemy_entity = pieces_query
-                        .iter()
-                        .find(|(_, &pos, _)| pos == tile_position)
-                        .map(|(entity, _, _)| entity)
-                        .unwrap();
-
-                    send_attack_event(
-                        &mut attack_event_writer,
-                        tile_position,
-                        player_entity,
-                        enemy_entity,
-                        damage.value,
-                        &mut next_state,
-                    );
+                if moved {
+                    next_state.set(TurnState::PlayerAnimation);
+                    return;
                 }
+
+                // else, try attacking from current tile
+                attack_from_tile(
+                    movement_types,
+                    current_tile_position,
+                    &all_pieces_positions,
+                    &enemy_pieces_positions,
+                    &pieces_query,
+                    &mut attack_event_writer,
+                    player_entity,
+                    damage,
+                    &mut next_state,
+                );
             }
         }
     } else {
@@ -90,23 +89,21 @@ fn send_move_event(
     event_writer: &mut EventWriter<'_, MovePieceEvent>,
     tile_position: BoardPosition,
     player_entity: Entity,
-    next_state: &mut ResMut<NextState<TurnState>>,
 ) {
     event_writer.send(MovePieceEvent {
         destination: tile_position,
         entity: player_entity,
     });
     debug!("Clicked tile: {:?}", tile_position);
-    next_state.set(TurnState::PlayerAnimation);
 }
 
-fn send_attack_event(
+pub fn send_attack_event(
     event_writer: &mut EventWriter<AttackPieceEvent>,
     tile_position: BoardPosition,
     player_entity: Entity,
     target_entity: Entity,
     damage: u64,
-    next_state: &mut ResMut<NextState<TurnState>>,
+    movement_type: &MovementType,
 ) {
     debug!(
         "Clicked tile: {:?}, attacking target: {:?}, with damage: {}",
@@ -117,6 +114,6 @@ fn send_attack_event(
         attacker: player_entity,
         target: target_entity,
         damage,
+        sprite_index: Some(movement_type.sprite_index() + SPRITESHEET_WIDTH),
     });
-    next_state.set(TurnState::PlayerAnimation);
 }

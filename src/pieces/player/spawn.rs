@@ -5,6 +5,7 @@ use crate::{
     globals::{self, PLAYER_ATLAS_INDEX},
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
+        attack::AttackAfterMove,
         common::{BlocksMovement, MovementTypes, Piece, PieceBundle, PieceState, Team},
         damage::Damage,
         health::Health,
@@ -53,7 +54,7 @@ pub fn spawn_player(
                 health: Health::new(globals::PLAYER_HEALTH),
                 damage: Damage::new(globals::PLAYER_DAMAGE),
                 state: PieceState::Idle,
-                movement_types: MovementTypes(vec![MovementType::King]),
+                movement_types: MovementTypes(vec![MovementType::Queen, MovementType::Knight]),
                 team: Team::Player,
             },
             Player,
@@ -65,6 +66,7 @@ pub fn spawn_player(
                 progress: 0.0,
                 speed: globals::PULSE_ANIMATION_SPEED,
             },
+            AttackAfterMove,
         ))
         .id();
 

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::globals;
+use crate::globals::{self, SPRITESHEET_HEIGHT, SPRITESHEET_WIDTH};
 
 #[derive(Resource)]
 pub struct SpriteSheetAtlas {
@@ -9,8 +9,13 @@ pub struct SpriteSheetAtlas {
 
 impl FromWorld for SpriteSheetAtlas {
     fn from_world(world: &mut World) -> Self {
-        let layout =
-            TextureAtlasLayout::from_grid(UVec2::splat(globals::TILE_SIZE), 20, 20, None, None);
+        let layout = TextureAtlasLayout::from_grid(
+            UVec2::splat(globals::TILE_SIZE),
+            SPRITESHEET_HEIGHT as u32,
+            SPRITESHEET_WIDTH as u32,
+            None,
+            None,
+        );
 
         // Get active atlases stored by Bevy
         let mut texture_atlases = world

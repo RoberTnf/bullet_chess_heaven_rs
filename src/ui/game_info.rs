@@ -13,16 +13,16 @@ use super::{setup_ui, LeftUINode};
 struct GameInfoNode;
 
 #[derive(Component)]
-pub struct TurnUILabel;
+struct TurnUILabel;
 
 #[derive(Component)]
-pub struct LevelUILabel;
+struct LevelUILabel;
 
 #[derive(Component)]
-pub struct ExpUILabel;
+struct ExpUILabel;
 
 #[derive(Component)]
-pub struct ScoreUILabel;
+struct ScoreUILabel;
 
 pub fn setup_game_info(
     mut commands: Commands,

@@ -1,6 +1,11 @@
 use crate::board::position::BoardPosition;
 use bevy::utils::HashSet;
 
+use super::enemies::{
+    bishop::WHITE_BISHOP_INFO, king::WHITE_KING_INFO, knight::WHITE_KNIGHT_INFO,
+    pawn::WHITE_PAWN_INFO, queen::WHITE_QUEEN_INFO, rook::WHITE_ROOK_INFO,
+};
+
 #[derive(Clone, Eq, PartialEq)]
 pub enum MovementType {
     WhitePawn,
@@ -109,6 +114,17 @@ impl MovementType {
         }
     }
 
+    pub fn sprite_index(&self) -> usize {
+        match self {
+            MovementType::WhitePawn => WHITE_PAWN_INFO.sprite_index,
+            MovementType::BlackPawn => WHITE_PAWN_INFO.sprite_index,
+            MovementType::Knight => WHITE_KNIGHT_INFO.sprite_index,
+            MovementType::Bishop => WHITE_BISHOP_INFO.sprite_index,
+            MovementType::Rook => WHITE_ROOK_INFO.sprite_index,
+            MovementType::Queen => WHITE_QUEEN_INFO.sprite_index,
+            MovementType::King => WHITE_KING_INFO.sprite_index,
+        }
+    }
     fn pawn_moves(
         &self,
         position: &BoardPosition,

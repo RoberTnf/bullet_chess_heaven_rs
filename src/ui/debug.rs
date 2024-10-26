@@ -5,7 +5,9 @@ use crate::{
     states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
 };
 
-use super::{setup_ui, LeftUINode};
+use super::{
+    character_info::setup_character_info, game_info::setup_game_info, setup_ui, LeftUINode,
+};
 
 #[derive(Component)]
 struct DebugUINode;
@@ -142,6 +144,12 @@ impl Plugin for DebugPlugin {
             ),
         );
 
-        app.add_systems(Startup, setup_debug_ui.after(setup_ui));
+        app.add_systems(
+            Startup,
+            setup_debug_ui
+                .after(setup_ui)
+                .after(setup_game_info)
+                .after(setup_character_info),
+        );
     }
 }

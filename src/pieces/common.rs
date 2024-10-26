@@ -19,11 +19,13 @@ pub enum PieceState {
         origin: Vec3,
         destination: Vec3,
     },
+    MoveEnded,
     Attacking {
         destination: BoardPosition,
         origin: BoardPosition,
         animation_state: AttackPieceAnimationState,
     },
+    AttackingWithNewSprite,
 }
 
 #[derive(Component, Clone)]

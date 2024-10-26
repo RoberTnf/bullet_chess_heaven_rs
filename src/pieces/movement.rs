@@ -48,16 +48,21 @@ pub fn move_piece(
     }
 }
 
+#[derive(Event)]
+pub struct MovePieceAnimationEndEvent {
+    pub entity: Entity,
+}
+
 pub fn move_pieces_animation(
-    mut pieces: Query<(&mut Transform, &PieceState, Entity)>,
+    mut pieces: Query<(&mut Transform, &mut PieceState, Entity)>,
     time: Res<Time>,
-    mut commands: Commands,
+    mut move_piece_animation_end_events: EventWriter<MovePieceAnimationEndEvent>,
 ) {
-    for (mut transform, state, entity) in pieces.iter_mut() {
+    for (mut transform, mut state, entity) in pieces.iter_mut() {
         if let PieceState::Moving {
             origin: _,
             destination,
-        } = state
+        } = state.as_mut()
         {
             let current_position = transform.translation;
             let lerp_value = TWEEN_MOVE_ANIMATION_SPEED * time.delta_seconds();
@@ -66,7 +71,8 @@ pub fn move_pieces_animation(
             // if less than 1 pixel away, snap to destination
             if distance < 1.0 {
                 transform.translation = *destination;
-                commands.entity(entity).insert(PieceState::Idle);
+                *state = PieceState::MoveEnded;
+                move_piece_animation_end_events.send(MovePieceAnimationEndEvent { entity });
             } else {
                 transform.translation = transform.translation.lerp(*destination, lerp_value);
             }
@@ -83,7 +89,7 @@ pub fn all_enemies_idle(
     }
 }
 
-pub fn player_idle(
+pub fn is_player_idle(
     moves: Query<&PieceState, With<Player>>,
     mut turn_state: ResMut<NextState<TurnState>>,
 ) {

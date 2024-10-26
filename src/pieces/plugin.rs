@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::states::{game_state::GameState, pause_state::GamePauseState};
 
 use super::{
-    attack::{attack_piece_animation_system, attack_piece_system},
+    attack::AttackPlugin,
     enemies::EnemyPlugin,
     health::{
         death_animation, death_system, health_change_system, health_change_text_animation,
@@ -19,7 +19,6 @@ impl Plugin for PiecePlugin {
         app.add_plugins(EnemyPlugin).add_systems(
             Update,
             (
-                attack_piece_system,
                 death_system,
                 death_animation,
                 health_change_system,
@@ -31,9 +30,10 @@ impl Plugin for PiecePlugin {
         );
         app.add_systems(
             FixedUpdate,
-            (attack_piece_animation_system, health_change_text_animation)
+            health_change_text_animation
                 .run_if(in_state(GameState::Game))
                 .run_if(in_state(GamePauseState::Playing)),
         );
+        app.add_plugins(AttackPlugin);
     }
 }

@@ -62,6 +62,8 @@ pub const PLAYER_ATLAS_INDEX: usize = 20; // Index of the player sprite in the s
                                           // Spawner settings
 pub const TARGET_NUM_ENEMIES: usize = 10; // Max number of enemies on the board
 pub const PER_TURN_ENEMY_SPAWN_COUNT: usize = 2; // Number of enemies to spawn per turn
+pub const SPRITESHEET_WIDTH: usize = 20; // Width of the spritesheet
+pub const SPRITESHEET_HEIGHT: usize = 20; // Height of the spritesheet
 
 // UI Settings
 pub const UI_FONT_SIZE: f32 = 8.0; // Font size for UI elements
