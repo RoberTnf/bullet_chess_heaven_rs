@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use character_info::CharacterInfoPlugin;
+#[cfg(debug_assertions)]
 use debug::DebugPlugin;
 use game_info::GameInfoPlugin;
 

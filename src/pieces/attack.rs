@@ -27,11 +27,10 @@ pub struct AttackPieceEvent {
     pub sprite_index: Option<usize>,
     pub delay: Option<f32>,
 }
-#[derive(Eq, PartialEq, Copy, Clone)]
+#[derive(Eq, PartialEq, Clone)]
 pub enum AttackPieceAnimationState {
-    Start,
-    Backwards,
-    Forwards,
+    Delayed(Timer),               // Combines Start with timer
+    Attacking { forwards: bool }, // Combines Forwards/Backwards into single state with direction
     Finished,
 }
 
@@ -44,7 +43,6 @@ pub struct AttackingWithNewSprite {
     pub origin: BoardPosition,
     pub sprite_index: usize,
     pub animation_state: AttackPieceAnimationState,
-    pub timer: Timer,
     pub piece_health_change_event: PieceHealthChangeEvent,
 }
 
@@ -64,11 +62,10 @@ pub fn attack_piece_system(
                         destination: event.destination,
                         origin: *attacker_pos,
                         sprite_index,
-                        animation_state: AttackPieceAnimationState::Start,
-                        timer: Timer::new(
+                        animation_state: AttackPieceAnimationState::Delayed(Timer::new(
                             Duration::from_secs_f32(event.delay.unwrap_or(0.0)),
                             TimerMode::Once,
-                        ),
+                        )),
                         piece_health_change_event: PieceHealthChangeEvent {
                             entity: event.target,
                             change: -(event.damage as i64),
@@ -83,7 +80,7 @@ pub fn attack_piece_system(
             *attacker_state = PieceState::Attacking {
                 destination: event.destination,
                 origin: *attacker_pos,
-                animation_state: AttackPieceAnimationState::Forwards,
+                animation_state: AttackPieceAnimationState::Attacking { forwards: true },
                 event: PieceHealthChangeEvent {
                     entity: event.target,
                     change: -(event.damage as i64),
@@ -119,29 +116,36 @@ pub fn attack_piece_animation_system(
             let original_z = transform.translation.z;
 
             match animation_state {
-                AttackPieceAnimationState::Forwards => {
-                    let new_position = truncated_translation + delta;
-                    let pixel_distance = new_position.distance(destination_global_position);
-                    transform.translation = new_position.extend(original_z);
+                AttackPieceAnimationState::Attacking { forwards } => {
+                    if *forwards {
+                        let new_position = truncated_translation + delta;
+                        let pixel_distance = new_position.distance(destination_global_position);
+                        transform.translation = new_position.extend(original_z);
 
-                    if pixel_distance < TILE_SIZE as f32 / 1.5 {
-                        *animation_state = AttackPieceAnimationState::Backwards;
-                        event_writer.send(*event);
+                        if pixel_distance < TILE_SIZE as f32 / 1.5 {
+                            *animation_state =
+                                AttackPieceAnimationState::Attacking { forwards: false };
+                            event_writer.send(*event);
+                        }
+                    } else {
+                        let new_position = truncated_translation - delta;
+                        let progress =
+                            new_position.distance(destination_global_position) / original_distance;
+                        transform.translation = new_position.extend(original_z);
+
+                        if progress > 0.98 {
+                            // snap to the origin
+                            transform.translation = origin_global_position.extend(original_z);
+                            *piece_state = PieceState::Idle;
+                        }
                     }
                 }
-                AttackPieceAnimationState::Backwards => {
-                    let new_position = truncated_translation - delta;
-                    let progress =
-                        new_position.distance(destination_global_position) / original_distance;
-                    transform.translation = new_position.extend(original_z);
-
-                    if progress > 0.98 {
-                        // snap to the origin
-                        transform.translation = origin_global_position.extend(original_z);
-                        *piece_state = PieceState::Idle;
+                AttackPieceAnimationState::Delayed(timer) => {
+                    timer.tick(time.delta());
+                    if timer.finished() {
+                        *animation_state = AttackPieceAnimationState::Attacking { forwards: true };
                     }
                 }
-                AttackPieceAnimationState::Start => {}
                 AttackPieceAnimationState::Finished => {}
             }
         }
@@ -167,10 +171,10 @@ fn attacking_with_new_sprite_animation_system(
             continue;
         };
 
-        match attacking_sprite.animation_state {
-            AttackPieceAnimationState::Start => {
-                attacking_sprite.timer.tick(time.delta());
-                if attacking_sprite.timer.finished() {
+        match &mut attacking_sprite.animation_state {
+            AttackPieceAnimationState::Delayed(ref mut timer) => {
+                timer.tick(time.delta());
+                if timer.finished() {
                     spawn_attack_sprite(
                         &mut commands,
                         entity,
@@ -178,10 +182,14 @@ fn attacking_with_new_sprite_animation_system(
                         &atlas_layout,
                         attacking_sprite.sprite_index,
                     );
-                    attacking_sprite.animation_state = AttackPieceAnimationState::Forwards;
+                    attacking_sprite.animation_state =
+                        AttackPieceAnimationState::Attacking { forwards: true };
                 }
             }
-            AttackPieceAnimationState::Forwards => {
+            AttackPieceAnimationState::Attacking { forwards } => {
+                if !*forwards {
+                    return;
+                }
                 update_sprite_positions(
                     &children_query,
                     entity,
@@ -193,7 +201,6 @@ fn attacking_with_new_sprite_animation_system(
                     &mut event_writer,
                 );
             }
-            AttackPieceAnimationState::Backwards => (),
             AttackPieceAnimationState::Finished => {}
         }
     }
