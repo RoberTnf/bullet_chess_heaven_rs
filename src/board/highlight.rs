@@ -3,6 +3,7 @@ use bevy::{prelude::*, utils::HashSet};
 use crate::{
     globals,
     graphics::spritesheet::SpriteSheetAtlas,
+    input::click_tile::HoveredTile,
     pieces::{
         attack::attack_piece_system,
         common::{MovementTypes, Piece, Team},
@@ -27,6 +28,9 @@ pub struct HighlightTileMove;
 #[derive(Component)]
 pub struct HighlightTileAttack;
 
+#[derive(Component)]
+pub struct HighlightHoveredTile;
+
 impl HighlightCache {
     pub fn new() -> Self {
         Self {
@@ -50,18 +54,21 @@ pub fn update_highlight_cache(
     >,
     player: Query<(&BoardPosition, &MovementTypes, &Team), (With<Piece>, With<Player>)>,
 ) {
-    let (player_board_position, player_movement_types, player_team) = player.single();
+    let (player_board_position, player_movement_types, &player_team) = player.single();
     if highlight.player_moves.is_empty() && highlight.player_attacks.is_empty() {
-        let enemies = other_pieces
-            .iter()
-            .filter(|(_, team)| **team == *player_team);
+        let enemies_board_positions = HashSet::from_iter(
+            other_pieces
+                .iter()
+                .filter(|(_, &team)| team != player_team)
+                .map(|(board_position, _)| *board_position),
+        );
+
+        debug!("enemies_board_positions: {:?}", enemies_board_positions);
         let other_pieces_board_positions = HashSet::from_iter(
             other_pieces
                 .iter()
                 .map(|(board_position, _)| *board_position),
         );
-        let enemies_board_positions =
-            HashSet::from_iter(enemies.map(|(board_position, _)| *board_position));
 
         // fill the highlight with valid moves and attacks
         player_movement_types.0.iter().for_each(|movement_type| {
@@ -81,12 +88,16 @@ pub fn despawn_highlight_tiles(
     mut commands: Commands,
     highlight_tiles_attack: Query<Entity, With<HighlightTileAttack>>,
     highlight_tiles_move: Query<Entity, With<HighlightTileMove>>,
+    hovered_tile: Query<Entity, With<HighlightHoveredTile>>,
     mut highlight: ResMut<HighlightCache>,
 ) {
     highlight_tiles_attack.iter().for_each(|entity| {
         commands.entity(entity).despawn_recursive();
     });
     highlight_tiles_move.iter().for_each(|entity| {
+        commands.entity(entity).despawn_recursive();
+    });
+    hovered_tile.iter().for_each(|entity| {
         commands.entity(entity).despawn_recursive();
     });
     highlight.invalidate();
@@ -107,6 +118,8 @@ pub fn update_highlight_tiles(
     mut commands: Commands,
     highlight_tiles_attack: Query<(Entity, &BoardPosition), With<HighlightTileAttack>>,
     highlight_tiles_move: Query<(Entity, &BoardPosition), With<HighlightTileMove>>,
+    highlight_hovered_tile: Query<Entity, With<HighlightHoveredTile>>,
+    hovered_tile: Res<HoveredTile>,
     highlight: Res<HighlightCache>,
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
@@ -118,6 +131,12 @@ pub fn update_highlight_tiles(
         if !highlight.player_attacks.contains(board_position) {
             commands.entity(entity).despawn_recursive();
         } else {
+            if let Some(hovered_tile) = hovered_tile.0 {
+                if hovered_tile == *board_position {
+                    commands.entity(entity).despawn_recursive();
+                    continue;
+                }
+            }
             present_tiles_attack.insert(*board_position);
         }
     }
@@ -125,7 +144,40 @@ pub fn update_highlight_tiles(
         if !highlight.player_moves.contains(board_position) {
             commands.entity(entity).despawn_recursive();
         } else {
+            if let Some(hovered_tile) = hovered_tile.0 {
+                if hovered_tile == *board_position {
+                    commands.entity(entity).despawn_recursive();
+                    continue;
+                }
+            }
             present_tiles_move.insert(*board_position);
+        }
+    }
+
+    // deal with hovered tile
+    if hovered_tile.is_changed() {
+        highlight_hovered_tile.iter().for_each(|entity| {
+            commands.entity(entity).despawn_recursive();
+        });
+        if let Some(hovered_tile) = hovered_tile.0 {
+            commands.spawn((
+                Name::new("Highlight Hovered Tile"),
+                StateScoped(GameState::Game),
+                HighlightHoveredTile,
+                SpriteBundle {
+                    texture: asset_server.load("custom/spritesheet.png"),
+                    transform: Transform::from_translation(
+                        hovered_tile
+                            .as_global_position()
+                            .extend(globals::HIGHLIGHT_Z_INDEX),
+                    ),
+                    ..default()
+                },
+                TextureAtlas {
+                    layout: atlas_layout.handle.clone(),
+                    index: 23,
+                },
+            ));
         }
     }
 
@@ -134,6 +186,12 @@ pub fn update_highlight_tiles(
         let global_position = board_position
             .as_global_position()
             .extend(globals::BOARD_Z_INDEX);
+
+        if let Some(hovered_tile) = hovered_tile.0 {
+            if hovered_tile == *board_position {
+                continue;
+            }
+        }
 
         if !present_tiles_attack.contains(board_position) {
             commands.spawn((
@@ -157,6 +215,11 @@ pub fn update_highlight_tiles(
         }
     }
     for board_position in highlight.player_moves.iter() {
+        if let Some(hovered_tile) = hovered_tile.0 {
+            if hovered_tile == *board_position {
+                continue;
+            }
+        }
         if !present_tiles_move.contains(board_position) {
             let global_position = board_position
                 .as_global_position()
@@ -165,7 +228,7 @@ pub fn update_highlight_tiles(
             if !present_tiles_attack.contains(board_position) {
                 commands.spawn((
                     Name::new(format!(
-                        "Highlight Tile Attack ({}, {})",
+                        "Highlight Tile Move ({}, {})",
                         board_position.x, board_position.y
                     )),
                     StateScoped(GameState::Game),

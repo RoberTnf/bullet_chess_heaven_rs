@@ -14,6 +14,37 @@ use crate::{
     states::turn_state::TurnState,
 };
 
+#[derive(Resource)]
+pub struct HoveredTile(pub Option<BoardPosition>);
+
+pub fn update_hovered_tile(
+    mut resource: ResMut<HoveredTile>,
+    window: Query<&Window, With<PrimaryWindow>>,
+    camera: Query<(&Camera, &GlobalTransform)>,
+) {
+    let (camera, camera_transform) = camera.single();
+    if let Some(tile_position) =
+        mouse_position_to_tile_position(window.single(), camera, camera_transform)
+    {
+        if resource.0 != Some(tile_position) {
+            resource.0 = Some(tile_position);
+        }
+    } else {
+        resource.0 = None;
+    }
+}
+
+fn mouse_position_to_tile_position(
+    window: &Window,
+    camera: &Camera,
+    camera_transform: &GlobalTransform,
+) -> Option<BoardPosition> {
+    window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
+        .and_then(BoardPosition::from_world_position)
+}
+
 /// Handles click tile events
 ///
 /// If the user clicks on a valid tile
@@ -40,45 +71,42 @@ pub fn click_tile_update_player_position(
         .collect();
 
     if mouse.just_pressed(MouseButton::Left) {
-        if let Some(world_position) = window
-            .cursor_position()
-            .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
+        if let Some(tile_position) =
+            mouse_position_to_tile_position(window, camera, camera_transform)
         {
-            if let Some(tile_position) = BoardPosition::from_world_position(world_position) {
-                let mut current_tile_position = player_position;
-                let mut moved = false;
-                // First, move the player to the tile if possible
-                movement_types.0.iter().for_each(|movement_type| {
-                    let response = movement_type.get_valid_moves(
-                        player_position,
-                        &all_pieces_positions,
-                        &enemy_pieces_positions,
-                    );
-                    if response.valid_moves.contains(&tile_position) {
-                        send_move_event(&mut move_event_writer, tile_position, player_entity);
-                        current_tile_position = &tile_position;
-                        moved = true;
-                    }
-                });
-
-                if moved {
-                    next_state.set(TurnState::PlayerAnimation);
-                    return;
-                }
-
-                // else, try attacking from current tile
-                attack_from_tile(
-                    movement_types,
-                    current_tile_position,
+            let mut current_tile_position = player_position;
+            let mut moved = false;
+            // First, move the player to the tile if possible
+            movement_types.0.iter().for_each(|movement_type| {
+                let response = movement_type.get_valid_moves(
+                    player_position,
                     &all_pieces_positions,
                     &enemy_pieces_positions,
-                    &pieces_query,
-                    &mut attack_event_writer,
-                    player_entity,
-                    damage,
-                    &mut next_state,
                 );
+                if response.valid_moves.contains(&tile_position) {
+                    send_move_event(&mut move_event_writer, tile_position, player_entity);
+                    current_tile_position = &tile_position;
+                    moved = true;
+                }
+            });
+
+            if moved {
+                next_state.set(TurnState::PlayerAnimation);
+                return;
             }
+
+            // else, try attacking from current tile
+            attack_from_tile(
+                movement_types,
+                current_tile_position,
+                &all_pieces_positions,
+                &enemy_pieces_positions,
+                &pieces_query,
+                &mut attack_event_writer,
+                player_entity,
+                damage,
+                &mut next_state,
+            );
         }
     } else {
         for _ in touches.iter_just_pressed() {}
