@@ -3,7 +3,9 @@ use bevy::prelude::*;
 use crate::{
     globals::{SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
     graphics::spritesheet::SpriteSheetAtlas,
-    pieces::{common::MovementTypes, health::Health, player::spawn::Player},
+    pieces::{
+        common::MovementTypes, experience::PlayerLevel, health::Health, player::spawn::Player,
+    },
     states::game_state::GameState,
 };
 
@@ -17,6 +19,12 @@ struct HealthUILabel;
 
 #[derive(Component)]
 struct MovementTypesUIContainer;
+
+#[derive(Component)]
+struct LevelUILabel;
+
+#[derive(Component)]
+struct ExpUILabel;
 
 #[derive(Component)]
 struct MovementTypesUILabel {
@@ -72,6 +80,28 @@ pub fn setup_character_info(
                                 },
                             ),
                             HealthUILabel,
+                        ));
+                        parent.spawn((
+                            TextBundle::from_section(
+                                "LevelPlaceholder",
+                                TextStyle {
+                                    font_size: UI_FONT_SIZE,
+                                    font: asset_server.load(UI_FONT),
+                                    ..default()
+                                },
+                            ),
+                            LevelUILabel,
+                        ));
+                        parent.spawn((
+                            TextBundle::from_section(
+                                "ExpPlaceholder",
+                                TextStyle {
+                                    font_size: UI_FONT_SIZE,
+                                    font: asset_server.load(UI_FONT),
+                                    ..default()
+                                },
+                            ),
+                            ExpUILabel,
                         ));
                         parent
                             .spawn((
@@ -167,13 +197,33 @@ fn update_health_information(
     text.sections[0].value = format!("Health: {} / {}", health.value, health.max_value);
 }
 
+fn update_level_information(
+    mut level_query: Query<&mut Text, (With<LevelUILabel>, Without<ExpUILabel>)>,
+    mut exp_query: Query<&mut Text, (With<ExpUILabel>, Without<LevelUILabel>)>,
+    level: Res<PlayerLevel>,
+) {
+    let mut level_text = level_query.get_single_mut().unwrap();
+    level_text.sections[0].value = format!("Level: {}", level.level);
+
+    let mut exp_text = exp_query.get_single_mut().unwrap();
+    exp_text.sections[0].value = format!(
+        "Exp: {} / {}",
+        level.experience,
+        level.get_exp_to_next_level()
+    );
+}
+
 pub struct CharacterInfoPlugin;
 
 impl Plugin for CharacterInfoPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (update_health_information, update_movement_types_information)
+            (
+                update_health_information,
+                update_movement_types_information,
+                update_level_information,
+            )
                 .run_if(in_state(GameState::Game)),
         )
         .add_systems(

@@ -3,7 +3,6 @@ use bevy::prelude::*;
 use crate::{
     game_logic::score::GameScore,
     globals::{UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
-    pieces::experience::PlayerLevel,
     states::turn_state::TurnInfo,
 };
 
@@ -14,12 +13,6 @@ struct GameInfoNode;
 
 #[derive(Component)]
 struct TurnUILabel;
-
-#[derive(Component)]
-struct LevelUILabel;
-
-#[derive(Component)]
-struct ExpUILabel;
 
 #[derive(Component)]
 struct ScoreUILabel;
@@ -64,28 +57,6 @@ pub fn setup_game_info(
                 ));
                 parent.spawn((
                     TextBundle::from_section(
-                        "LevelPlaceholder",
-                        TextStyle {
-                            font_size: UI_FONT_SIZE,
-                            font: asset_server.load(UI_FONT),
-                            ..default()
-                        },
-                    ),
-                    LevelUILabel,
-                ));
-                parent.spawn((
-                    TextBundle::from_section(
-                        "ExpPlaceholder",
-                        TextStyle {
-                            font_size: UI_FONT_SIZE,
-                            font: asset_server.load(UI_FONT),
-                            ..default()
-                        },
-                    ),
-                    ExpUILabel,
-                ));
-                parent.spawn((
-                    TextBundle::from_section(
                         "ScorePlaceholder",
                         TextStyle {
                             font_size: UI_FONT_SIZE,
@@ -107,22 +78,6 @@ fn update_turn_information(
     text.sections[0].value = format!("Turn: {}", turn_info.number);
 }
 
-fn update_level_information(
-    mut level_query: Query<&mut Text, (With<LevelUILabel>, Without<ExpUILabel>)>,
-    mut exp_query: Query<&mut Text, (With<ExpUILabel>, Without<LevelUILabel>)>,
-    level: Res<PlayerLevel>,
-) {
-    let mut level_text = level_query.get_single_mut().unwrap();
-    level_text.sections[0].value = format!("Level: {}", level.level);
-
-    let mut exp_text = exp_query.get_single_mut().unwrap();
-    exp_text.sections[0].value = format!(
-        "Exp: {} / {}",
-        level.experience,
-        level.get_exp_to_next_level()
-    );
-}
-
 fn update_score_information(
     score: Res<GameScore>,
     mut query: Query<&mut Text, With<ScoreUILabel>>,
@@ -135,14 +90,7 @@ pub struct GameInfoPlugin;
 
 impl Plugin for GameInfoPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (
-                update_turn_information,
-                update_level_information,
-                update_score_information,
-            ),
-        )
-        .add_systems(Startup, setup_game_info.after(setup_ui));
+        app.add_systems(Update, (update_turn_information, update_score_information))
+            .add_systems(Startup, setup_game_info.after(setup_ui));
     }
 }
