@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    pieces::{common::Team, experience::PieceValue, health::PieceDeathEvent},
+    pieces::{common::Team, health::PieceDeathEvent, player::experience::PieceValue},
     states::game_state::GameState,
 };
 

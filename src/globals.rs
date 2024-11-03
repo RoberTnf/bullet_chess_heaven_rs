@@ -12,14 +12,15 @@ pub const TARGET_PIXEL_HEIGHT: f32 = 180.0; // Target pixel height for scaling
 pub const TILE_SIZE: u32 = 20; // Size of each tile in pixels
 
 // Z-index settings for rendering order
-pub const PLAYER_Z_INDEX: f32 = 20.0; // Z-index for player entities
-pub const ENEMY_Z_INDEX: f32 = 19.0; // Z-index for enemy entities
 pub const BOARD_Z_INDEX: f32 = 1.0; // Z-index for the game board
 pub const HIGHLIGHT_Z_INDEX: f32 = 2.0; // Z-index for highlighted tiles
+pub const ENEMY_Z_INDEX: f32 = 19.0; // Z-index for enemy entities
+pub const PLAYER_Z_INDEX: f32 = 20.0; // Z-index for player entities
 pub const HEALTH_Z_INDEX: f32 = 25.0; // Z-index for health bars
 pub const HEALTH_CHANGE_TEXT_Z_INDEX: f32 = 26.0; // Z-index for health change text
 pub const EMPTY_HEALTHBAR_Z_INDEX: f32 = 29.0; // Z-index for empty healthbars
 pub const HEALTHBAR_Z_INDEX: f32 = 30.0; // Z-index for healthbars
+pub const GOLD_Z_INDEX: f32 = 31.0;
 
 pub const BOARD_SIZE: i32 = 8; // Size of the game board (8x8)
 
@@ -27,11 +28,14 @@ pub const BOARD_SIZE: i32 = 8; // Size of the game board (8x8)
 pub const TWEEN_MOVE_ANIMATION_SPEED: f32 = 10.0; // Speed of tween move animations
 pub const PULSE_ANIMATION_SPEED: f32 = 4.0; // Speed of pulse animations
 pub const HEALTH_CHANGE_TEXT_ANIMATION_SPEED: f32 = 15.0; // Speed of health change text animations
+pub const GOLD_ANIMATION_SPEED: f32 = 15.0; // Speed of gold animation
 
 // Animation durations
 pub const HEALTH_CHANGE_TEXT_ANIMATION_DURATION: f32 = 0.5; // Duration of health change text animations
 pub const DEATH_ANIMATION_DURATION: f32 = 0.5; // Duration of death animations
 pub const ATTACK_ANIMATION_DURATION: f32 = 0.5; // Duration of attack animations
+pub const GOLD_ANIMATION_DURATION: f32 = 1.5; // Duration of gold animation
+pub const GOLD_UI_COLOR_DURATION: f32 = 0.5; // Duration of gold UI color
 
 // Player settings
 pub const PLAYER_HEALTH: u64 = 5; // Health of the player
@@ -80,6 +84,7 @@ pub const UI_FONT_SIZE: f32 = 8.0; // Font size for UI elements
 pub const UI_FONT: &str = "fonts/monogram/ttf/monogram-extended.ttf"; // Font for UI elements
 pub const UI_HEADER_FONT_SIZE: f32 = 12.0; // Font size for UI headers
 pub const HEALTH_CHANGE_TEXT_FONT_SIZE: f32 = 12.0; // Font size for health change text
+pub const GOLD_FONT_SIZE: f32 = 12.0; // Font size for gold text
 
 // UI Defeat
 pub const DEFEAT_HEADER_FONT_SIZE: f32 = 36.0; // Font size for defeat text

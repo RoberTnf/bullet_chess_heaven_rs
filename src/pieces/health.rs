@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use rand::prelude::*;
 
@@ -59,10 +61,21 @@ impl Health {
 }
 
 #[derive(Component)]
-pub struct HealthChangeTextAnimation {
-    timer: Timer,
-    direction: Vec2,
-    speed: f32,
+pub struct TextAnimation {
+    pub timer: Timer,
+    pub direction: Vec2,
+    pub speed: f32,
+}
+
+impl Default for TextAnimation {
+    fn default() -> Self {
+        let mut rng = rand::thread_rng();
+        TextAnimation {
+            timer: Timer::new(Duration::from_secs(1), TimerMode::Once),
+            direction: Vec2::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0)).normalize(),
+            speed: 0.0,
+        }
+    }
 }
 
 #[derive(Component)]
@@ -95,9 +108,6 @@ pub fn spawn_health_change_text(
                 PRIMARY_COLOR
             };
 
-            let mut rng = rand::thread_rng();
-            let direction = Vec2::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0));
-
             commands.spawn((
                 Text2dBundle {
                     text: Text::from_section(
@@ -118,13 +128,13 @@ pub fn spawn_health_change_text(
                     },
                     ..default()
                 },
-                HealthChangeTextAnimation {
+                TextAnimation {
                     timer: Timer::from_seconds(
                         HEALTH_CHANGE_TEXT_ANIMATION_DURATION,
                         TimerMode::Once,
                     ),
-                    direction,
                     speed: HEALTH_CHANGE_TEXT_ANIMATION_SPEED,
+                    ..default()
                 },
                 StateScoped(GameState::Game),
             ));
@@ -191,7 +201,7 @@ pub fn death_animation(
 }
 
 pub fn health_change_text_animation(
-    mut health_change_text_query: Query<(&mut Transform, &mut HealthChangeTextAnimation, Entity)>,
+    mut health_change_text_query: Query<(&mut Transform, &mut TextAnimation, Entity)>,
     time: Res<Time>,
     mut commands: Commands,
 ) {

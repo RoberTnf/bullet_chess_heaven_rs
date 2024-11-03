@@ -1,12 +1,17 @@
 use bevy::prelude::*;
 
 use crate::{
-    globals::{SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
+    globals::{
+        GOLD_UI_COLOR_DURATION, SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE,
+    },
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
-        common::MovementTypes, experience::PlayerLevel, health::Health, player::spawn::Player,
+        common::MovementTypes,
+        health::Health,
+        player::{experience::PlayerLevel, gold::Gold, spawn::Player},
     },
     states::game_state::GameState,
+    utils::math::lerp,
 };
 
 use super::{game_info::setup_game_info, setup_ui, LeftUINode};
@@ -26,6 +31,10 @@ struct LevelUILabel;
 #[derive(Component)]
 struct ExpUILabel;
 
+#[derive(Component)]
+struct GoldUILabel {
+    timer: Timer,
+}
 #[derive(Component)]
 struct MovementTypesUILabel {
     sprite_index: usize,
@@ -102,6 +111,19 @@ pub fn setup_character_info(
                                 },
                             ),
                             ExpUILabel,
+                        ));
+                        parent.spawn((
+                            TextBundle::from_section(
+                                "GoldPlaceholder",
+                                TextStyle {
+                                    font_size: UI_FONT_SIZE,
+                                    font: asset_server.load(UI_FONT),
+                                    color: Color::srgb(1.0, 1.0, 1.0),
+                                },
+                            ),
+                            GoldUILabel {
+                                timer: Timer::from_seconds(GOLD_UI_COLOR_DURATION, TimerMode::Once),
+                            },
                         ));
                         parent
                             .spawn((
@@ -213,6 +235,31 @@ fn update_level_information(
     );
 }
 
+fn update_gold_information(
+    mut query: Query<(&mut Text, &mut GoldUILabel)>,
+    gold: Res<Gold>,
+    time: Res<Time>,
+) {
+    let time_delta = time.delta();
+    let (mut text, mut gold_ui_label) = query.get_single_mut().unwrap();
+    let has_changed_recently =
+        !gold_ui_label.timer.tick(time.delta()).finished() && gold.amount != 0;
+    if let Color::Srgba(color) = text.sections[0].style.color {
+        let blue = color.blue;
+        let lerped = if has_changed_recently {
+            lerp(blue, 0.0, time_delta.as_secs_f32() / GOLD_UI_COLOR_DURATION)
+        } else {
+            lerp(blue, 1.0, time_delta.as_secs_f32() / GOLD_UI_COLOR_DURATION)
+        };
+        text.sections[0].style.color = Color::srgb(lerped, 1.0, lerped);
+    }
+
+    if gold.is_changed() {
+        text.sections[0].value = format!("{}$", gold.amount);
+        gold_ui_label.timer.reset();
+    }
+}
+
 pub struct CharacterInfoPlugin;
 
 impl Plugin for CharacterInfoPlugin {
@@ -223,6 +270,7 @@ impl Plugin for CharacterInfoPlugin {
                 update_health_information,
                 update_movement_types_information,
                 update_level_information,
+                update_gold_information,
             )
                 .run_if(in_state(GameState::Game)),
         )

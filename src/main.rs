@@ -9,6 +9,7 @@ mod pieces;
 mod plugins;
 mod states;
 mod ui;
+mod utils;
 
 fn main() {
     App::new()

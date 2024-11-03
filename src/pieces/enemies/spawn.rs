@@ -12,10 +12,10 @@ use crate::{
             queen::{BLACK_QUEEN_INFO, WHITE_QUEEN_INFO},
             rook::{BLACK_ROOK_INFO, WHITE_ROOK_INFO},
         },
-        experience::PieceValue,
         health::Health,
         healthbar::spawn_healthbar,
         movement_type::MovementType,
+        player::experience::PieceValue,
     },
     states::{
         game_state::GameState,

@@ -5,8 +5,8 @@ use crate::{
     pieces::{
         common::{MovementTypes, Piece},
         enemies::king::{BLACK_KING_INFO, WHITE_KING_INFO},
-        experience::PieceValue,
         movement_type::MovementType,
+        player::experience::PieceValue,
     },
 };
 

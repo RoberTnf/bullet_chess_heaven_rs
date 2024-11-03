@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 
-use crate::states::game_state::GameState;
-
-use super::{common::Team, health::PieceDeathEvent};
+use crate::{
+    pieces::{common::Team, health::PieceDeathEvent},
+    states::game_state::GameState,
+};
 
 #[derive(Component)]
 pub struct PieceValue {

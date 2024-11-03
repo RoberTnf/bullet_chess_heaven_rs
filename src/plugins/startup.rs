@@ -29,13 +29,7 @@ impl Plugin for StartupPlugin {
             .add_event::<pieces::health::PieceDeathEvent>()
             .add_systems(Startup, graphics::camera::setup_camera)
             // One off systems
-            .add_systems(
-                OnEnter(GameState::Game),
-                (
-                    board::tile::spawn_board,
-                    pieces::player::spawn::spawn_player,
-                ),
-            )
+            .add_systems(OnEnter(GameState::Game), (board::tile::spawn_board,))
             .add_plugins(UiPlugin)
             .init_resource::<states::turn_state::TurnInfo>();
     }

@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     board::highlight,
     game_logic::{score::GameScorePlugin, GameLogicPlugin},
-    pieces::{experience::ExperiencePlugin, plugin::PiecePlugin},
+    pieces::{player::PlayerPlugin, plugin::PiecePlugin},
     states::{game_state::GameStatePlugin, turn_state},
 };
 mod animation;
@@ -22,9 +22,9 @@ impl Plugin for UpdatePlugin {
             PiecePlugin,
             GameLogicPlugin,
             // ResolutionPlugin,
-            ExperiencePlugin,
             GameScorePlugin,
             GameStatePlugin,
+            PlayerPlugin,
         ));
     }
 }
