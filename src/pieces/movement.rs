@@ -81,19 +81,31 @@ pub fn move_pieces_animation(
 }
 
 pub fn all_enemies_idle(
-    moves: Query<&PieceState, With<Enemy>>,
+    mut moves: Query<&mut PieceState, With<Enemy>>,
     mut turn_state: ResMut<NextState<TurnState>>,
 ) {
-    if moves.iter().all(|state| matches!(state, PieceState::Idle)) {
+    if moves
+        .iter()
+        .all(|state| matches!(state, PieceState::AttackEnded))
+    {
         turn_state.set(TurnState::EnemySpawn);
+        moves.iter_mut().for_each(|mut state| {
+            *state = PieceState::Idle;
+        });
     }
 }
 
 pub fn is_player_idle(
-    moves: Query<&PieceState, With<Player>>,
+    mut moves: Query<&mut PieceState, With<Player>>,
     mut turn_state: ResMut<NextState<TurnState>>,
 ) {
-    if moves.iter().all(|state| matches!(state, PieceState::Idle)) {
+    if moves
+        .iter()
+        .all(|state| matches!(state, PieceState::AttackEnded))
+    {
         turn_state.set(TurnState::EnemyAI);
+        moves.iter_mut().for_each(|mut state| {
+            *state = PieceState::Idle;
+        });
     }
 }

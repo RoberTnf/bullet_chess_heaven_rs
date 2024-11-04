@@ -23,6 +23,7 @@ pub enum PieceState {
         destination: Vec3,
     },
     MoveEnded,
+    AttackEnded,
     Attacking {
         destination: BoardPosition,
         origin: BoardPosition,

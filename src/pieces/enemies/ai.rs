@@ -4,7 +4,7 @@ use crate::{
     board::position::BoardPosition,
     pieces::{
         attack::AttackPieceEvent,
-        common::{MovementTypes, Piece, Team},
+        common::{MovementTypes, Piece, PieceState, Team},
         damage::Damage,
         health::DeathAnimation,
         movement::MovePieceEvent,
@@ -13,30 +13,40 @@ use crate::{
 };
 
 pub fn ai_system(
-    pieces: Query<
-        (&BoardPosition, &MovementTypes, &Team, &Damage, Entity),
+    mut pieces: Query<
+        (
+            &BoardPosition,
+            &MovementTypes,
+            &Team,
+            &Damage,
+            Entity,
+            &mut PieceState,
+        ),
         (With<Piece>, Without<DeathAnimation>),
     >,
     mut move_events: EventWriter<MovePieceEvent>,
     mut turn_state: ResMut<NextState<TurnState>>,
     mut attack_events: EventWriter<AttackPieceEvent>,
 ) {
-    let enemy_pieces = pieces
-        .iter()
-        .filter(|(_, _, &team, _, _)| team == Team::Enemy);
     let player_pieces_positions_and_entities = HashSet::from_iter(
         pieces
             .iter()
-            .filter(|(_, _, &team, _, _)| team == Team::Player)
-            .map(|(pos, _, _, _, entity)| (entity, *pos)),
+            .filter(|(_, _, &team, _, _, _)| team == Team::Player)
+            .map(|(pos, _, _, _, entity, _)| (entity, *pos)),
     );
+    let mut all_pieces_positions =
+        HashSet::from_iter(pieces.iter().map(|(pos, _, _, _, _, _)| *pos));
+    let enemy_pieces = pieces
+        .iter_mut()
+        .filter(|(_, _, &team, _, _, _)| team == Team::Enemy);
     let player_pieces_positions = HashSet::from_iter(
         player_pieces_positions_and_entities
             .iter()
             .map(|(_, pos)| *pos),
     );
-    let mut all_pieces_positions = HashSet::from_iter(pieces.iter().map(|(pos, _, _, _, _)| *pos));
-    for (enemy_pos, enemy_movement_types, _, enemy_damage, enemy_entity) in enemy_pieces {
+    for (enemy_pos, enemy_movement_types, _, enemy_damage, enemy_entity, mut enemy_state) in
+        enemy_pieces
+    {
         // we make the assumption that there will be enemies with more than one movement type
         let mut moves = HashSet::new();
         let mut attacks = HashSet::new();
@@ -52,6 +62,7 @@ pub fn ai_system(
 
         if attacks.is_empty() {
             if moves.is_empty() {
+                *enemy_state = PieceState::AttackEnded;
                 continue;
             }
             // no attacks, so we move

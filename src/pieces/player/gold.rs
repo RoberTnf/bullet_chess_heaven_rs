@@ -6,6 +6,7 @@ use crate::{
         GOLD_ANIMATION_DURATION, GOLD_ANIMATION_SPEED, GOLD_FONT_SIZE, GOLD_Z_INDEX, UI_FONT,
     },
     pieces::health::{PieceDeathEvent, TextAnimation},
+    states::game_state::GameState,
 };
 
 use super::experience::PieceValue;
@@ -38,6 +39,7 @@ pub fn spawn_gold(
         let gold_position = enemy_position.as_global_position().extend(GOLD_Z_INDEX);
         commands.spawn((
             Name::new("PickedUpGold"),
+            StateScoped(GameState::Game),
             PickedUpGold {
                 amount: enemy_value.value,
             },
@@ -66,11 +68,16 @@ pub fn spawn_gold(
     });
 }
 
+pub fn reset_gold(mut gold: ResMut<Gold>) {
+    gold.amount = 0;
+}
+
 pub struct GoldPlugin;
 
 impl Plugin for GoldPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Gold::new(0));
         app.add_systems(Update, spawn_gold.run_if(on_event::<PieceDeathEvent>()));
+        app.add_systems(OnEnter(GameState::Game), reset_gold);
     }
 }

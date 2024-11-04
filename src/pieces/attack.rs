@@ -136,7 +136,7 @@ pub fn attack_piece_animation_system(
                         if progress > 0.98 {
                             // snap to the origin
                             transform.translation = origin_global_position.extend(original_z);
-                            *piece_state = PieceState::Idle;
+                            *piece_state = PieceState::AttackEnded;
                         }
                     }
                 }
@@ -223,7 +223,7 @@ fn piece_idle_if_all_animations_finished(
             }
         }
         if finished && !children_to_despawn.is_empty() {
-            *piece_state = PieceState::Idle;
+            *piece_state = PieceState::AttackEnded;
             for child in children_to_despawn.iter() {
                 commands.entity(*child).despawn_recursive();
             }
@@ -382,12 +382,12 @@ pub fn on_move_animation_end_attack_system(
                 damage,
                 &mut next_state,
             ) {
-                *piece_state = PieceState::Idle;
+                *piece_state = PieceState::AttackEnded;
             }
         }
         if !to_attack {
             if let Ok(mut piece_state) = pieces_without_attack.get_mut(event.entity) {
-                *piece_state = PieceState::Idle;
+                *piece_state = PieceState::AttackEnded;
             }
         }
     }
