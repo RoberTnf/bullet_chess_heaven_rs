@@ -6,6 +6,7 @@ use crate::states::game_state::GameState;
 pub mod experience;
 pub mod gold;
 pub mod spawn;
+pub mod upgrades;
 
 pub struct PlayerPlugin;
 
