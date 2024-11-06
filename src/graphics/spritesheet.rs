@@ -10,7 +10,7 @@ pub struct SpriteSheetAtlas {
 impl FromWorld for SpriteSheetAtlas {
     fn from_world(world: &mut World) -> Self {
         let layout = TextureAtlasLayout::from_grid(
-            UVec2::splat(globals::TILE_SIZE),
+            UVec2::splat(globals::TILE_SIZE as u32),
             SPRITESHEET_HEIGHT as u32,
             SPRITESHEET_WIDTH as u32,
             None,

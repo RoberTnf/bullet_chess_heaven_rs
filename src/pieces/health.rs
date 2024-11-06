@@ -17,9 +17,9 @@ use super::{common::Team, player::spawn::Player};
 
 #[derive(Component)]
 pub struct Health {
-    pub value: u64,
+    pub value: usize,
     pub changes: Vec<i64>,
-    pub max_value: u64,
+    pub max_value: usize,
 }
 
 #[derive(Event)]
@@ -28,7 +28,7 @@ pub struct PieceDeathEvent {
 }
 
 impl Health {
-    pub fn new(value: u64) -> Self {
+    pub fn new(value: usize) -> Self {
         Health {
             value,
             changes: vec![],
@@ -36,7 +36,7 @@ impl Health {
         }
     }
 
-    pub fn take_damage(&mut self, damage: u64) {
+    pub fn take_damage(&mut self, damage: usize) {
         self.value = self.value.saturating_sub(damage);
         self.changes.push(-(damage as i64));
     }
@@ -45,12 +45,12 @@ impl Health {
         self.value == 0
     }
 
-    pub fn heal(&mut self, amount: u64) {
+    pub fn heal(&mut self, amount: usize) {
         self.value = self.value.saturating_add(amount);
         self.changes.push(amount as i64);
     }
 
-    pub fn set_health(&mut self, value: u64) {
+    pub fn set_health(&mut self, value: usize) {
         self.value = value;
         self.changes.push((value as i64) - (self.value as i64));
     }
@@ -153,12 +153,12 @@ pub fn health_change_system(
             health_query
                 .get_mut(event.entity)
                 .unwrap()
-                .take_damage(-event.change as u64);
+                .take_damage(-event.change as usize);
         } else {
             health_query
                 .get_mut(event.entity)
                 .unwrap()
-                .heal(event.change as u64);
+                .heal(event.change as usize);
         }
     }
 }

@@ -13,16 +13,16 @@ use super::experience::PieceValue;
 
 #[derive(Resource)]
 pub struct Gold {
-    pub amount: u64,
+    pub amount: usize,
 }
 
 #[derive(Component)]
 pub struct PickedUpGold {
-    pub amount: u64,
+    pub amount: usize,
 }
 
 impl Gold {
-    pub fn new(amount: u64) -> Self {
+    pub fn new(amount: usize) -> Self {
         Self { amount }
     }
 }

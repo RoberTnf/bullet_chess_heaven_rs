@@ -18,13 +18,13 @@ pub struct Enemy;
 
 #[derive(Clone)]
 pub struct PieceInfo {
-    pub health: u64,
-    pub damage: u64,
+    pub health: usize,
+    pub damage: usize,
     pub sprite_index: usize,
     pub movement_types: MovementTypes,
-    pub spawn_weight: f64,
-    pub spawn_turn: u32,
-    pub value: u64,
+    pub spawn_weight: f32,
+    pub spawn_turn: usize,
+    pub value: usize,
 }
 
 pub struct EnemyPlugin;

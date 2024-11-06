@@ -6,7 +6,7 @@ use crate::{
 };
 
 #[derive(Resource)]
-pub struct GameScore(pub u32);
+pub struct GameScore(pub usize);
 
 impl FromWorld for GameScore {
     fn from_world(_world: &mut World) -> Self {
@@ -25,7 +25,7 @@ fn score_system(
             continue;
         }
         debug!("Adding to score: {}", value.value);
-        score.0 += value.value as u32;
+        score.0 += value.value;
     }
 }
 

@@ -37,7 +37,7 @@ impl TurnState {
 
 #[derive(Resource, Default)]
 pub struct TurnInfo {
-    pub number: u32,
+    pub number: usize,
 }
 
 fn increment_turn(mut turn_info: ResMut<TurnInfo>) {

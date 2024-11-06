@@ -130,7 +130,7 @@ pub fn send_attack_event(
     tile_position: &BoardPosition,
     player_entity: Entity,
     target_entity: Entity,
-    damage: u64,
+    damage: usize,
     movement_type: &MovementType,
     delay: Option<f32>,
 ) {

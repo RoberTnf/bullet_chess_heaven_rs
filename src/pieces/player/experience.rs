@@ -7,18 +7,18 @@ use crate::{
 
 #[derive(Component)]
 pub struct PieceValue {
-    pub value: u64,
+    pub value: usize,
 }
 
 #[derive(Event)]
 pub struct PlayerLevelUpEvent {
-    pub level: u64,
+    pub level: usize,
 }
 
 #[derive(Resource)]
 pub struct PlayerLevel {
-    pub level: u64,
-    pub experience: u64,
+    pub level: usize,
+    pub experience: usize,
 }
 
 impl FromWorld for PlayerLevel {
@@ -35,7 +35,7 @@ impl PlayerLevel {
         }
     }
 
-    pub fn add_experience(&mut self, amount: u64) {
+    pub fn add_experience(&mut self, amount: usize) {
         debug!("Adding experience: {}", amount);
         self.experience = self.experience.saturating_add(amount);
     }
@@ -51,7 +51,7 @@ impl PlayerLevel {
         }
     }
 
-    pub fn get_exp_to_next_level(&self) -> u64 {
+    pub fn get_exp_to_next_level(&self) -> usize {
         self.level * 2
     }
 }

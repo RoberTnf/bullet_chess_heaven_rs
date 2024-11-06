@@ -5,11 +5,13 @@ use character_info::CharacterInfoPlugin;
 use debug::DebugPlugin;
 use defeat::DefeatPlugin;
 use game_info::GameInfoPlugin;
+use shop::ShopPlugin;
 mod button;
 mod character_info;
 mod debug;
 mod defeat;
 mod game_info;
+mod shop;
 use crate::{globals::TILE_SIZE, states::turn_state::TurnInfo};
 
 fn display_turn_information(turn_info: Res<TurnInfo>) {
@@ -59,7 +61,8 @@ impl Plugin for UiPlugin {
         app.add_systems(Startup, setup_ui)
             .add_plugins((GameInfoPlugin, CharacterInfoPlugin))
             .add_plugins(DefeatPlugin)
-            .add_plugins(ButtonPlugin);
+            .add_plugins(ButtonPlugin)
+            .add_plugins(ShopPlugin);
 
         #[cfg(debug_assertions)]
         app.add_plugins(DebugPlugin);

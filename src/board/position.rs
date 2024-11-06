@@ -59,8 +59,8 @@ impl BoardPosition {
     pub fn as_global_position(&self) -> Vec2 {
         let center_offset = Vec2::splat(globals::TILE_SIZE as f32 / 2.0);
         Vec2::new(
-            self.x as f32 * globals::TILE_SIZE as f32,
-            self.y as f32 * globals::TILE_SIZE as f32,
+            (self.x * globals::TILE_SIZE as i32) as f32,
+            (self.y * globals::TILE_SIZE as i32) as f32,
         ) + center_offset
     }
 
@@ -172,18 +172,21 @@ mod tests {
 
     #[test]
     fn test_from_global_position() {
-        let tile_size = globals::TILE_SIZE as f32;
+        let tile_size = globals::TILE_SIZE;
 
         assert_eq!(
             BoardPosition::from_world_position(Vec2::new(0.0, 0.0)),
             Some(BoardPosition::new(0, 0).unwrap())
         );
         assert_eq!(
-            BoardPosition::from_world_position(Vec2::new(tile_size, tile_size)),
+            BoardPosition::from_world_position(Vec2::new(tile_size as f32, tile_size as f32)),
             Some(BoardPosition::new(1, 1).unwrap())
         );
         assert_eq!(
-            BoardPosition::from_world_position(Vec2::new(tile_size * 2.5, tile_size * 3.5)),
+            BoardPosition::from_world_position(Vec2::new(
+                tile_size as f32 * 2.5,
+                tile_size as f32 * 3.5
+            )),
             Some(BoardPosition::new(2, 3).unwrap())
         );
         assert_eq!(
@@ -214,14 +217,14 @@ mod tests {
 
     #[test]
     fn test_world_to_board_position_conversion() {
-        let tile_size = globals::TILE_SIZE as f32;
+        let tile_size = globals::TILE_SIZE;
         assert_eq!(
             BoardPosition::from_world_position(Vec2::new(0.0, 0.0)),
             Some(BoardPosition::new(0, 0).unwrap())
         );
 
         assert_eq!(
-            BoardPosition::from_world_position(Vec2::new(tile_size, tile_size)),
+            BoardPosition::from_world_position(Vec2::new(tile_size as f32, tile_size as f32)),
             Some(BoardPosition::new(1, 1).unwrap())
         );
     }

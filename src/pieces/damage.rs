@@ -2,11 +2,11 @@ use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct Damage {
-    pub value: u64,
+    pub value: usize,
 }
 
 impl Damage {
-    pub fn new(value: u64) -> Self {
+    pub fn new(value: usize) -> Self {
         Damage { value }
     }
 }

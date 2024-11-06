@@ -51,7 +51,7 @@ fn get_random_piece_info(turn_info: &Res<TurnInfo>) -> PieceInfo {
         .filter(|p| turn_info.number >= p.spawn_turn)
         .collect::<Vec<_>>();
 
-    let total_weight = spawnable_pieces.iter().map(|p| p.spawn_weight).sum::<f64>();
+    let total_weight = spawnable_pieces.iter().map(|p| p.spawn_weight).sum::<f32>();
     let mut random_value = rand::thread_rng().gen_range(0.0..total_weight);
 
     for &piece in spawnable_pieces.iter() {

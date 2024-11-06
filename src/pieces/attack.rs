@@ -23,7 +23,7 @@ pub struct AttackPieceEvent {
     pub destination: BoardPosition,
     pub attacker: Entity,
     pub target: Entity,
-    pub damage: u64,
+    pub damage: usize,
     pub sprite_index: Option<usize>,
     pub delay: Option<f32>,
 }
@@ -122,7 +122,7 @@ pub fn attack_piece_animation_system(
                         let pixel_distance = new_position.distance(destination_global_position);
                         transform.translation = new_position.extend(original_z);
 
-                        if pixel_distance < TILE_SIZE as f32 / 1.5 {
+                        if pixel_distance < (TILE_SIZE as f32 / 1.5) {
                             *animation_state =
                                 AttackPieceAnimationState::Attacking { forwards: false };
                             event_writer.send(*event);
@@ -279,7 +279,7 @@ fn update_sprite_positions(
             / ATTACK_ANIMATION_DURATION
             * delta_time;
 
-        if (current_pos - destination).length() < TILE_SIZE as f32 / 2.0 {
+        if (current_pos - destination).length() < (TILE_SIZE as f32 / 2.0) {
             commands.entity(*sprite).despawn_recursive();
             attacking_sprite.animation_state = AttackPieceAnimationState::Finished;
             event_writer.send(attacking_sprite.piece_health_change_event);

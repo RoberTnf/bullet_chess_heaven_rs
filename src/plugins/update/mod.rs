@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::{
     board::highlight,
     game_logic::{score::GameScorePlugin, GameLogicPlugin},
+    input::keyboard::KeyboardPlugin,
     pieces::{player::PlayerPlugin, plugin::PiecePlugin},
     states::{game_state::GameStatePlugin, turn_state},
 };
@@ -25,6 +26,7 @@ impl Plugin for UpdatePlugin {
             GameScorePlugin,
             GameStatePlugin,
             PlayerPlugin,
+            KeyboardPlugin,
         ));
     }
 }

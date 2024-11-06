@@ -9,7 +9,7 @@ use super::health::Health;
 
 #[derive(Component)]
 pub struct Healthbar {
-    pub fraction: f64,
+    pub fraction: f32,
 }
 
 #[derive(Component)]
@@ -36,10 +36,10 @@ pub fn update_healthbars(
     for (entity, mut healthbar, mut transform, parent) in query.iter_mut() {
         match parent_query.get(parent.get()) {
             Ok((_, Some(parent_health))) => {
-                let new_fraction = parent_health.value as f64 / parent_health.max_value as f64;
+                let new_fraction = parent_health.value as f32 / parent_health.max_value as f32;
                 if new_fraction != healthbar.fraction {
                     healthbar.fraction = new_fraction;
-                    transform.scale = Vec3::new(new_fraction as f32, 1.0, 1.0);
+                    transform.scale = Vec3::new(new_fraction, 1.0, 1.0);
                 }
             }
             Ok((parent_entity, None)) => {

@@ -9,7 +9,7 @@ pub const TARGET_PIXEL_WIDTH: f32 = 320.0; // Target pixel width for scaling
 pub const TARGET_PIXEL_HEIGHT: f32 = 180.0; // Target pixel height for scaling
 
 // Tile settings
-pub const TILE_SIZE: u32 = 20; // Size of each tile in pixels
+pub const TILE_SIZE: usize = 20; // Size of each tile in pixels
 
 // Z-index settings for rendering order
 pub const BOARD_Z_INDEX: f32 = 1.0; // Z-index for the game board
@@ -38,8 +38,8 @@ pub const GOLD_ANIMATION_DURATION: f32 = 1.5; // Duration of gold animation
 pub const GOLD_UI_COLOR_DURATION: f32 = 0.5; // Duration of gold UI color
 
 // Player settings
-pub const PLAYER_HEALTH: u64 = 5; // Health of the player
-pub const PLAYER_DAMAGE: u64 = 1; // Damage of the player
+pub const PLAYER_HEALTH: usize = 5; // Health of the player
+pub const PLAYER_DAMAGE: usize = 1; // Damage of the player
 pub const PRIMARY_COLOR: Color = Color::srgba(94.0 / 255.0, 205.0 / 255.0, 228.0 / 255.0, 1.0);
 pub const SECONDARY_COLOR: Color = Color::srgba(0.674, 0.192, 0.192, 1.0);
 
@@ -50,22 +50,22 @@ pub const DARKER_PRIMARY_COLOR: Color = Color::srgba(
     1.0,
 );
 // Enemy settings
-pub const ENEMY_BASE_HEALTH: u64 = 3; // Health of the enemy
-pub const ENEMY_BASE_DAMAGE: u64 = 1; // Damage of the enemy
+pub const ENEMY_BASE_HEALTH: usize = 3; // Health of the enemy
+pub const ENEMY_BASE_DAMAGE: usize = 1; // Damage of the enemy
 
 // Enemy spawn settings
-pub const KING_SPAWN_TURN: u32 = 15; // Turn number to spawn kings
-pub const KNIGHT_SPAWN_TURN: u32 = 30; // Turn number to spawn knights
-pub const BISHOP_SPAWN_TURN: u32 = 45; // Turn number to spawn bishops
-pub const ROOK_SPAWN_TURN: u32 = 60; // Turn number to spawn rooks
-pub const QUEEN_SPAWN_TURN: u32 = 75; // Turn number to spawn queens
+pub const KING_SPAWN_TURN: usize = 15; // Turn number to spawn kings
+pub const KNIGHT_SPAWN_TURN: usize = 30; // Turn number to spawn knights
+pub const BISHOP_SPAWN_TURN: usize = 45; // Turn number to spawn bishops
+pub const ROOK_SPAWN_TURN: usize = 60; // Turn number to spawn rooks
+pub const QUEEN_SPAWN_TURN: usize = 75; // Turn number to spawn queens
 
-pub const KING_SPAWN_WEIGHT: f64 = 1.0; // Weight of the king spawn
-pub const PAWN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the pawn spawn
-pub const KNIGHT_SPAWN_WEIGHT: f64 = 1.0; // Weight of the knight spawn
-pub const BISHOP_SPAWN_WEIGHT: f64 = 1.0; // Weight of the bishop spawn
-pub const ROOK_SPAWN_WEIGHT: f64 = 1.0; // Weight of the rook spawn
-pub const QUEEN_SPAWN_WEIGHT: f64 = 1.0; // Weight of the queen spawn
+pub const KING_SPAWN_WEIGHT: f32 = 1.0; // Weight of the king spawn
+pub const PAWN_SPAWN_WEIGHT: f32 = 1.0; // Weight of the pawn spawn
+pub const KNIGHT_SPAWN_WEIGHT: f32 = 1.0; // Weight of the knight spawn
+pub const BISHOP_SPAWN_WEIGHT: f32 = 1.0; // Weight of the bishop spawn
+pub const ROOK_SPAWN_WEIGHT: f32 = 1.0; // Weight of the rook spawn
+pub const QUEEN_SPAWN_WEIGHT: f32 = 1.0; // Weight of the queen spawn
 
 // Spritesheet settings
 pub const HIGHLIGHT_ATLAS_INDEX: usize = 3; // Index of the highlight sprite in the spritesheet
@@ -89,3 +89,11 @@ pub const GOLD_FONT_SIZE: f32 = 12.0; // Font size for gold text
 // UI Defeat
 pub const DEFEAT_HEADER_FONT_SIZE: f32 = 36.0; // Font size for defeat text
 pub const DEFEAT_SCORE_FONT_SIZE: f32 = 24.0; // Font size for score text
+
+// UI Shop
+pub const SHOP_FONT_SIZE: f32 = 12.0; // Font size for shop text
+pub const SHOP_HEADER_FONT_SIZE: f32 = 24.0; // Font size for shop header text
+pub const SHOP_PIECE_VALUE_GOLD_MULTIPLIER: f32 = 10.0; // Multiplier for the value of pieces in the shop
+
+// Keyboard settings
+pub const SHOP_KEY: KeyCode = KeyCode::KeyS; // Key to toggle the shop
