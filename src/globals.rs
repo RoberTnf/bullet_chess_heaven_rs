@@ -43,6 +43,8 @@ pub const PLAYER_DAMAGE: usize = 1; // Damage of the player
 pub const PRIMARY_COLOR: Color = Color::srgba(94.0 / 255.0, 205.0 / 255.0, 228.0 / 255.0, 1.0);
 pub const SECONDARY_COLOR: Color = Color::srgba(0.674, 0.192, 0.192, 1.0);
 
+pub const PRIMARY_COLOR_GRAYED: Color = Color::hsl(190.0, 1.0, 0.1);
+pub const PRIMARY_COLOR_GRAYED_BRIGHTER: Color = Color::hsl(190.0, 1.0, 0.4);
 pub const DARKER_PRIMARY_COLOR: Color = Color::srgba(
     94.0 * 0.9 / 255.0,
     205.0 * 0.9 / 255.0,
@@ -78,6 +80,7 @@ pub const TARGET_NUM_ENEMIES: usize = 10; // Max number of enemies on the board
 pub const PER_TURN_ENEMY_SPAWN_COUNT: usize = 2; // Number of enemies to spawn per turn
 pub const SPRITESHEET_WIDTH: usize = 20; // Width of the spritesheet
 pub const SPRITESHEET_HEIGHT: usize = 20; // Height of the spritesheet
+pub const WIP_SPRITE_INDEX: usize = 19; // Index of the wip sprite in the spritesheet
 
 // UI Settings
 pub const UI_FONT_SIZE: f32 = 8.0; // Font size for UI elements
@@ -91,9 +94,10 @@ pub const DEFEAT_HEADER_FONT_SIZE: f32 = 36.0; // Font size for defeat text
 pub const DEFEAT_SCORE_FONT_SIZE: f32 = 24.0; // Font size for score text
 
 // UI Shop
-pub const SHOP_FONT_SIZE: f32 = 12.0; // Font size for shop text
-pub const SHOP_HEADER_FONT_SIZE: f32 = 24.0; // Font size for shop header text
+pub const SHOP_FONT_SIZE: f32 = 16.0; // Font size for shop text
+pub const SHOP_HEADER_FONT_SIZE: f32 = 32.0; // Font size for shop header text
 pub const SHOP_PIECE_VALUE_GOLD_MULTIPLIER: f32 = 10.0; // Multiplier for the value of pieces in the shop
+pub const SHOP_UPGRADES_COUNT: usize = 3; // Number of upgrades in the shop
 
 // Keyboard settings
 pub const SHOP_KEY: KeyCode = KeyCode::KeyS; // Key to toggle the shop

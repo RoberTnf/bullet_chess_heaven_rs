@@ -6,20 +6,13 @@ use crate::{
     states::game_state::GameState,
 };
 
-use super::{
-    button::{ButtonFunction, ButtonPressedEvent},
-    RootUINode,
-};
+use super::{button::ButtonFunction, RootUINode};
 
 pub struct DefeatPlugin;
 
 impl Plugin for DefeatPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Defeat), show_defeat_screen)
-            .add_systems(
-                Update,
-                handle_defeat_button_pressed.run_if(in_state(GameState::Defeat)),
-            );
+        app.add_systems(OnEnter(GameState::Defeat), show_defeat_screen);
     }
 }
 
@@ -80,7 +73,7 @@ fn show_defeat_screen(
                         border_radius: BorderRadius::all(Val::Px(2.0)),
                         ..default()
                     },
-                    ButtonFunction::Restart,
+                    ButtonFunction::RestartGame,
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
@@ -96,17 +89,4 @@ fn show_defeat_screen(
         .id();
 
     commands.entity(root_node).add_child(defeat_node);
-}
-
-pub fn handle_defeat_button_pressed(
-    mut event_reader: EventReader<ButtonPressedEvent>,
-    mut game_state: ResMut<NextState<GameState>>,
-) {
-    for event in event_reader.read() {
-        match event.function {
-            ButtonFunction::Restart => {
-                game_state.set(GameState::Game);
-            }
-        }
-    }
 }

@@ -6,7 +6,7 @@ use super::enemies::{
     pawn::WHITE_PAWN_INFO, queen::WHITE_QUEEN_INFO, rook::WHITE_ROOK_INFO,
 };
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum MovementType {
     WhitePawn,
     BlackPawn,

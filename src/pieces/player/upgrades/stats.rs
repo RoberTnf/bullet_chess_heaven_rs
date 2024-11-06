@@ -1,12 +1,14 @@
+#[derive(Clone, Debug)]
 pub enum Stat {
     Health,
     Attack,
 }
 
+#[derive(Clone, Debug)]
 pub struct StatEffect {
-    stat: Stat,
-    additive: f64,
-    multiplicative: f64,
+    pub stat: Stat,
+    pub additive: f32,
+    pub multiplicative: f32,
 }
 
 impl Default for StatEffect {
