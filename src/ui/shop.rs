@@ -102,7 +102,7 @@ pub enum ShopState {
 fn update_shop(mut shop_upgrades: ResMut<ShopUpgrades>) {
     let upgrades_mov = sample_weighted(SHOP_UPGRADES_COUNT_MOVEMENT, &UPGRADES_MOVEMENT);
     let upgrades_stats = sample_weighted(SHOP_UPGRADES_COUNT_STATS, &UPGRADES_STATS);
-    let chosen_upgrades = upgrades_mov.into_iter().chain(upgrades_stats.into_iter());
+    let chosen_upgrades = upgrades_mov.into_iter().chain(upgrades_stats);
     *shop_upgrades = ShopUpgrades(chosen_upgrades.collect());
 }
 

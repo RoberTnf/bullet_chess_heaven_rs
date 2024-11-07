@@ -83,11 +83,12 @@ pub const SPRITESHEET_HEIGHT: usize = 20; // Height of the spritesheet
 pub const WIP_SPRITE_INDEX: usize = 19; // Index of the wip sprite in the spritesheet
 
 // UI Settings
-pub const UI_FONT_SIZE: f32 = 16.0 * 1.5; // Font size for UI elements
+const UI_FONT_SCALE: f32 = 3.0;
+pub const UI_FONT_SIZE: f32 = 12.0 * UI_FONT_SCALE; // Font size for UI elements
 pub const UI_FONT: &str = "fonts/monogram/ttf/monogram-extended.ttf"; // Font for UI elements
-pub const UI_HEADER_FONT_SIZE: f32 = 24.0 * 1.5; // Font size for UI headers
-pub const DEFEAT_HEADER_FONT_SIZE: f32 = 64.0 * 1.5; // Font size for defeat text
-pub const DEFEAT_SCORE_FONT_SIZE: f32 = 48.0 * 1.5; // Font size for score text
+pub const UI_HEADER_FONT_SIZE: f32 = 18.0 * UI_FONT_SCALE; // Font size for UI headers
+pub const DEFEAT_HEADER_FONT_SIZE: f32 = 64.0 * UI_FONT_SCALE; // Font size for defeat text
+pub const DEFEAT_SCORE_FONT_SIZE: f32 = 48.0 * UI_FONT_SCALE; // Font size for score text
 
 // Game Fonts
 pub const HEALTH_CHANGE_TEXT_FONT_SIZE: f32 = 12.0; // Font size for health change text
