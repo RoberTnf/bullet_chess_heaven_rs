@@ -23,10 +23,6 @@ fn main() {
                         resolution: WindowResolution::new(
                             globals::WINDOW_WIDTH,
                             globals::WINDOW_HEIGHT,
-                        )
-                        // TODO: dynamic scaling
-                        .with_scale_factor_override(
-                            globals::WINDOW_WIDTH / globals::TARGET_PIXEL_WIDTH,
                         ),
                         ..default()
                     }),

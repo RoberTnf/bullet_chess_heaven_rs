@@ -41,7 +41,7 @@ fn setup_ui(mut commands: Commands) {
             parent.spawn((
                 NodeBundle {
                     style: Style {
-                        width: Val::Px(TILE_SIZE as f32 * 4.0),
+                        width: Val::Px(TILE_SIZE as f32 * 16.0),
                         flex_direction: FlexDirection::Column,
                         justify_content: JustifyContent::SpaceBetween,
                         ..default()

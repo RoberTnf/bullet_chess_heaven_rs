@@ -83,19 +83,19 @@ pub const SPRITESHEET_HEIGHT: usize = 20; // Height of the spritesheet
 pub const WIP_SPRITE_INDEX: usize = 19; // Index of the wip sprite in the spritesheet
 
 // UI Settings
-pub const UI_FONT_SIZE: f32 = 8.0; // Font size for UI elements
+pub const UI_FONT_SIZE: f32 = 16.0 * 1.5; // Font size for UI elements
 pub const UI_FONT: &str = "fonts/monogram/ttf/monogram-extended.ttf"; // Font for UI elements
-pub const UI_HEADER_FONT_SIZE: f32 = 12.0; // Font size for UI headers
+pub const UI_HEADER_FONT_SIZE: f32 = 24.0 * 1.5; // Font size for UI headers
+pub const DEFEAT_HEADER_FONT_SIZE: f32 = 64.0 * 1.5; // Font size for defeat text
+pub const DEFEAT_SCORE_FONT_SIZE: f32 = 48.0 * 1.5; // Font size for score text
+
+// Game Fonts
 pub const HEALTH_CHANGE_TEXT_FONT_SIZE: f32 = 12.0; // Font size for health change text
 pub const GOLD_FONT_SIZE: f32 = 12.0; // Font size for gold text
 
-// UI Defeat
-pub const DEFEAT_HEADER_FONT_SIZE: f32 = 36.0; // Font size for defeat text
-pub const DEFEAT_SCORE_FONT_SIZE: f32 = 24.0; // Font size for score text
-
 // UI Shop
-pub const SHOP_FONT_SIZE: f32 = 16.0; // Font size for shop text
-pub const SHOP_HEADER_FONT_SIZE: f32 = 32.0; // Font size for shop header text
+pub const SHOP_FONT_SIZE: f32 = 32.0 * 1.5; // Font size for shop text
+pub const SHOP_HEADER_FONT_SIZE: f32 = 64.0 * 1.5; // Font size for shop header text
 pub const SHOP_PIECE_VALUE_GOLD_MULTIPLIER: f32 = 10.0; // Multiplier for the value of pieces in the shop
 pub const SHOP_UPGRADES_COUNT_MOVEMENT: usize = 2;
 pub const SHOP_UPGRADES_COUNT_STATS: usize = 3;
