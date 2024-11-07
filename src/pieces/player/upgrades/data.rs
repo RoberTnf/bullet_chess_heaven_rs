@@ -11,9 +11,10 @@ use crate::{
     },
     utils::rng::Weighted,
 };
+use bevy::prelude::*;
 use once_cell::sync::Lazy;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Component)]
 pub struct Upgrade {
     weight: f32,
     pub display_name: String,
@@ -37,7 +38,7 @@ pub enum Effect {
     StatEffect(StatEffect),
 }
 
-pub static UPGRADES: Lazy<Vec<Upgrade>> = Lazy::new(|| {
+pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
     vec![
         Upgrade {
             weight: 1.0,
@@ -93,6 +94,11 @@ pub static UPGRADES: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             effect: Effect::MovementType(MovementType::Rook),
             icon_index: WHITE_ROOK_INFO.sprite_index + SPRITESHEET_WIDTH,
         },
+    ]
+});
+
+pub static UPGRADES_STATS: Lazy<Vec<Upgrade>> = Lazy::new(|| {
+    vec![
         Upgrade {
             weight: 1.0,
             display_name: "Health +10".to_string(),

@@ -3,7 +3,8 @@ use bevy::prelude::*;
 use crate::{
     board::position::BoardPosition,
     globals::{
-        GOLD_ANIMATION_DURATION, GOLD_ANIMATION_SPEED, GOLD_FONT_SIZE, GOLD_Z_INDEX, UI_FONT,
+        GOLD_ANIMATION_DURATION, GOLD_ANIMATION_SPEED, GOLD_FONT_SIZE, GOLD_Z_INDEX, STARTING_GOLD,
+        UI_FONT,
     },
     pieces::health::{PieceDeathEvent, TextAnimation},
     states::game_state::GameState,
@@ -69,14 +70,14 @@ pub fn spawn_gold(
 }
 
 pub fn reset_gold(mut gold: ResMut<Gold>) {
-    gold.amount = 0;
+    gold.amount = STARTING_GOLD;
 }
 
 pub struct GoldPlugin;
 
 impl Plugin for GoldPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Gold::new(0));
+        app.insert_resource(Gold::new(STARTING_GOLD));
         app.add_systems(Update, spawn_gold.run_if(on_event::<PieceDeathEvent>()));
         app.add_systems(OnEnter(GameState::Game), reset_gold);
     }

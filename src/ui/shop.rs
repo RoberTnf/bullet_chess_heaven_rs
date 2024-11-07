@@ -1,15 +1,24 @@
 use bevy::prelude::*;
 
 use crate::{
-    globals::{SHOP_UPGRADES_COUNT, UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE},
+    globals::{
+        SHOP_UPGRADES_COUNT_MOVEMENT, SHOP_UPGRADES_COUNT_STATS, UI_FONT, UI_FONT_SIZE,
+        UI_HEADER_FONT_SIZE,
+    },
     graphics::spritesheet::SpriteSheetAtlas,
     input::keyboard::ToggleShop,
-    pieces::player::upgrades::data::{Upgrade, UPGRADES},
+    pieces::player::{
+        gold::Gold,
+        upgrades::data::{Upgrade, UPGRADES_MOVEMENT, UPGRADES_STATS},
+    },
     states::{game_state::GameState, pause_state::GamePauseState},
     utils::rng::sample_weighted,
 };
 
-use super::{button::ButtonFunction, RootUINode};
+use super::{
+    button::{ButtonFunction, ButtonPressedEvent},
+    RootUINode,
+};
 
 #[derive(Component)]
 struct ShopNode;
@@ -91,11 +100,30 @@ pub enum ShopState {
 }
 
 fn update_shop(mut shop_upgrades: ResMut<ShopUpgrades>) {
-    *shop_upgrades = ShopUpgrades(
-        sample_weighted(SHOP_UPGRADES_COUNT, &UPGRADES)
-            .into_iter()
-            .collect(),
-    );
+    let upgrades_mov = sample_weighted(SHOP_UPGRADES_COUNT_MOVEMENT, &UPGRADES_MOVEMENT);
+    let upgrades_stats = sample_weighted(SHOP_UPGRADES_COUNT_STATS, &UPGRADES_STATS);
+    let chosen_upgrades = upgrades_mov.into_iter().chain(upgrades_stats.into_iter());
+    *shop_upgrades = ShopUpgrades(chosen_upgrades.collect());
+}
+
+fn buy_upgrade(
+    mut event_reader: EventReader<ButtonPressedEvent>,
+    upgrade: Query<&Upgrade>,
+    mut gold: ResMut<Gold>,
+    mut refresh_event_writer: EventWriter<RefreshShop>,
+) {
+    for event in event_reader.read() {
+        if event.function == ButtonFunction::BuyUpgrade {
+            let upgrade = upgrade.get(event.entity).expect("Upgrade not found");
+            if gold.amount >= upgrade.cost {
+                gold.amount -= upgrade.cost;
+                debug!("Bought upgrade: {}", upgrade.display_name);
+                refresh_event_writer.send(RefreshShop);
+            } else {
+                debug!("Not enough gold to buy upgrade: {}", upgrade.display_name);
+            }
+        }
+    }
 }
 
 #[derive(Event)]
@@ -105,7 +133,9 @@ fn update_shop_system(
     shop_upgrades: ResMut<ShopUpgrades>,
     mut refresh_event: EventReader<RefreshShop>,
 ) {
-    if shop_upgrades.0.len() != SHOP_UPGRADES_COUNT || refresh_event.read().count() > 0 {
+    if shop_upgrades.0.len() != (SHOP_UPGRADES_COUNT_MOVEMENT + SHOP_UPGRADES_COUNT_STATS)
+        || refresh_event.read().count() > 0
+    {
         update_shop(shop_upgrades);
     }
 }
@@ -164,6 +194,7 @@ fn display_shop(
                         ..default()
                     },
                     ButtonFunction::BuyUpgrade,
+                    upgrade.clone(),
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
@@ -246,7 +277,7 @@ impl Plugin for ShopPlugin {
         app.add_systems(Update, toggle_shop.run_if(in_state(GameState::Game)));
         app.add_systems(
             Update,
-            (update_shop_system, display_shop)
+            (update_shop_system, display_shop, buy_upgrade)
                 .run_if(in_state(GameState::Game))
                 .run_if(in_state(ShopState::Open)),
         );

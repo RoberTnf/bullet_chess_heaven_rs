@@ -97,7 +97,9 @@ pub const DEFEAT_SCORE_FONT_SIZE: f32 = 24.0; // Font size for score text
 pub const SHOP_FONT_SIZE: f32 = 16.0; // Font size for shop text
 pub const SHOP_HEADER_FONT_SIZE: f32 = 32.0; // Font size for shop header text
 pub const SHOP_PIECE_VALUE_GOLD_MULTIPLIER: f32 = 10.0; // Multiplier for the value of pieces in the shop
-pub const SHOP_UPGRADES_COUNT: usize = 3; // Number of upgrades in the shop
+pub const SHOP_UPGRADES_COUNT_MOVEMENT: usize = 2;
+pub const SHOP_UPGRADES_COUNT_STATS: usize = 3;
+pub const STARTING_GOLD: usize = 100; // Starting gold
 
 // Keyboard settings
 pub const SHOP_KEY: KeyCode = KeyCode::KeyS; // Key to toggle the shop

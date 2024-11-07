@@ -13,7 +13,7 @@ pub struct ButtonPressedEvent {
     pub entity: Entity,
 }
 
-#[derive(Component, Clone)]
+#[derive(Component, Clone, Eq, PartialEq)]
 pub enum ButtonFunction {
     RestartGame,
     BuyUpgrade,
@@ -36,7 +36,6 @@ pub fn button_system(
     for (interaction, mut color, mut border_color, button_function, entity) in
         &mut interaction_query
     {
-        debug!("Button system running!");
         match *interaction {
             Interaction::Hovered => {
                 *color = PRIMARY_COLOR_GRAYED_BRIGHTER.into();
@@ -66,12 +65,10 @@ pub fn handle_button_pressed(
             ButtonFunction::RestartGame => {
                 game_state.set(GameState::Game);
             }
-            ButtonFunction::BuyUpgrade => {
-                todo!("Buy upgrade");
-            }
             ButtonFunction::RefreshShop => {
                 refresh_shop_event_writer.send(RefreshShop);
             }
+            _ => {}
         }
     }
 }
