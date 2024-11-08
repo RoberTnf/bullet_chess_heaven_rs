@@ -6,7 +6,7 @@ use super::{
     attack::AttackPieceAnimationState,
     damage::Damage,
     health::{Health, PieceHealthChangeEvent},
-    movement_type::MovementType,
+    player::upgrades::data::Upgrades,
 };
 
 #[derive(Component, Default)]
@@ -33,9 +33,6 @@ pub enum PieceState {
     AttackingWithNewSprite,
 }
 
-#[derive(Component, Clone)]
-pub struct MovementTypes(pub Vec<MovementType>);
-
 #[derive(Component, Eq, PartialEq, Copy, Clone)]
 pub enum Team {
     Player,
@@ -53,6 +50,6 @@ pub struct PieceBundle {
     pub damage: Damage,
     pub blocks_movement: BlocksMovement,
     pub state: PieceState,
-    pub movement_types: MovementTypes,
+    pub upgrades: Upgrades,
     pub team: Team,
 }

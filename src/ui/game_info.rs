@@ -22,6 +22,7 @@ pub fn setup_game_info(
     query: Query<Entity, With<LeftUINode>>,
     asset_server: Res<AssetServer>,
 ) {
+    debug!("Setting up game info");
     let root_node = query.single();
     commands.entity(root_node).with_children(|parent| {
         parent

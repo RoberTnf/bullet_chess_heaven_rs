@@ -27,6 +27,7 @@ pub fn reset_states(
     mut next_state: ResMut<NextState<TurnState>>,
     mut next_state_2: ResMut<NextState<GamePauseState>>,
 ) {
+    debug!("Resetting states");
     next_state.set(TurnState::PlayerInput);
     next_state_2.set(GamePauseState::Playing);
 }

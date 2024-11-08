@@ -77,6 +77,7 @@ pub fn add_experience_on_death(
 }
 
 pub fn reset_player_level(mut player_level: ResMut<PlayerLevel>) {
+    debug!("Resetting player level");
     *player_level = PlayerLevel::new();
 }
 

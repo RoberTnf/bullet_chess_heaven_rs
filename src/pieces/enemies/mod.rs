@@ -3,7 +3,8 @@ use pawn::promotion::promotion_system;
 
 use crate::states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState};
 
-use super::common::MovementTypes;
+use super::movement_type::MovementType;
+
 pub mod ai;
 pub mod bishop;
 pub mod king;
@@ -21,7 +22,7 @@ pub struct PieceInfo {
     pub health: usize,
     pub damage: usize,
     pub sprite_index: usize,
-    pub movement_types: MovementTypes,
+    pub movement_type: MovementType,
     pub spawn_weight: f32,
     pub spawn_turn: usize,
     pub value: usize,

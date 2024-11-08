@@ -6,7 +6,7 @@ use super::enemies::{
     pawn::WHITE_PAWN_INFO, queen::WHITE_QUEEN_INFO, rook::WHITE_ROOK_INFO,
 };
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub enum MovementType {
     WhitePawn,
     BlackPawn,
@@ -278,7 +278,8 @@ impl MovementType {
 
 #[cfg(test)]
 mod tests {
-    use crate::pieces::common::MovementTypes;
+
+    use crate::pieces::player::upgrades::data::{get_movement_upgrade, Upgrades};
 
     use super::*;
 
@@ -292,12 +293,12 @@ mod tests {
             BoardPosition::new(5, 5).unwrap(),
         ]);
         let enemies_positions = HashSet::from_iter(vec![BoardPosition::new(5, 5).unwrap()]);
-        let movement_types = MovementTypes(vec![MovementType::King]);
-        let valid_moves = movement_types.0[0].get_valid_moves(
-            &king_position,
-            &other_positions,
-            &enemies_positions,
-        );
+        let movement_types =
+            Upgrades(vec![get_movement_upgrade(&MovementType::King)]).get_movement_types_set();
+        let valid_moves = movement_types
+            .get(&MovementType::King)
+            .unwrap()
+            .get_valid_moves(&king_position, &other_positions, &enemies_positions);
         assert_eq!(valid_moves.valid_moves.len(), 6);
         assert_eq!(valid_moves.valid_attacks.len(), 1);
     }
@@ -311,12 +312,12 @@ mod tests {
             BoardPosition::new(5, 5).unwrap(),
         ]);
         let enemies_positions = HashSet::from_iter(vec![BoardPosition::new(5, 5).unwrap()]);
-        let movement_types = MovementTypes(vec![MovementType::WhitePawn]);
-        let valid_moves = movement_types.0[0].get_valid_moves(
-            &pawn_position,
-            &other_positions,
-            &enemies_positions,
-        );
+        let movement_types =
+            Upgrades(vec![get_movement_upgrade(&MovementType::WhitePawn)]).get_movement_types_set();
+        let valid_moves = movement_types
+            .get(&MovementType::WhitePawn)
+            .unwrap()
+            .get_valid_moves(&pawn_position, &other_positions, &enemies_positions);
         assert_eq!(valid_moves.valid_moves.len(), 1);
         assert_eq!(valid_moves.valid_attacks.len(), 1);
         assert_eq!(

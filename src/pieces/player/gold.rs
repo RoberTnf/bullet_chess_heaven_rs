@@ -70,6 +70,7 @@ pub fn spawn_gold(
 }
 
 pub fn reset_gold(mut gold: ResMut<Gold>) {
+    debug!("Resetting gold");
     gold.amount = STARTING_GOLD;
 }
 

@@ -30,6 +30,7 @@ fn score_system(
 }
 
 fn reset_score_system(mut score: ResMut<GameScore>) {
+    debug!("Resetting score");
     score.0 = 0;
 }
 

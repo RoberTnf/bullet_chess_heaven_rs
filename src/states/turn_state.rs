@@ -53,5 +53,6 @@ impl Plugin for TurnPlugin {
 }
 
 pub fn reset_turn(mut turn_info: ResMut<TurnInfo>) {
+    debug!("Resetting turn");
     turn_info.number = 1;
 }

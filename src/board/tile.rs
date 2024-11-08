@@ -20,6 +20,7 @@ pub fn spawn_board(
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
 ) {
+    debug!("Spawning board");
     for x in 0..globals::BOARD_SIZE {
         for y in 0..globals::BOARD_SIZE {
             let tile_position = BoardPosition::new(x, y).unwrap();

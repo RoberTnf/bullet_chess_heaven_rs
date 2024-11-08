@@ -6,10 +6,10 @@ use crate::{
     input::click_tile::HoveredTile,
     pieces::{
         attack::attack_piece_system,
-        common::{MovementTypes, Piece, Team},
+        common::{Piece, Team},
         health::DeathAnimation,
         movement::{move_piece, MovePieceEvent},
-        player::spawn::Player,
+        player::{spawn::Player, upgrades::data::Upgrades},
     },
     states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
 };
@@ -52,14 +52,14 @@ pub fn update_highlight_cache(
         (&BoardPosition, &Team),
         (With<Piece>, Without<Player>, Without<DeathAnimation>),
     >,
-    player: Query<(&BoardPosition, &MovementTypes, &Team), (With<Piece>, With<Player>)>,
+    player: Query<(&BoardPosition, &Upgrades, &Team), (With<Piece>, With<Player>)>,
 ) {
-    let (player_board_position, player_movement_types, &player_team) = player.single();
+    let (player_board_position, player_upgrades, player_team) = player.single();
     if highlight.player_moves.is_empty() && highlight.player_attacks.is_empty() {
         let enemies_board_positions = HashSet::from_iter(
             other_pieces
                 .iter()
-                .filter(|(_, &team)| team != player_team)
+                .filter(|(_, &team)| team != *player_team)
                 .map(|(board_position, _)| *board_position),
         );
 
@@ -69,9 +69,10 @@ pub fn update_highlight_cache(
                 .iter()
                 .map(|(board_position, _)| *board_position),
         );
+        let movement_types = player_upgrades.get_movement_types_set();
 
         // fill the highlight with valid moves and attacks
-        player_movement_types.0.iter().for_each(|movement_type| {
+        for movement_type in movement_types {
             let response = movement_type.get_valid_moves(
                 player_board_position,
                 &other_pieces_board_positions,
@@ -79,7 +80,7 @@ pub fn update_highlight_cache(
             );
             highlight.player_moves.extend(response.valid_moves);
             highlight.player_attacks.extend(response.valid_attacks);
-        });
+        }
     }
 }
 

@@ -24,6 +24,7 @@ struct RootUINode;
 #[derive(Component)]
 struct LeftUINode;
 fn setup_ui(mut commands: Commands) {
+    debug!("Setting up UI");
     // root node
     commands
         .spawn((

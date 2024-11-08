@@ -4,10 +4,11 @@ use crate::{
     board::position::BoardPosition,
     pieces::{
         attack::AttackPieceEvent,
-        common::{MovementTypes, Piece, PieceState, Team},
+        common::{Piece, PieceState, Team},
         damage::Damage,
         health::DeathAnimation,
         movement::MovePieceEvent,
+        player::upgrades::data::Upgrades,
     },
     states::turn_state::TurnState,
 };
@@ -16,7 +17,7 @@ pub fn ai_system(
     mut pieces: Query<
         (
             &BoardPosition,
-            &MovementTypes,
+            &Upgrades,
             &Team,
             &Damage,
             Entity,
@@ -44,13 +45,13 @@ pub fn ai_system(
             .iter()
             .map(|(_, pos)| *pos),
     );
-    for (enemy_pos, enemy_movement_types, _, enemy_damage, enemy_entity, mut enemy_state) in
-        enemy_pieces
+    for (enemy_pos, enemy_upgrades, _, enemy_damage, enemy_entity, mut enemy_state) in enemy_pieces
     {
+        let enemy_movement_types = enemy_upgrades.get_movement_types_set();
         // we make the assumption that there will be enemies with more than one movement type
         let mut moves = HashSet::new();
         let mut attacks = HashSet::new();
-        for movement_type in enemy_movement_types.0.iter() {
+        for movement_type in enemy_movement_types.iter() {
             let response = movement_type.get_valid_moves(
                 enemy_pos,
                 &all_pieces_positions,
@@ -70,7 +71,7 @@ pub fn ai_system(
             let best_move = moves
                 .iter()
                 .min_by_key(|pos| {
-                    let enables_attack = enemy_movement_types.0.iter().any(|movement_type| {
+                    let enables_attack = enemy_movement_types.iter().any(|movement_type| {
                         !movement_type
                             .get_valid_moves(pos, &all_pieces_positions, &player_pieces_positions)
                             .valid_attacks

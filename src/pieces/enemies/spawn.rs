@@ -15,7 +15,10 @@ use crate::{
         health::Health,
         healthbar::spawn_healthbar,
         movement_type::MovementType,
-        player::experience::PieceValue,
+        player::{
+            experience::PieceValue,
+            upgrades::data::{get_movement_upgrade, Upgrades},
+        },
     },
     states::{
         game_state::GameState,
@@ -109,7 +112,7 @@ pub fn spawn_enemies(
                     health: Health::new(piece_info.health),
                     damage: Damage::new(piece_info.damage),
                     state: PieceState::Idle,
-                    movement_types: piece_info.movement_types,
+                    upgrades: Upgrades(vec![get_movement_upgrade(&piece_info.movement_type)]),
                     team: Team::Enemy,
                 },
                 Enemy,
@@ -132,17 +135,9 @@ fn get_spawn_position(
     occupied_positions: &HashSet<BoardPosition>,
     all_positions: &[PositionAvailable],
 ) -> BoardPosition {
-    if piece_info
-        .movement_types
-        .0
-        .contains(&MovementType::WhitePawn)
-    {
+    if piece_info.movement_type == MovementType::WhitePawn {
         BoardPosition::get_random_position_limited(occupied_positions, &[PositionAvailable::Bottom])
-    } else if piece_info
-        .movement_types
-        .0
-        .contains(&MovementType::BlackPawn)
-    {
+    } else if piece_info.movement_type == MovementType::BlackPawn {
         BoardPosition::get_random_position_limited(occupied_positions, &[PositionAvailable::Top])
     } else {
         BoardPosition::get_random_position_limited(occupied_positions, all_positions)

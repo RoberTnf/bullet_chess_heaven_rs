@@ -3,6 +3,7 @@ use bevy::{prelude::*, render::camera::ScalingMode};
 use crate::globals;
 
 pub fn setup_camera(mut commands: Commands) {
+    debug!("Setting up camera");
     commands.spawn((
         Camera2dBundle {
             transform: Transform::from_xyz(

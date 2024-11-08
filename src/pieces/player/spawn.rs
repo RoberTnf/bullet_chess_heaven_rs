@@ -6,7 +6,7 @@ use crate::{
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
         attack::AttackAfterMove,
-        common::{BlocksMovement, MovementTypes, Piece, PieceBundle, PieceState, Team},
+        common::{BlocksMovement, Piece, PieceBundle, PieceState, Team},
         damage::Damage,
         health::Health,
         healthbar::spawn_healthbar,
@@ -14,6 +14,8 @@ use crate::{
     },
     states::game_state::GameState,
 };
+
+use super::upgrades::data::{get_movement_upgrade, Upgrades};
 
 #[derive(Component)]
 pub struct PulseSize {
@@ -31,6 +33,7 @@ pub fn spawn_player(
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
 ) {
+    debug!("Spawning player");
     let tile_pos = BoardPosition::new(4, 4).unwrap();
     let global_position = tile_pos
         .as_global_position()
@@ -54,11 +57,7 @@ pub fn spawn_player(
                 health: Health::new(globals::PLAYER_HEALTH),
                 damage: Damage::new(globals::PLAYER_DAMAGE),
                 state: PieceState::Idle,
-                movement_types: MovementTypes(vec![
-                    MovementType::King,
-                    MovementType::Queen,
-                    MovementType::Knight,
-                ]),
+                upgrades: Upgrades(vec![get_movement_upgrade(&MovementType::King)]),
                 team: Team::Player,
             },
             Player,

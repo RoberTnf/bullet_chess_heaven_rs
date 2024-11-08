@@ -11,11 +11,12 @@ use crate::{
 };
 
 use super::{
-    common::{MovementTypes, Piece, PieceState, Team},
+    common::{Piece, PieceState, Team},
     damage::Damage,
     health::PieceHealthChangeEvent,
     movement::MovePieceAnimationEndEvent,
-    player::spawn::Player,
+    movement_type::MovementType,
+    player::{spawn::Player, upgrades::data::Upgrades},
 };
 
 #[derive(Event)]
@@ -291,7 +292,7 @@ fn update_sprite_positions(
 }
 
 pub fn attack_from_tile(
-    movement_types: &MovementTypes,
+    movement_types: &HashSet<MovementType>,
     current_tile_position: &BoardPosition,
     all_pieces_positions: &HashSet<BoardPosition>,
     enemy_pieces_positions: &HashSet<BoardPosition>,
@@ -303,7 +304,7 @@ pub fn attack_from_tile(
 ) -> bool {
     let mut attack = false;
     let mut delay = 0.0;
-    movement_types.0.iter().for_each(|movement_type| {
+    for movement_type in movement_types {
         let valid_attacks = movement_type
             .get_valid_moves(
                 current_tile_position,
@@ -334,20 +335,14 @@ pub fn attack_from_tile(
         if !valid_attacks.is_empty() {
             delay += ATTACK_ANIMATION_DURATION / 3.0;
         }
-    });
+    }
     attack
 }
 
 pub fn on_move_animation_end_attack_system(
     mut attack_event_writer: EventWriter<AttackPieceEvent>,
     mut pieces_with_attack: Query<
-        (
-            Entity,
-            &BoardPosition,
-            &Damage,
-            &MovementTypes,
-            &mut PieceState,
-        ),
+        (Entity, &BoardPosition, &Damage, &Upgrades, &mut PieceState),
         With<AttackAfterMove>,
     >,
     mut pieces_without_attack: Query<&mut PieceState, (With<Piece>, Without<AttackAfterMove>)>,
@@ -363,7 +358,7 @@ pub fn on_move_animation_end_attack_system(
         .collect();
     for event in move_piece_animation_end_events.read() {
         let mut to_attack = false;
-        for (piece_entity, piece_position, damage, movement_types, mut piece_state) in
+        for (piece_entity, piece_position, damage, upgrades, mut piece_state) in
             pieces_with_attack.iter_mut()
         {
             if event.entity != piece_entity {
@@ -371,8 +366,9 @@ pub fn on_move_animation_end_attack_system(
             }
 
             to_attack = true;
+            let movement_types = upgrades.get_movement_types_set();
             if !attack_from_tile(
-                movement_types,
+                &movement_types,
                 piece_position,
                 &all_pieces_positions,
                 &enemy_pieces_positions,

@@ -5,11 +5,11 @@ use crate::{
     globals::SPRITESHEET_WIDTH,
     pieces::{
         attack::{attack_from_tile, AttackPieceEvent},
-        common::{MovementTypes, Piece, Team},
+        common::{Piece, Team},
         damage::Damage,
         movement::MovePieceEvent,
         movement_type::MovementType,
-        player::spawn::Player,
+        player::{spawn::Player, upgrades::data::Upgrades},
     },
     states::turn_state::TurnState,
 };
@@ -55,14 +55,14 @@ pub fn click_tile_update_player_position(
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<ButtonInput<MouseButton>>,
-    player: Query<(Entity, &BoardPosition, &Damage, &MovementTypes), With<Player>>,
+    player: Query<(Entity, &BoardPosition, &Damage, &Upgrades), With<Player>>,
     touches: Res<Touches>,
     pieces_query: Query<(Entity, &BoardPosition, &Team), (With<Piece>, Without<Player>)>,
     mut next_state: ResMut<NextState<TurnState>>,
 ) {
     let window = windows.single();
     let (camera, camera_transform) = camera.single();
-    let (player_entity, player_position, damage, movement_types) = player.single();
+    let (player_entity, player_position, damage, player_upgrades) = player.single();
     let all_pieces_positions = pieces_query.iter().map(|(_, pos, _)| *pos).collect();
     let enemy_pieces_positions = pieces_query
         .iter()
@@ -76,8 +76,9 @@ pub fn click_tile_update_player_position(
         {
             let mut current_tile_position = player_position;
             let mut moved = false;
+            let movement_types = player_upgrades.get_movement_types_set();
             // First, move the player to the tile if possible
-            movement_types.0.iter().for_each(|movement_type| {
+            for movement_type in movement_types.clone() {
                 let response = movement_type.get_valid_moves(
                     player_position,
                     &all_pieces_positions,
@@ -88,7 +89,7 @@ pub fn click_tile_update_player_position(
                     current_tile_position = &tile_position;
                     moved = true;
                 }
-            });
+            }
 
             if moved {
                 next_state.set(TurnState::PlayerAnimation);
@@ -97,7 +98,7 @@ pub fn click_tile_update_player_position(
 
             // else, try attacking from current tile
             attack_from_tile(
-                movement_types,
+                &movement_types,
                 current_tile_position,
                 &all_pieces_positions,
                 &enemy_pieces_positions,

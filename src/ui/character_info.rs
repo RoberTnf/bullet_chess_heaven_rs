@@ -6,9 +6,8 @@ use crate::{
     },
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
-        common::MovementTypes,
         health::Health,
-        player::{experience::PlayerLevel, gold::Gold, spawn::Player},
+        player::{experience::PlayerLevel, gold::Gold, spawn::Player, upgrades::data::Upgrades},
     },
     states::game_state::GameState,
     utils::math::lerp,
@@ -152,7 +151,7 @@ pub fn setup_character_info(
 }
 
 fn update_movement_types_information(
-    movement_types_query: Query<&MovementTypes, With<Player>>,
+    movement_types_query: Query<&Upgrades, With<Player>>,
     parent_query: Query<Entity, With<MovementTypesUIContainer>>,
     mut text_query: Query<(Entity, &mut TextureAtlas, &MovementTypesUILabel)>,
     mut commands: Commands,
@@ -160,15 +159,16 @@ fn update_movement_types_information(
     atlas_layout: Res<SpriteSheetAtlas>,
 ) {
     let container_entity = parent_query.single();
-    let movement_types = movement_types_query.single();
+    let upgrades = movement_types_query.single();
+    let movement_types = upgrades.get_movement_types_set();
 
-    if movement_types.0.len() != text_query.iter().len() {
+    if upgrades.0.len() != text_query.iter().len() {
         // Despawn all labels
         for (entity, _, _) in text_query.iter() {
             commands.entity(entity).despawn();
         }
         // Spawn all labels
-        for movement_type in movement_types.0.iter() {
+        for movement_type in movement_types.iter() {
             let player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
             debug!("Spawning movement type in UI: {}", player_sprite_index);
             commands.entity(container_entity).with_children(|parent| {
@@ -194,7 +194,7 @@ fn update_movement_types_information(
         }
     } else {
         for ((_, mut atlas, label), movement_type) in
-            text_query.iter_mut().zip(movement_types.0.iter())
+            text_query.iter_mut().zip(movement_types.iter())
         {
             let player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
             // Update the text if the sprite index has changed5

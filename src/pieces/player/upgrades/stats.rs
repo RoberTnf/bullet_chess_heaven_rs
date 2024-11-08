@@ -1,4 +1,4 @@
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Stat {
     Health,
     Attack,
@@ -18,5 +18,13 @@ impl Default for StatEffect {
             additive: 0.0,
             multiplicative: 1.0,
         }
+    }
+}
+
+impl PartialEq for StatEffect {
+    fn eq(&self, other: &Self) -> bool {
+        self.stat == other.stat
+            && self.additive == other.additive
+            && self.multiplicative == other.multiplicative
     }
 }
