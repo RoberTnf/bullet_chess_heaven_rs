@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
+    board::highlight::HighlightCache,
     globals::{
         SHOP_UPGRADES_COUNT_MOVEMENT, SHOP_UPGRADES_COUNT_STATS, UI_FONT, UI_FONT_SIZE,
         UI_HEADER_FONT_SIZE,
@@ -9,7 +10,8 @@ use crate::{
     input::keyboard::ToggleShop,
     pieces::player::{
         gold::Gold,
-        upgrades::data::{Upgrade, UPGRADES_MOVEMENT, UPGRADES_STATS},
+        spawn::Player,
+        upgrades::data::{Upgrade, Upgrades, UPGRADES_MOVEMENT, UPGRADES_STATS},
     },
     states::{game_state::GameState, pause_state::GamePauseState},
     utils::rng::sample_weighted,
@@ -111,12 +113,16 @@ fn buy_upgrade(
     upgrade: Query<&Upgrade>,
     mut gold: ResMut<Gold>,
     mut refresh_event_writer: EventWriter<RefreshShop>,
+    mut player_upgrades: Query<&mut Upgrades, With<Player>>,
+    mut highlight_cache: ResMut<HighlightCache>,
 ) {
     for event in event_reader.read() {
         if event.function == ButtonFunction::BuyUpgrade {
             let upgrade = upgrade.get(event.entity).expect("Upgrade not found");
             if gold.amount >= upgrade.cost {
                 gold.amount -= upgrade.cost;
+                player_upgrades.single_mut().0.push(upgrade.clone());
+                highlight_cache.invalidate();
                 debug!("Bought upgrade: {}", upgrade.display_name);
                 refresh_event_writer.send(RefreshShop);
             } else {
