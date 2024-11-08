@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::{
     globals::{
         GOLD_UI_COLOR_DURATION, SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE,
+        UI_PIECE_SPRITE_SIZE,
     },
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
@@ -175,8 +176,8 @@ fn update_movement_types_information(
                 parent.spawn((
                     ImageBundle {
                         style: Style {
-                            width: Val::Px(12.0),
-                            height: Val::Px(12.0),
+                            width: Val::Px(UI_PIECE_SPRITE_SIZE),
+                            height: Val::Px(UI_PIECE_SPRITE_SIZE),
                             ..default()
                         },
                         image: UiImage::new(asset_server.load("custom/spritesheet.png")),

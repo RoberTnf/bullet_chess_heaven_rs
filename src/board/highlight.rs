@@ -63,7 +63,6 @@ pub fn update_highlight_cache(
                 .map(|(board_position, _)| *board_position),
         );
 
-        debug!("enemies_board_positions: {:?}", enemies_board_positions);
         let other_pieces_board_positions = HashSet::from_iter(
             other_pieces
                 .iter()
