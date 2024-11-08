@@ -163,7 +163,7 @@ fn update_movement_types_information(
     let upgrades = movement_types_query.single();
     let movement_types = upgrades.get_movement_types_set();
 
-    if upgrades.0.len() != text_query.iter().len() {
+    if movement_types.len() != text_query.iter().len() {
         // Despawn all labels
         for (entity, _, _) in text_query.iter() {
             commands.entity(entity).despawn();
@@ -217,7 +217,10 @@ fn update_health_information(
 ) {
     let mut text = query.get_single_mut().unwrap();
     let health = health.single();
-    text.sections[0].value = format!("Health: {} / {}", health.value, health.max_value);
+    text.sections[0].value = format!(
+        "Health: {} / {}",
+        health.value, health.max_value.upgraded_value
+    );
 }
 
 fn update_level_information(

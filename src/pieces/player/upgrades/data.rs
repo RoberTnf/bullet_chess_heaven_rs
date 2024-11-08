@@ -11,7 +11,7 @@ use crate::{
             rook::WHITE_ROOK_INFO,
         },
         movement_type::MovementType,
-        player::upgrades::stats::Stat,
+        player::upgrades::stats::StatVariant,
     },
     utils::rng::Weighted,
 };
@@ -145,7 +145,7 @@ pub static UPGRADES_STATS: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             cost: 100,
             rarity: Rarity::Common,
             effect: Effect::StatEffect(StatEffect {
-                stat: Stat::Health,
+                stat: StatVariant::MaxHealth,
                 additive: 10.0,
                 multiplicative: 1.0,
             }),
@@ -159,7 +159,7 @@ pub static UPGRADES_STATS: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             icon_index: WIP_SPRITE_INDEX,
             rarity: Rarity::Rare,
             effect: Effect::StatEffect(StatEffect {
-                stat: Stat::Health,
+                stat: StatVariant::MaxHealth,
                 additive: 20.0,
                 multiplicative: 1.0,
             }),

@@ -13,13 +13,19 @@ use crate::{
     states::game_state::GameState,
 };
 
-use super::{common::Team, player::spawn::Player};
+use super::{
+    common::Team,
+    player::{
+        spawn::Player,
+        upgrades::stats::{Stat, StatVariant},
+    },
+};
 
 #[derive(Component)]
 pub struct Health {
     pub value: usize,
     pub changes: Vec<i64>,
-    pub max_value: usize,
+    pub max_value: Stat,
 }
 
 #[derive(Event)]
@@ -32,7 +38,11 @@ impl Health {
         Health {
             value,
             changes: vec![],
-            max_value: value,
+            max_value: Stat {
+                base_value: value as f32,
+                stat_variant: StatVariant::MaxHealth,
+                upgraded_value: value as f32,
+            },
         }
     }
 
@@ -47,6 +57,9 @@ impl Health {
 
     pub fn heal(&mut self, amount: usize) {
         self.value = self.value.saturating_add(amount);
+        if self.value > self.max_value.upgraded_value as usize {
+            self.value = self.max_value.upgraded_value as usize;
+        }
         self.changes.push(amount as i64);
     }
 

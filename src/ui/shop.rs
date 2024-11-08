@@ -8,10 +8,16 @@ use crate::{
     },
     graphics::spritesheet::SpriteSheetAtlas,
     input::keyboard::ToggleShop,
-    pieces::player::{
-        gold::Gold,
-        spawn::Player,
-        upgrades::data::{Upgrade, Upgrades, UPGRADES_MOVEMENT, UPGRADES_STATS},
+    pieces::{
+        health::Health,
+        player::{
+            gold::Gold,
+            spawn::Player,
+            upgrades::{
+                data::{Effect, Upgrade, Upgrades, UPGRADES_MOVEMENT, UPGRADES_STATS},
+                stats::StatVariant,
+            },
+        },
     },
     states::{game_state::GameState, pause_state::GamePauseState},
     utils::rng::sample_weighted,
@@ -108,13 +114,16 @@ fn update_shop(mut shop_upgrades: ResMut<ShopUpgrades>) {
     *shop_upgrades = ShopUpgrades(chosen_upgrades.collect());
 }
 
+#[derive(Event)]
+struct ApplyUpgrades(Upgrade);
+
 fn buy_upgrade(
     mut event_reader: EventReader<ButtonPressedEvent>,
     upgrade: Query<&Upgrade>,
     mut gold: ResMut<Gold>,
     mut refresh_event_writer: EventWriter<RefreshShop>,
     mut player_upgrades: Query<&mut Upgrades, With<Player>>,
-    mut highlight_cache: ResMut<HighlightCache>,
+    mut apply_upgrades_event_writer: EventWriter<ApplyUpgrades>,
 ) {
     for event in event_reader.read() {
         if event.function == ButtonFunction::BuyUpgrade {
@@ -122,11 +131,40 @@ fn buy_upgrade(
             if gold.amount >= upgrade.cost {
                 gold.amount -= upgrade.cost;
                 player_upgrades.single_mut().0.push(upgrade.clone());
-                highlight_cache.invalidate();
                 debug!("Bought upgrade: {}", upgrade.display_name);
                 refresh_event_writer.send(RefreshShop);
+                apply_upgrades_event_writer.send(ApplyUpgrades(upgrade.clone()));
             } else {
                 debug!("Not enough gold to buy upgrade: {}", upgrade.display_name);
+            }
+        }
+    }
+}
+
+fn apply_upgrades(
+    mut player: Query<(&Upgrades, &mut Health), With<Player>>,
+    mut event_reader: EventReader<ApplyUpgrades>,
+    mut highlight_cache: ResMut<HighlightCache>,
+) {
+    for upgrade in event_reader.read() {
+        let (upgrades, mut health) = player.single_mut();
+        match &upgrade.0.effect {
+            Effect::StatEffect(stat_effect) => match stat_effect.stat {
+                StatVariant::MaxHealth => {
+                    let prev_health = health.max_value.upgraded_value;
+                    health.max_value.apply_upgrades(upgrades);
+                    let new_health = health.max_value.upgraded_value;
+                    let health_diff = (new_health / prev_health * health.value as f32).round()
+                        as usize
+                        - health.value;
+                    health.heal(health_diff);
+                }
+                _ => {
+                    todo!("Apply other stat upgrades");
+                }
+            },
+            Effect::MovementType(_) => {
+                highlight_cache.invalidate();
             }
         }
     }
@@ -287,6 +325,13 @@ impl Plugin for ShopPlugin {
                 .run_if(in_state(GameState::Game))
                 .run_if(in_state(ShopState::Open)),
         );
+        app.add_systems(
+            Update,
+            apply_upgrades
+                .run_if(in_state(GameState::Game))
+                .run_if(on_event::<ApplyUpgrades>()),
+        );
         app.add_event::<RefreshShop>().add_event::<RefreshShopUI>();
+        app.add_event::<ApplyUpgrades>();
     }
 }
