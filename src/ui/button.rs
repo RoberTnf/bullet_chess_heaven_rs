@@ -18,6 +18,7 @@ pub enum ButtonFunction {
     RestartGame,
     BuyUpgrade,
     RefreshShop,
+    ShowShop,
 }
 
 pub fn button_system(

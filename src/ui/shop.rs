@@ -26,6 +26,7 @@ use crate::{
 
 use super::{
     button::{ButtonFunction, ButtonPressedEvent},
+    right_side::get_shop_button,
     RootUINode,
 };
 
@@ -189,7 +190,7 @@ fn update_shop_system(
 struct RefreshShopUI;
 
 #[derive(Component)]
-struct ShopUpgradeUI;
+pub struct ShopUpgradeUI;
 
 fn display_shop(
     shop_upgrades: Res<ShopUpgrades>,
@@ -309,6 +310,9 @@ fn display_shop(
             })
             .id();
         commands.entity(shop_node).add_child(refresh_button);
+        let toggle_shop_button = get_shop_button(&mut commands, asset_server, "Exit Shop (S)");
+        commands.entity(toggle_shop_button).insert(ShopUpgradeUI);
+        commands.entity(shop_node).add_child(toggle_shop_button);
     }
 }
 
