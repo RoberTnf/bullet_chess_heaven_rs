@@ -14,6 +14,7 @@ use crate::{
         player::upgrades::stats::{Stat, StatVariant},
     },
     states::game_state::GameState,
+    ui::shop::ApplyUpgrades,
 };
 
 use super::upgrades::data::{get_movement_upgrade, Upgrades};
@@ -33,6 +34,7 @@ pub fn spawn_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
+    mut apply_upgrades_event_writer: EventWriter<ApplyUpgrades>,
 ) {
     debug!("Spawning player");
     let tile_pos = BoardPosition::new(4, 4).unwrap();
@@ -80,4 +82,5 @@ pub fn spawn_player(
 
     let healthbars = spawn_healthbar(&mut commands, &asset_server, &atlas_layout.handle);
     commands.entity(player_id).push_children(&healthbars);
+    apply_upgrades_event_writer.send(ApplyUpgrades(get_movement_upgrade(&MovementType::King)));
 }

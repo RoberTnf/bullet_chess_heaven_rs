@@ -13,8 +13,8 @@ mod debug;
 mod defeat;
 mod game_info;
 mod right_side;
-mod shop;
-use crate::{globals::TILE_SIZE, states::turn_state::TurnInfo};
+pub mod shop;
+use crate::states::turn_state::TurnInfo;
 
 fn display_turn_information(turn_info: Res<TurnInfo>) {
     println!("Turn: {}", turn_info.number);
@@ -49,9 +49,10 @@ fn setup_ui(mut commands: Commands) {
             parent.spawn((
                 NodeBundle {
                     style: Style {
-                        width: Val::Px(TILE_SIZE as f32 * 16.0),
+                        width: Val::Percent(25.0),
                         flex_direction: FlexDirection::Column,
                         justify_content: JustifyContent::SpaceBetween,
+                        padding: UiRect::all(Val::Px(16.0)),
                         ..default()
                     },
                     // background_color: BackgroundColor(Color::srgb(0.15, 0.15, 0.15)),
@@ -62,9 +63,10 @@ fn setup_ui(mut commands: Commands) {
             parent.spawn((
                 NodeBundle {
                     style: Style {
-                        width: Val::Px(TILE_SIZE as f32 * 16.0),
+                        width: Val::Percent(25.0),
                         flex_direction: FlexDirection::Column,
                         justify_content: JustifyContent::SpaceBetween,
+                        padding: UiRect::all(Val::Px(16.0)),
                         ..default()
                     },
                     ..default()

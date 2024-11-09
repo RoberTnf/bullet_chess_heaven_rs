@@ -4,7 +4,7 @@ use crate::{
     board::highlight::HighlightCache,
     globals::{
         SHOP_UPGRADES_COUNT_MOVEMENT, SHOP_UPGRADES_COUNT_STATS, UI_FONT, UI_FONT_SIZE,
-        UI_HEADER_FONT_SIZE,
+        UI_HEADER_FONT_SIZE, UI_PIECE_SPRITE_SIZE_SHOP,
     },
     graphics::spritesheet::SpriteSheetAtlas,
     input::keyboard::ToggleShop,
@@ -20,7 +20,7 @@ use crate::{
             },
         },
     },
-    states::{game_state::GameState, pause_state::GamePauseState},
+    states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
     utils::rng::sample_weighted,
 };
 
@@ -70,10 +70,10 @@ fn spawn_shop(commands: &mut Commands, root_node: &Entity, asset_server: &Res<As
         .spawn((
             NodeBundle {
                 style: Style {
-                    width: Val::Vw(100.0),
+                    width: Val::Vw(50.0),
                     height: Val::Vh(100.0),
                     top: Val::Px(0.0),
-                    left: Val::Px(0.0),
+                    left: Val::Percent(25.0),
                     position_type: PositionType::Absolute,
                     flex_direction: FlexDirection::Column,
                     padding: UiRect::all(Val::Px(8.0)),
@@ -117,7 +117,7 @@ fn update_shop(mut shop_upgrades: ResMut<ShopUpgrades>) {
 }
 
 #[derive(Event)]
-struct ApplyUpgrades(Upgrade);
+pub struct ApplyUpgrades(pub Upgrade);
 
 fn buy_upgrade(
     mut event_reader: EventReader<ButtonPressedEvent>,
@@ -229,7 +229,7 @@ fn display_shop(
                     ButtonBundle {
                         style: Style {
                             flex_direction: FlexDirection::Column,
-                            justify_content: JustifyContent::Center,
+                            width: Val::Percent(100.0),
                             align_items: AlignItems::Center,
                             padding: UiRect::all(Val::Px(4.0)),
                             border: UiRect::all(Val::Px(1.0)),
@@ -262,8 +262,8 @@ fn display_shop(
                     parent.spawn((
                         ImageBundle {
                             style: Style {
-                                width: Val::Px(12.0),
-                                height: Val::Px(12.0),
+                                width: Val::Px(UI_PIECE_SPRITE_SIZE_SHOP),
+                                height: Val::Px(UI_PIECE_SPRITE_SIZE_SHOP),
                                 ..default()
                             },
                             image: UiImage::new(asset_server.load("custom/spritesheet.png")),
@@ -289,6 +289,7 @@ fn display_shop(
                         align_items: AlignItems::Center,
                         padding: UiRect::all(Val::Px(4.0)),
                         border: UiRect::all(Val::Px(1.0)),
+                        width: Val::Percent(100.0),
                         ..default()
                     },
                     border_radius: BorderRadius::all(Val::Px(2.0)),
@@ -309,10 +310,26 @@ fn display_shop(
                 ));
             })
             .id();
-        commands.entity(shop_node).add_child(refresh_button);
-        let toggle_shop_button = get_shop_button(&mut commands, asset_server, "Exit Shop (S)");
-        commands.entity(toggle_shop_button).insert(ShopUpgradeUI);
-        commands.entity(shop_node).add_child(toggle_shop_button);
+        let bottom_container = commands
+            .spawn((
+                ShopUpgradeUI,
+                NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        column_gap: Val::Px(10.0),
+                        ..default()
+                    },
+                    ..default()
+                },
+                Name::new("UpgradesContainer"),
+            ))
+            .id();
+        commands.entity(shop_node).add_child(bottom_container);
+        commands.entity(bottom_container).add_child(refresh_button);
+        let toggle_shop_button = get_shop_button(&mut commands, &asset_server, "Exit Shop (S)");
+        commands
+            .entity(bottom_container)
+            .add_child(toggle_shop_button);
     }
 }
 
@@ -323,7 +340,12 @@ impl Plugin for ShopPlugin {
         app.insert_state(ShopState::Closed)
             .enable_state_scoped_entities::<ShopState>()
             .insert_resource(ShopUpgrades(Vec::new()));
-        app.add_systems(Update, toggle_shop.run_if(in_state(GameState::Game)));
+        app.add_systems(
+            Update,
+            toggle_shop
+                .run_if(in_state(GameState::Game))
+                .run_if(in_state(TurnState::PlayerInput)),
+        );
         app.add_systems(
             Update,
             (update_shop_system, display_shop, buy_upgrade)

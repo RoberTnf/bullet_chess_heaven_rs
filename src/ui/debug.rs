@@ -33,7 +33,7 @@ pub fn setup_debug_ui(
                 style: Style {
                     width: Val::Percent(100.0),
                     row_gap: Val::Px(2.0),
-                    padding: UiRect::all(Val::Px(2.0)),
+                    padding: UiRect::all(Val::Px(8.0)),
                     flex_direction: FlexDirection::Column,
                     ..default()
                 },

@@ -89,7 +89,8 @@ pub const UI_FONT: &str = "fonts/monogram/ttf/monogram-extended.ttf"; // Font fo
 pub const UI_HEADER_FONT_SIZE: f32 = 18.0 * UI_FONT_SCALE; // Font size for UI headers
 pub const DEFEAT_HEADER_FONT_SIZE: f32 = 64.0 * UI_FONT_SCALE; // Font size for defeat text
 pub const DEFEAT_SCORE_FONT_SIZE: f32 = 48.0 * UI_FONT_SCALE; // Font size for score text
-pub const UI_PIECE_SPRITE_SIZE: f32 = 12.0 * UI_FONT_SCALE; // Size of the piece sprite in the UI
+pub const UI_PIECE_SPRITE_SIZE_INFO: f32 = 12.0 * UI_FONT_SCALE; // Size of the piece sprite in the UI
+pub const UI_PIECE_SPRITE_SIZE_SHOP: f32 = 24.0 * UI_FONT_SCALE; // Size of the piece sprite in the UI
 
 // Game Fonts
 pub const HEALTH_CHANGE_TEXT_FONT_SIZE: f32 = 12.0; // Font size for health change text
@@ -99,9 +100,9 @@ pub const GOLD_FONT_SIZE: f32 = 12.0; // Font size for gold text
 pub const SHOP_FONT_SIZE: f32 = 32.0 * 1.5; // Font size for shop text
 pub const SHOP_HEADER_FONT_SIZE: f32 = 64.0 * 1.5; // Font size for shop header text
 pub const SHOP_PIECE_VALUE_GOLD_MULTIPLIER: f32 = 10.0; // Multiplier for the value of pieces in the shop
-pub const SHOP_UPGRADES_COUNT_MOVEMENT: usize = 2;
+pub const SHOP_UPGRADES_COUNT_MOVEMENT: usize = 1;
 pub const SHOP_UPGRADES_COUNT_STATS: usize = 3;
-pub const STARTING_GOLD: usize = 100; // Starting gold
+pub const STARTING_GOLD: usize = 10000; // Starting gold
 
 // Keyboard settings
 pub const SHOP_KEY: KeyCode = KeyCode::KeyS; // Key to toggle the shop

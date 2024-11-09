@@ -15,7 +15,10 @@ use crate::{
     },
     utils::rng::Weighted,
 };
-use bevy::{prelude::*, utils::HashSet};
+use bevy::{
+    prelude::*,
+    utils::{HashMap, HashSet},
+};
 use once_cell::sync::Lazy;
 
 #[derive(Clone, Debug, PartialEq, Component)]
@@ -43,6 +46,18 @@ impl Upgrades {
             }
         }
         set
+    }
+
+    pub fn get_movement_types_count(&self) -> HashMap<MovementType, usize> {
+        let mut map = HashMap::new();
+        for upgrade in &self.0 {
+            if let Effect::MovementType(movement_types) = upgrade.effect.clone() {
+                for movement_type in movement_types {
+                    *map.entry(movement_type).or_insert(0) += 1;
+                }
+            }
+        }
+        map
     }
 }
 

@@ -249,6 +249,21 @@ pub fn update_highlight_tiles(
     }
 }
 
+fn restart_cleanup(
+    mut commands: Commands,
+    mut highlight: ResMut<HighlightCache>,
+    highlight_tiles_move: Query<Entity, With<HighlightTileMove>>,
+    highlight_tiles_attack: Query<Entity, With<HighlightTileAttack>>,
+) {
+    highlight.invalidate();
+    for entity in highlight_tiles_move.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+    for entity in highlight_tiles_attack.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
 pub struct HighlightPlugin;
 
 impl Plugin for HighlightPlugin {
@@ -269,5 +284,6 @@ impl Plugin for HighlightPlugin {
                 invalidate_highlight_cache_on_move,
             ),
         );
+        app.add_systems(OnEnter(GameState::Game), restart_cleanup);
     }
 }

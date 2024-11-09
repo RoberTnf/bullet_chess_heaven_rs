@@ -64,7 +64,7 @@ pub fn handle_button_pressed(
     for event in event_reader.read() {
         match event.function {
             ButtonFunction::RestartGame => {
-                game_state.set(GameState::Game);
+                game_state.set(GameState::Restart);
             }
             ButtonFunction::RefreshShop => {
                 refresh_shop_event_writer.send(RefreshShop);

@@ -3,18 +3,19 @@ use bevy::prelude::*;
 use crate::{
     globals::{
         GOLD_UI_COLOR_DURATION, SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE,
-        UI_PIECE_SPRITE_SIZE,
+        UI_PIECE_SPRITE_SIZE_INFO,
     },
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
         health::Health,
+        movement_type::MovementType,
         player::{experience::PlayerLevel, gold::Gold, spawn::Player, upgrades::data::Upgrades},
     },
     states::game_state::GameState,
     utils::math::lerp,
 };
 
-use super::{game_info::setup_game_info, setup_ui, LeftUINode};
+use super::{game_info::setup_game_info, setup_ui, shop::ApplyUpgrades, LeftUINode};
 
 #[derive(Component)]
 struct CharacterInfoNode;
@@ -50,7 +51,7 @@ pub fn setup_character_info(
         parent
             .spawn(NodeBundle {
                 style: Style {
-                    padding: UiRect::all(Val::Px(2.0)),
+                    padding: UiRect::all(Val::Px(8.0)),
                     row_gap: Val::Px(2.0),
                     flex_direction: FlexDirection::Column,
                     ..default()
@@ -125,27 +126,24 @@ pub fn setup_character_info(
                                 timer: Timer::from_seconds(GOLD_UI_COLOR_DURATION, TimerMode::Once),
                             },
                         ));
-                        parent
-                            .spawn((
-                                NodeBundle {
-                                    style: Style {
-                                        flex_direction: FlexDirection::Row,
-                                        ..default()
-                                    },
+                        parent.spawn((TextBundle::from_section(
+                            "Moves:",
+                            TextStyle {
+                                font_size: UI_FONT_SIZE,
+                                font: asset_server.load(UI_FONT),
+                                ..default()
+                            },
+                        ),));
+                        parent.spawn((
+                            NodeBundle {
+                                style: Style {
+                                    flex_direction: FlexDirection::Row,
                                     ..default()
                                 },
-                                MovementTypesUIContainer,
-                            ))
-                            .with_children(|parent| {
-                                parent.spawn((TextBundle::from_section(
-                                    "Moves:",
-                                    TextStyle {
-                                        font_size: UI_FONT_SIZE,
-                                        font: asset_server.load(UI_FONT),
-                                        ..default()
-                                    },
-                                ),));
-                            });
+                                ..default()
+                            },
+                            MovementTypesUIContainer,
+                        ));
                     });
             });
     });
@@ -154,60 +152,65 @@ pub fn setup_character_info(
 fn update_movement_types_information(
     movement_types_query: Query<&Upgrades, With<Player>>,
     parent_query: Query<Entity, With<MovementTypesUIContainer>>,
-    mut text_query: Query<(Entity, &mut TextureAtlas, &MovementTypesUILabel)>,
+    text_query: Query<Entity, With<MovementTypesUILabel>>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
 ) {
     let container_entity = parent_query.single();
     let upgrades = movement_types_query.single();
-    let movement_types = upgrades.get_movement_types_set();
+    let mut movement_types = upgrades.get_movement_types_count();
+    // Even tho black and white pawns are different, In the the UI there is just pawn
+    movement_types.retain(|movement_type, _| movement_type != &MovementType::BlackPawn);
 
-    if movement_types.len() != text_query.iter().len() {
-        // Despawn all labels
-        for (entity, _, _) in text_query.iter() {
-            commands.entity(entity).despawn();
-        }
-        // Spawn all labels
-        for movement_type in movement_types.iter() {
-            let player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
-            debug!("Spawning movement type in UI: {}", player_sprite_index);
-            commands.entity(container_entity).with_children(|parent| {
-                parent.spawn((
-                    ImageBundle {
+    // Despawn all labels
+    for entity in text_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+    // Spawn all labels
+    for (movement_type, count) in movement_types.iter() {
+        let player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
+        debug!("Spawning movement type in UI: {}", player_sprite_index);
+        commands.entity(container_entity).with_children(|parent| {
+            parent
+                .spawn((
+                    NodeBundle {
                         style: Style {
-                            width: Val::Px(UI_PIECE_SPRITE_SIZE),
-                            height: Val::Px(UI_PIECE_SPRITE_SIZE),
+                            flex_wrap: FlexWrap::Wrap,
                             ..default()
                         },
-                        image: UiImage::new(asset_server.load("custom/spritesheet.png")),
                         ..default()
-                    },
-                    TextureAtlas {
-                        layout: atlas_layout.handle.clone(),
-                        index: player_sprite_index,
                     },
                     MovementTypesUILabel {
                         sprite_index: player_sprite_index,
                     },
-                ));
-            });
-        }
-    } else {
-        for ((_, mut atlas, label), movement_type) in
-            text_query.iter_mut().zip(movement_types.iter())
-        {
-            let player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
-            // Update the text if the sprite index has changed5
-            if label.sprite_index != player_sprite_index {
-                debug!(
-                    "Updating movement type in UI: {} -> {}",
-                    label.sprite_index,
-                    movement_type.sprite_index()
-                );
-                atlas.index = player_sprite_index;
-            }
-        }
+                ))
+                .with_children(|parent| {
+                    parent.spawn((
+                        ImageBundle {
+                            style: Style {
+                                width: Val::Px(UI_PIECE_SPRITE_SIZE_INFO),
+                                height: Val::Px(UI_PIECE_SPRITE_SIZE_INFO),
+                                ..default()
+                            },
+                            image: UiImage::new(asset_server.load("custom/spritesheet.png")),
+                            ..default()
+                        },
+                        TextureAtlas {
+                            layout: atlas_layout.handle.clone(),
+                            index: player_sprite_index,
+                        },
+                    ));
+                    parent.spawn((TextBundle::from_section(
+                        count.to_string(),
+                        TextStyle {
+                            font_size: UI_FONT_SIZE,
+                            font: asset_server.load(UI_FONT),
+                            ..default()
+                        },
+                    ),));
+                });
+        });
     }
 }
 
@@ -272,7 +275,7 @@ impl Plugin for CharacterInfoPlugin {
             Update,
             (
                 update_health_information,
-                update_movement_types_information,
+                update_movement_types_information.run_if(on_event::<ApplyUpgrades>()),
                 update_level_information,
                 update_gold_information,
             )

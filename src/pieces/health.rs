@@ -163,15 +163,11 @@ pub fn health_change_system(
 ) {
     for event in health_change_event_reader.read() {
         if event.change < 0 {
-            health_query
-                .get_mut(event.entity)
-                .unwrap()
-                .take_damage(-event.change as usize);
-        } else {
-            health_query
-                .get_mut(event.entity)
-                .unwrap()
-                .heal(event.change as usize);
+            if let Ok(mut health) = health_query.get_mut(event.entity) {
+                health.take_damage(-event.change as usize);
+            }
+        } else if let Ok(mut health) = health_query.get_mut(event.entity) {
+            health.heal(event.change as usize);
         }
     }
 }
