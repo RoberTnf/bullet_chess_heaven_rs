@@ -9,6 +9,7 @@ use crate::{
     graphics::spritesheet::SpriteSheetAtlas,
     input::keyboard::ToggleShop,
     pieces::{
+        damage::Attack,
         health::Health,
         player::{
             gold::Gold,
@@ -142,12 +143,12 @@ fn buy_upgrade(
 }
 
 fn apply_upgrades(
-    mut player: Query<(&Upgrades, &mut Health), With<Player>>,
+    mut player: Query<(&Upgrades, &mut Health, &mut Attack), With<Player>>,
     mut event_reader: EventReader<ApplyUpgrades>,
     mut highlight_cache: ResMut<HighlightCache>,
 ) {
     for upgrade in event_reader.read() {
-        let (upgrades, mut health) = player.single_mut();
+        let (upgrades, mut health, mut attack) = player.single_mut();
         match &upgrade.0.effect {
             Effect::StatEffect(stat_effect) => match stat_effect.stat {
                 StatVariant::MaxHealth => {
@@ -159,8 +160,8 @@ fn apply_upgrades(
                         - health.value;
                     health.heal(health_diff);
                 }
-                _ => {
-                    todo!("Apply other stat upgrades");
+                StatVariant::Attack => {
+                    attack.0.apply_upgrades(upgrades);
                 }
             },
             Effect::MovementType(_) => {

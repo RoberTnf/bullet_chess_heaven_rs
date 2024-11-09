@@ -1,12 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Component)]
-pub struct Damage {
-    pub value: usize,
-}
+use super::player::upgrades::stats::Stat;
 
-impl Damage {
-    pub fn new(value: usize) -> Self {
-        Damage { value }
-    }
-}
+#[derive(Component)]
+pub struct Attack(pub Stat);

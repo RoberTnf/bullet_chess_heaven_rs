@@ -7,10 +7,11 @@ use crate::{
     pieces::{
         attack::AttackAfterMove,
         common::{BlocksMovement, Piece, PieceBundle, PieceState, Team},
-        damage::Damage,
+        damage::Attack,
         health::Health,
         healthbar::spawn_healthbar,
         movement_type::MovementType,
+        player::upgrades::stats::{Stat, StatVariant},
     },
     states::game_state::GameState,
 };
@@ -55,7 +56,11 @@ pub fn spawn_player(
                 creature: Piece,
                 board_position: tile_pos,
                 health: Health::new(globals::PLAYER_HEALTH),
-                damage: Damage::new(globals::PLAYER_DAMAGE),
+                damage: Attack(Stat {
+                    base_value: globals::PLAYER_DAMAGE as f32,
+                    stat_variant: StatVariant::Attack,
+                    upgraded_value: globals::PLAYER_DAMAGE as f32,
+                }),
                 state: PieceState::Idle,
                 upgrades: Upgrades(vec![get_movement_upgrade(&MovementType::King)]),
                 team: Team::Player,

@@ -12,7 +12,7 @@ use crate::{
 
 use super::{
     common::{Piece, PieceState, Team},
-    damage::Damage,
+    damage::Attack,
     health::PieceHealthChangeEvent,
     movement::MovePieceAnimationEndEvent,
     movement_type::MovementType,
@@ -32,7 +32,7 @@ pub struct AttackPieceEvent {
 pub enum AttackPieceAnimationState {
     Delayed(Timer),               // Combines Start with timer
     Attacking { forwards: bool }, // Combines Forwards/Backwards into single state with direction
-    Finished,
+    Finished(Timer),
 }
 
 #[derive(Component)]
@@ -147,7 +147,7 @@ pub fn attack_piece_animation_system(
                         *animation_state = AttackPieceAnimationState::Attacking { forwards: true };
                     }
                 }
-                AttackPieceAnimationState::Finished => {}
+                AttackPieceAnimationState::Finished(_) => {}
             }
         }
     }
@@ -202,25 +202,34 @@ fn attacking_with_new_sprite_animation_system(
                     &mut event_writer,
                 );
             }
-            AttackPieceAnimationState::Finished => {}
+            AttackPieceAnimationState::Finished(_) => {}
         }
     }
 }
 
 fn piece_idle_if_all_animations_finished(
     mut piece_query: Query<(&mut PieceState, &Children)>,
-    children_query: Query<&AttackingWithNewSprite>,
+    mut children_query: Query<&mut AttackingWithNewSprite>,
     mut commands: Commands,
+    time: Res<Time>,
 ) {
     for (mut piece_state, children) in piece_query.iter_mut() {
         let mut finished = true;
         let mut children_to_despawn = Vec::new();
         for child in children.iter() {
-            if let Ok(attacking_sprite) = children_query.get(*child) {
-                if attacking_sprite.animation_state != AttackPieceAnimationState::Finished {
+            if let Ok(mut attacking_sprite) = children_query.get_mut(*child) {
+                if let AttackPieceAnimationState::Finished(ref mut timer) =
+                    &mut attacking_sprite.animation_state
+                {
+                    if timer.finished() {
+                        children_to_despawn.push(*child);
+                    } else {
+                        timer.tick(time.delta());
+                        finished = false;
+                    }
+                } else {
                     finished = false;
                 }
-                children_to_despawn.push(*child);
             }
         }
         if finished && !children_to_despawn.is_empty() {
@@ -282,7 +291,10 @@ fn update_sprite_positions(
 
         if (current_pos - destination).length() < (TILE_SIZE as f32 / 2.0) {
             commands.entity(*sprite).despawn_recursive();
-            attacking_sprite.animation_state = AttackPieceAnimationState::Finished;
+            attacking_sprite.animation_state = AttackPieceAnimationState::Finished(Timer::new(
+                Duration::from_secs_f32(0.1),
+                TimerMode::Once,
+            ));
             event_writer.send(attacking_sprite.piece_health_change_event);
         } else {
             sprite_transform.translation = (sprite_transform.translation.truncate() + movement)
@@ -299,7 +311,7 @@ pub fn attack_from_tile(
     pieces_query: &Query<(Entity, &BoardPosition, &Team), (With<Piece>, Without<Player>)>,
     attack_event_writer: &mut EventWriter<AttackPieceEvent>,
     player_entity: Entity,
-    damage: &Damage,
+    damage: &Attack,
     next_state: &mut ResMut<NextState<TurnState>>,
 ) -> bool {
     let mut attack = false;
@@ -326,7 +338,7 @@ pub fn attack_from_tile(
                 attack_position,
                 player_entity,
                 enemy_entity,
-                damage.value,
+                damage.0.upgraded_value as usize,
                 movement_type,
                 Some(delay),
             );
@@ -342,7 +354,7 @@ pub fn attack_from_tile(
 pub fn on_move_animation_end_attack_system(
     mut attack_event_writer: EventWriter<AttackPieceEvent>,
     mut pieces_with_attack: Query<
-        (Entity, &BoardPosition, &Damage, &Upgrades, &mut PieceState),
+        (Entity, &BoardPosition, &Attack, &Upgrades, &mut PieceState),
         With<AttackAfterMove>,
     >,
     mut pieces_without_attack: Query<&mut PieceState, (With<Piece>, Without<AttackAfterMove>)>,

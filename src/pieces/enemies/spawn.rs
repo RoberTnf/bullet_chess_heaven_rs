@@ -4,7 +4,7 @@ use crate::{
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
         common::{BlocksMovement, Piece, PieceBundle, PieceState, Team},
-        damage::Damage,
+        damage::Attack,
         enemies::{
             bishop::{BLACK_BISHOP_INFO, WHITE_BISHOP_INFO},
             king::{BLACK_KING_INFO, WHITE_KING_INFO},
@@ -17,7 +17,10 @@ use crate::{
         movement_type::MovementType,
         player::{
             experience::PieceValue,
-            upgrades::data::{get_movement_upgrade, Upgrades},
+            upgrades::{
+                data::{get_movement_upgrade, Upgrades},
+                stats::{Stat, StatVariant},
+            },
         },
     },
     states::{
@@ -110,7 +113,11 @@ pub fn spawn_enemies(
                     creature: Piece,
                     board_position: tile_pos,
                     health: Health::new(piece_info.health),
-                    damage: Damage::new(piece_info.damage),
+                    damage: Attack(Stat {
+                        base_value: piece_info.damage as f32,
+                        stat_variant: StatVariant::Attack,
+                        upgraded_value: piece_info.damage as f32,
+                    }),
                     state: PieceState::Idle,
                     upgrades: Upgrades(vec![get_movement_upgrade(&piece_info.movement_type)]),
                     team: Team::Enemy,

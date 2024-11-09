@@ -4,7 +4,7 @@ use crate::board::position::BoardPosition;
 
 use super::{
     attack::AttackPieceAnimationState,
-    damage::Damage,
+    damage::Attack,
     health::{Health, PieceHealthChangeEvent},
     player::upgrades::data::Upgrades,
 };
@@ -47,7 +47,7 @@ pub struct PieceBundle {
     // pub movement_types: MovementTypes,
     pub board_position: BoardPosition,
     pub health: Health,
-    pub damage: Damage,
+    pub damage: Attack,
     pub blocks_movement: BlocksMovement,
     pub state: PieceState,
     pub upgrades: Upgrades,

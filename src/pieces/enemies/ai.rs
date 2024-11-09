@@ -5,7 +5,7 @@ use crate::{
     pieces::{
         attack::AttackPieceEvent,
         common::{Piece, PieceState, Team},
-        damage::Damage,
+        damage::Attack,
         health::DeathAnimation,
         movement::MovePieceEvent,
         player::upgrades::data::Upgrades,
@@ -19,7 +19,7 @@ pub fn ai_system(
             &BoardPosition,
             &Upgrades,
             &Team,
-            &Damage,
+            &Attack,
             Entity,
             &mut PieceState,
         ),
@@ -106,7 +106,7 @@ pub fn ai_system(
                     .find(|(_, pos)| pos == attack_position)
                     .unwrap()
                     .0,
-                damage: enemy_damage.value,
+                damage: enemy_damage.0.upgraded_value as usize,
                 destination: *attack_position,
                 sprite_index: None,
                 delay: None,

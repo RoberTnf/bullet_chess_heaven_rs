@@ -6,7 +6,7 @@ use crate::{
     pieces::{
         attack::{attack_from_tile, AttackPieceEvent},
         common::{Piece, Team},
-        damage::Damage,
+        damage::Attack,
         movement::MovePieceEvent,
         movement_type::MovementType,
         player::{spawn::Player, upgrades::data::Upgrades},
@@ -55,7 +55,7 @@ pub fn click_tile_update_player_position(
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<ButtonInput<MouseButton>>,
-    player: Query<(Entity, &BoardPosition, &Damage, &Upgrades), With<Player>>,
+    player: Query<(Entity, &BoardPosition, &Attack, &Upgrades), With<Player>>,
     touches: Res<Touches>,
     pieces_query: Query<(Entity, &BoardPosition, &Team), (With<Piece>, Without<Player>)>,
     mut next_state: ResMut<NextState<TurnState>>,
