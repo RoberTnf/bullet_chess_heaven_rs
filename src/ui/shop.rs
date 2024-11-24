@@ -109,11 +109,11 @@ pub enum ShopState {
     Closed,
 }
 
-fn update_shop(mut shop_upgrades: ResMut<ShopUpgrades>) {
+fn update_shop(shop_upgrades: &mut ResMut<ShopUpgrades>) {
     let upgrades_mov = sample_weighted(SHOP_UPGRADES_COUNT_MOVEMENT, &UPGRADES_MOVEMENT);
     let upgrades_stats = sample_weighted(SHOP_UPGRADES_COUNT_STATS, &UPGRADES_STATS);
     let chosen_upgrades = upgrades_mov.into_iter().chain(upgrades_stats);
-    *shop_upgrades = ShopUpgrades(chosen_upgrades.collect());
+    **shop_upgrades = ShopUpgrades(chosen_upgrades.collect());
 }
 
 #[derive(Event)]
@@ -134,7 +134,7 @@ fn buy_upgrade(
                 gold.amount -= upgrade.cost;
                 player_upgrades.single_mut().0.push(upgrade.clone());
                 debug!("Bought upgrade: {}", upgrade.display_name);
-                refresh_event_writer.send(RefreshShop);
+                refresh_event_writer.send(RefreshShop { cost: 0 });
                 apply_upgrades_event_writer.send(ApplyUpgrades(upgrade.clone()));
             } else {
                 debug!("Not enough gold to buy upgrade: {}", upgrade.display_name);
@@ -171,16 +171,25 @@ fn apply_upgrades(
 }
 
 #[derive(Event)]
-pub struct RefreshShop;
+pub struct RefreshShop {
+    pub cost: usize,
+}
 
 fn update_shop_system(
-    shop_upgrades: ResMut<ShopUpgrades>,
+    mut shop_upgrades: ResMut<ShopUpgrades>,
     mut refresh_event: EventReader<RefreshShop>,
+    mut gold: ResMut<Gold>,
 ) {
-    if shop_upgrades.0.len() != (SHOP_UPGRADES_COUNT_MOVEMENT + SHOP_UPGRADES_COUNT_STATS)
-        || refresh_event.read().count() > 0
-    {
-        update_shop(shop_upgrades);
+    // ensure the shop is filled
+    if shop_upgrades.0.len() != (SHOP_UPGRADES_COUNT_MOVEMENT + SHOP_UPGRADES_COUNT_STATS) {
+        update_shop(&mut shop_upgrades);
+    }
+
+    for event in refresh_event.read() {
+        if gold.amount >= event.cost {
+            gold.amount -= event.cost;
+            update_shop(&mut shop_upgrades);
+        }
     }
 }
 
@@ -299,7 +308,7 @@ fn display_shop(
             ))
             .with_children(|parent| {
                 parent.spawn(TextBundle::from_section(
-                    "Refresh",
+                    "Refresh (R)",
                     TextStyle {
                         font_size: UI_FONT_SIZE,
                         font: asset_server.load(UI_FONT),

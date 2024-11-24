@@ -103,10 +103,12 @@ pub const SHOP_PIECE_VALUE_GOLD_MULTIPLIER: f32 = 10.0; // Multiplier for the va
 pub const SHOP_UPGRADES_COUNT_MOVEMENT: usize = 1;
 pub const SHOP_UPGRADES_COUNT_STATS: usize = 3;
 pub const STARTING_GOLD: usize = 10000; // Starting gold
+pub const REFRESH_SHOP_COST: usize = 1; // Cost of refreshing the shop
 
 // Keyboard settings
 pub const SHOP_KEY: KeyCode = KeyCode::KeyS; // Key to toggle the shop
+pub const REFRESH_SHOP_KEY: KeyCode = KeyCode::KeyR; // Key to refresh the shop
 
 // Upgrade settings
 pub const UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER: usize = 2;
-pub const UNIQUE_UPGRADE_DAMAGE_MULTIPLIER: f32 = 1.1;
+pub const UNIQUE_UPGRADE_DAMAGE_MULTIPLIER: f32 = 0.1;

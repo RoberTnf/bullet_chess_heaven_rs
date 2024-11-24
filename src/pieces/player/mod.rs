@@ -13,6 +13,10 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::Game), spawn_player);
-        app.add_plugins((experience::ExperiencePlugin, gold::GoldPlugin));
+        app.add_plugins((
+            experience::ExperiencePlugin,
+            gold::GoldPlugin,
+            upgrades::unique_upgrades::UniqueUpgradesPlugin,
+        ));
     }
 }

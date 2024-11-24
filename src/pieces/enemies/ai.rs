@@ -71,6 +71,8 @@ pub fn ai_system(
                     sprite_index: None,
                     delay: None,
                     movement_type: movement_type.clone(),
+                    // for now, we don't want to apply unique upgrades to the AI
+                    with_unique_upgrade: false,
                 });
                 has_attacked = true;
             }

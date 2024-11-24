@@ -147,5 +147,6 @@ pub fn send_attack_event(
         sprite_index: Some(movement_type.sprite_index() + SPRITESHEET_WIDTH),
         delay,
         movement_type: movement_type.clone(),
+        with_unique_upgrade: true,
     });
 }

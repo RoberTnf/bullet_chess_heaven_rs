@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 
 use crate::{
-    globals::{PRIMARY_COLOR_GRAYED, PRIMARY_COLOR_GRAYED_BRIGHTER, SECONDARY_COLOR},
+    globals::{
+        PRIMARY_COLOR_GRAYED, PRIMARY_COLOR_GRAYED_BRIGHTER, REFRESH_SHOP_COST, SECONDARY_COLOR,
+    },
     states::game_state::GameState,
 };
 
@@ -67,7 +69,9 @@ pub fn handle_button_pressed(
                 game_state.set(GameState::Restart);
             }
             ButtonFunction::RefreshShop => {
-                refresh_shop_event_writer.send(RefreshShop);
+                refresh_shop_event_writer.send(RefreshShop {
+                    cost: REFRESH_SHOP_COST,
+                });
             }
             _ => {}
         }

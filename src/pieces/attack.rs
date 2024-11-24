@@ -18,7 +18,10 @@ use super::{
     movement_type::MovementType,
     player::{
         spawn::Player,
-        upgrades::{data::Upgrades, unique_upgrades::apply_unique_upgrades},
+        upgrades::{
+            data::Upgrades,
+            unique_upgrades::{apply_unique_upgrades, SideEffect},
+        },
     },
 };
 
@@ -31,6 +34,7 @@ pub struct AttackPieceEvent {
     pub sprite_index: Option<usize>,
     pub movement_type: MovementType,
     pub delay: Option<f32>,
+    pub with_unique_upgrade: bool,
 }
 #[derive(Eq, PartialEq, Clone)]
 pub enum AttackPieceAnimationState {
@@ -55,12 +59,15 @@ pub fn attack_piece_system(
     mut attack_event_reader: EventReader<AttackPieceEvent>,
     mut pieces: Query<(&BoardPosition, &mut PieceState, &Upgrades), With<Piece>>,
     mut commands: Commands,
+    mut side_effect_event_writer: EventWriter<SideEffect>,
 ) {
     for event in attack_event_reader.read() {
         let (attacker_pos, mut attacker_state, upgrades) = pieces.get_mut(event.attacker).unwrap();
         let mut event = (*event).clone();
-        // handle unique upgrades
-        apply_unique_upgrades(&mut event, upgrades);
+        if event.with_unique_upgrade {
+            // handle unique upgrades
+            apply_unique_upgrades(&mut event, upgrades, &mut side_effect_event_writer);
+        }
 
         if let Some(sprite_index) = event.sprite_index {
             *attacker_state = PieceState::AttackingWithNewSprite;
