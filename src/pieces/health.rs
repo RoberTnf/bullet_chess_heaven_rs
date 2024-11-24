@@ -23,8 +23,8 @@ use super::{
 
 #[derive(Component)]
 pub struct Health {
-    pub value: usize,
-    pub changes: Vec<i64>,
+    pub value: f32,
+    pub changes: Vec<f32>,
     pub max_value: Stat,
 }
 
@@ -34,38 +34,38 @@ pub struct PieceDeathEvent {
 }
 
 impl Health {
-    pub fn new(value: usize) -> Self {
+    pub fn new(value: f32) -> Self {
         Health {
             value,
             changes: vec![],
             max_value: Stat {
-                base_value: value as f32,
+                base_value: value,
                 stat_variant: StatVariant::MaxHealth,
-                upgraded_value: value as f32,
+                upgraded_value: value,
             },
         }
     }
 
-    pub fn take_damage(&mut self, damage: usize) {
-        self.value = self.value.saturating_sub(damage);
-        self.changes.push(-(damage as i64));
+    pub fn take_damage(&mut self, damage: f32) {
+        self.value -= damage;
+        self.changes.push(-damage);
     }
 
     pub fn is_dead(&self) -> bool {
-        self.value == 0
+        self.value <= 0.0
     }
 
-    pub fn heal(&mut self, amount: usize) {
-        self.value = self.value.saturating_add(amount);
-        if self.value > self.max_value.upgraded_value as usize {
-            self.value = self.max_value.upgraded_value as usize;
+    pub fn heal(&mut self, amount: f32) {
+        self.value += amount;
+        if self.value > self.max_value.upgraded_value {
+            self.value = self.max_value.upgraded_value;
         }
-        self.changes.push(amount as i64);
+        self.changes.push(amount);
     }
 
-    pub fn set_health(&mut self, value: usize) {
+    pub fn set_health(&mut self, value: f32) {
+        self.changes.push(value - self.value);
         self.value = value;
-        self.changes.push((value as i64) - (self.value as i64));
     }
 
     pub fn clear_changes(&mut self) {
@@ -99,7 +99,7 @@ pub struct DeathAnimation {
 #[derive(Event, Copy, Clone)]
 pub struct PieceHealthChangeEvent {
     pub entity: Entity,
-    pub change: i64,
+    pub change: f32,
 }
 
 pub fn spawn_health_change_text(
@@ -109,7 +109,7 @@ pub fn spawn_health_change_text(
 ) {
     for (mut health, transform, team) in health_query.iter_mut() {
         for change in health.changes.iter() {
-            let color = if *change < 0 {
+            let color = if *change < 0.0 {
                 if *team == Team::Player {
                     Color::srgba(1.0, 0.0, 0.0, 1.0)
                 } else {
@@ -162,12 +162,12 @@ pub fn health_change_system(
     mut health_query: Query<&mut Health>,
 ) {
     for event in health_change_event_reader.read() {
-        if event.change < 0 {
+        if event.change < 0.0 {
             if let Ok(mut health) = health_query.get_mut(event.entity) {
-                health.take_damage(-event.change as usize);
+                health.take_damage(-event.change);
             }
         } else if let Ok(mut health) = health_query.get_mut(event.entity) {
-            health.heal(event.change as usize);
+            health.heal(event.change);
         }
     }
 }

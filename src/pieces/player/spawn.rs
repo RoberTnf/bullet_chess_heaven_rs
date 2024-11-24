@@ -59,9 +59,9 @@ pub fn spawn_player(
                 board_position: tile_pos,
                 health: Health::new(globals::PLAYER_HEALTH),
                 damage: Attack(Stat {
-                    base_value: globals::PLAYER_DAMAGE as f32,
+                    base_value: globals::PLAYER_DAMAGE,
                     stat_variant: StatVariant::Attack,
-                    upgraded_value: globals::PLAYER_DAMAGE as f32,
+                    upgraded_value: globals::PLAYER_DAMAGE,
                 }),
                 state: PieceState::Idle,
                 upgrades: Upgrades(vec![get_movement_upgrade(&MovementType::King)]),

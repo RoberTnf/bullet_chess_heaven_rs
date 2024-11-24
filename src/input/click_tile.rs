@@ -131,7 +131,7 @@ pub fn send_attack_event(
     tile_position: &BoardPosition,
     player_entity: Entity,
     target_entity: Entity,
-    damage: usize,
+    damage: f32,
     movement_type: &MovementType,
     delay: Option<f32>,
 ) {
@@ -146,5 +146,6 @@ pub fn send_attack_event(
         damage,
         sprite_index: Some(movement_type.sprite_index() + SPRITESHEET_WIDTH),
         delay,
+        movement_type: movement_type.clone(),
     });
 }

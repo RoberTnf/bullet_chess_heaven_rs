@@ -156,9 +156,7 @@ fn apply_upgrades(
                     let prev_health = health.max_value.upgraded_value;
                     health.max_value.apply_upgrades(upgrades);
                     let new_health = health.max_value.upgraded_value;
-                    let health_diff = (new_health / prev_health * health.value as f32).round()
-                        as usize
-                        - health.value;
+                    let health_diff = (new_health / prev_health * health.value) - health.value;
                     health.heal(health_diff);
                 }
                 StatVariant::Attack => {

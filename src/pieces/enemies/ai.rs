@@ -47,10 +47,10 @@ pub fn ai_system(
     );
     for (enemy_pos, enemy_upgrades, _, enemy_damage, enemy_entity, mut enemy_state) in enemy_pieces
     {
+        let mut has_attacked = false;
         let enemy_movement_types = enemy_upgrades.get_movement_types_set();
         // we make the assumption that there will be enemies with more than one movement type
         let mut moves = HashSet::new();
-        let mut attacks = HashSet::new();
         for movement_type in enemy_movement_types.iter() {
             let response = movement_type.get_valid_moves(
                 enemy_pos,
@@ -58,10 +58,25 @@ pub fn ai_system(
                 &player_pieces_positions,
             );
             moves.extend(response.valid_moves);
-            attacks.extend(response.valid_attacks);
+            for attack in response.valid_attacks {
+                attack_events.send(AttackPieceEvent {
+                    attacker: enemy_entity,
+                    target: player_pieces_positions_and_entities
+                        .iter()
+                        .find(|(_, pos)| *pos == attack)
+                        .unwrap()
+                        .0,
+                    damage: enemy_damage.0.upgraded_value,
+                    destination: attack,
+                    sprite_index: None,
+                    delay: None,
+                    movement_type: movement_type.clone(),
+                });
+                has_attacked = true;
+            }
         }
 
-        if attacks.is_empty() {
+        if !has_attacked {
             if moves.is_empty() {
                 *enemy_state = PieceState::AttackEnded;
                 continue;
@@ -96,20 +111,6 @@ pub fn ai_system(
             move_events.send(MovePieceEvent {
                 entity: enemy_entity,
                 destination: *best_move,
-            });
-        } else {
-            let attack_position = attacks.iter().next().unwrap();
-            attack_events.send(AttackPieceEvent {
-                attacker: enemy_entity,
-                target: player_pieces_positions_and_entities
-                    .iter()
-                    .find(|(_, pos)| pos == attack_position)
-                    .unwrap()
-                    .0,
-                damage: enemy_damage.0.upgraded_value as usize,
-                destination: *attack_position,
-                sprite_index: None,
-                delay: None,
             });
         }
     }

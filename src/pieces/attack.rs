@@ -16,16 +16,20 @@ use super::{
     health::PieceHealthChangeEvent,
     movement::MovePieceAnimationEndEvent,
     movement_type::MovementType,
-    player::{spawn::Player, upgrades::data::Upgrades},
+    player::{
+        spawn::Player,
+        upgrades::{data::Upgrades, unique_upgrades::apply_unique_upgrades},
+    },
 };
 
-#[derive(Event)]
+#[derive(Event, Clone)]
 pub struct AttackPieceEvent {
     pub destination: BoardPosition,
     pub attacker: Entity,
     pub target: Entity,
-    pub damage: usize,
+    pub damage: f32,
     pub sprite_index: Option<usize>,
+    pub movement_type: MovementType,
     pub delay: Option<f32>,
 }
 #[derive(Eq, PartialEq, Clone)]
@@ -49,11 +53,14 @@ pub struct AttackingWithNewSprite {
 
 pub fn attack_piece_system(
     mut attack_event_reader: EventReader<AttackPieceEvent>,
-    mut pieces: Query<(&BoardPosition, &mut PieceState), With<Piece>>,
+    mut pieces: Query<(&BoardPosition, &mut PieceState, &Upgrades), With<Piece>>,
     mut commands: Commands,
 ) {
     for event in attack_event_reader.read() {
-        let (attacker_pos, mut attacker_state) = pieces.get_mut(event.attacker).unwrap();
+        let (attacker_pos, mut attacker_state, upgrades) = pieces.get_mut(event.attacker).unwrap();
+        let mut event = (*event).clone();
+        // handle unique upgrades
+        apply_unique_upgrades(&mut event, upgrades);
 
         if let Some(sprite_index) = event.sprite_index {
             *attacker_state = PieceState::AttackingWithNewSprite;
@@ -69,7 +76,7 @@ pub fn attack_piece_system(
                         )),
                         piece_health_change_event: PieceHealthChangeEvent {
                             entity: event.target,
-                            change: -(event.damage as i64),
+                            change: -event.damage,
                         },
                     },
                     TransformBundle::default(),
@@ -84,7 +91,7 @@ pub fn attack_piece_system(
                 animation_state: AttackPieceAnimationState::Attacking { forwards: true },
                 event: PieceHealthChangeEvent {
                     entity: event.target,
-                    change: -(event.damage as i64),
+                    change: -event.damage,
                 },
             };
         }
@@ -338,7 +345,7 @@ pub fn attack_from_tile(
                 attack_position,
                 player_entity,
                 enemy_entity,
-                damage.0.upgraded_value as usize,
+                damage.0.upgraded_value,
                 movement_type,
                 Some(delay),
             );

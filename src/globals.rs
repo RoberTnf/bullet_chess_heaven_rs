@@ -31,15 +31,15 @@ pub const HEALTH_CHANGE_TEXT_ANIMATION_SPEED: f32 = 15.0; // Speed of health cha
 pub const GOLD_ANIMATION_SPEED: f32 = 15.0; // Speed of gold animation
 
 // Animation durations
-pub const HEALTH_CHANGE_TEXT_ANIMATION_DURATION: f32 = 0.5; // Duration of health change text animations
+pub const HEALTH_CHANGE_TEXT_ANIMATION_DURATION: f32 = 1.5; // Duration of health change text animations
 pub const DEATH_ANIMATION_DURATION: f32 = 0.5; // Duration of death animations
 pub const ATTACK_ANIMATION_DURATION: f32 = 0.5; // Duration of attack animations
 pub const GOLD_ANIMATION_DURATION: f32 = 1.5; // Duration of gold animation
 pub const GOLD_UI_COLOR_DURATION: f32 = 0.5; // Duration of gold UI color
 
 // Player settings
-pub const PLAYER_HEALTH: usize = 5; // Health of the player
-pub const PLAYER_DAMAGE: usize = 1; // Damage of the player
+pub const PLAYER_HEALTH: f32 = 5.0; // Health of the player
+pub const PLAYER_DAMAGE: f32 = 1.0; // Damage of the player
 pub const PRIMARY_COLOR: Color = Color::srgba(94.0 / 255.0, 205.0 / 255.0, 228.0 / 255.0, 1.0);
 pub const SECONDARY_COLOR: Color = Color::srgba(0.674, 0.192, 0.192, 1.0);
 
@@ -52,8 +52,8 @@ pub const DARKER_PRIMARY_COLOR: Color = Color::srgba(
     1.0,
 );
 // Enemy settings
-pub const ENEMY_BASE_HEALTH: usize = 3; // Health of the enemy
-pub const ENEMY_BASE_DAMAGE: usize = 1; // Damage of the enemy
+pub const ENEMY_BASE_HEALTH: f32 = 3.0; // Health of the enemy
+pub const ENEMY_BASE_DAMAGE: f32 = 1.0; // Damage of the enemy
 
 // Enemy spawn settings
 pub const KING_SPAWN_TURN: usize = 15; // Turn number to spawn kings
@@ -106,3 +106,7 @@ pub const STARTING_GOLD: usize = 10000; // Starting gold
 
 // Keyboard settings
 pub const SHOP_KEY: KeyCode = KeyCode::KeyS; // Key to toggle the shop
+
+// Upgrade settings
+pub const UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER: usize = 2;
+pub const UNIQUE_UPGRADE_DAMAGE_MULTIPLIER: f32 = 1.1;
