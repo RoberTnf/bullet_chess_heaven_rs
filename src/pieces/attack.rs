@@ -29,6 +29,7 @@ use super::{
 pub struct AttackPieceEvent {
     pub destination: BoardPosition,
     pub attacker: Entity,
+    pub origin: BoardPosition,
     pub target: Entity,
     pub damage: f32,
     pub sprite_index: Option<usize>,
@@ -75,7 +76,7 @@ pub fn attack_piece_system(
                 .spawn((
                     AttackingWithNewSprite {
                         destination: event.destination,
-                        origin: *attacker_pos,
+                        origin: event.origin,
                         sprite_index,
                         animation_state: AttackPieceAnimationState::Delayed(Timer::new(
                             Duration::from_secs_f32(event.delay.unwrap_or(0.0)),
@@ -195,7 +196,8 @@ fn attacking_with_new_sprite_animation_system(
                         entity,
                         &asset_server,
                         &atlas_layout,
-                        attacking_sprite.sprite_index,
+                        &attacking_sprite,
+                        piece_transform,
                     );
                     attacking_sprite.animation_state =
                         AttackPieceAnimationState::Attacking { forwards: true };
@@ -260,17 +262,23 @@ fn spawn_attack_sprite(
     parent: Entity,
     asset_server: &Res<AssetServer>,
     atlas_layout: &Res<SpriteSheetAtlas>,
-    sprite_index: usize,
+    attacking_sprite: &AttackingWithNewSprite,
+    piece_transform: &Transform,
 ) {
+    let origin_offset =
+        attacking_sprite.origin.as_global_position() - piece_transform.translation.truncate();
     let sprite = SpriteBundle {
         texture: asset_server.load("custom/spritesheet.png"),
         // TODO: Fix invisible
-        transform: Transform::default(),
+        transform: Transform {
+            translation: origin_offset.extend(piece_transform.translation.z),
+            ..default()
+        },
         ..default()
     };
     let atlas = TextureAtlas {
         layout: atlas_layout.handle.clone(),
-        index: sprite_index,
+        index: attacking_sprite.sprite_index,
     };
     let sprite_entity = commands.spawn((sprite, atlas, AttackingSprite)).id();
     commands.entity(parent).add_child(sprite_entity);
@@ -355,6 +363,7 @@ pub fn attack_from_tile(
                 damage.0.upgraded_value,
                 movement_type,
                 Some(delay),
+                current_tile_position,
             );
             next_state.set(TurnState::PlayerAnimation);
         }

@@ -7,8 +7,8 @@ use crate::{
 };
 
 use super::{
-    common::{Piece, PieceState},
-    enemies::Enemy,
+    common::{Piece, PieceState, Team},
+    enemies::spawn::AIControlled,
     player::spawn::Player,
 };
 
@@ -81,15 +81,32 @@ pub fn move_pieces_animation(
 }
 
 pub fn all_enemies_idle(
-    mut moves: Query<&mut PieceState, With<Enemy>>,
+    mut moves: Query<(&mut PieceState, &Team), With<AIControlled>>,
     mut turn_state: ResMut<NextState<TurnState>>,
 ) {
     if moves
         .iter()
-        .all(|state| matches!(state, PieceState::AttackEnded))
+        .filter(|(_, &team)| team == Team::Enemy)
+        .all(|(state, _)| matches!(state, PieceState::AttackEnded))
     {
         turn_state.set(TurnState::EnemySpawn);
-        moves.iter_mut().for_each(|mut state| {
+        moves.iter_mut().for_each(|(mut state, _)| {
+            *state = PieceState::Idle;
+        });
+    }
+}
+
+pub fn all_player_ai_idle(
+    mut moves: Query<(&mut PieceState, &Team), With<AIControlled>>,
+    mut turn_state: ResMut<NextState<TurnState>>,
+) {
+    if moves
+        .iter()
+        .filter(|(_, &team)| team == Team::Player)
+        .all(|(state, _)| matches!(state, PieceState::AttackEnded))
+    {
+        turn_state.set(TurnState::EnemyAI);
+        moves.iter_mut().for_each(|(mut state, _)| {
             *state = PieceState::Idle;
         });
     }
@@ -103,7 +120,7 @@ pub fn is_player_idle(
         .iter()
         .all(|state| matches!(state, PieceState::AttackEnded))
     {
-        turn_state.set(TurnState::EnemyAI);
+        turn_state.set(TurnState::PlayerAI);
         moves.iter_mut().for_each(|mut state| {
             *state = PieceState::Idle;
         });

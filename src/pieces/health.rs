@@ -17,7 +17,10 @@ use super::{
     common::Team,
     player::{
         spawn::Player,
-        upgrades::stats::{Stat, StatVariant},
+        upgrades::{
+            stats::{Stat, StatVariant},
+            unique_upgrades::convert_enemy::Converted,
+        },
     },
 };
 
@@ -48,6 +51,7 @@ impl Health {
 
     pub fn take_damage(&mut self, damage: f32) {
         self.value -= damage;
+        self.value = self.value.clamp(0.0, self.max_value.upgraded_value);
         self.changes.push(-damage);
     }
 
@@ -57,9 +61,7 @@ impl Health {
 
     pub fn heal(&mut self, amount: f32) {
         self.value += amount;
-        if self.value > self.max_value.upgraded_value {
-            self.value = self.max_value.upgraded_value;
-        }
+        self.value = self.value.clamp(0.0, self.max_value.upgraded_value);
         self.changes.push(amount);
     }
 
@@ -174,7 +176,10 @@ pub fn health_change_system(
 
 // death of player is handled by game logic
 pub fn death_system(
-    health_query: Query<(&Health, Entity, &Name), (Without<DeathAnimation>, Without<Player>)>,
+    health_query: Query<
+        (&Health, Entity, &Name),
+        (Without<DeathAnimation>, Without<Player>, Without<Converted>),
+    >,
     mut commands: Commands,
     mut death_event_writer: EventWriter<PieceDeathEvent>,
 ) {

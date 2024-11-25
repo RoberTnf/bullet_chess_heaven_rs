@@ -134,6 +134,7 @@ pub fn send_attack_event(
     damage: f32,
     movement_type: &MovementType,
     delay: Option<f32>,
+    player_position: &BoardPosition,
 ) {
     debug!(
         "Clicked tile: {:?}, attacking target: {:?}, with damage: {}",
@@ -141,6 +142,7 @@ pub fn send_attack_event(
     );
     event_writer.send(AttackPieceEvent {
         destination: *tile_position,
+        origin: *player_position,
         attacker: player_entity,
         target: target_entity,
         damage,

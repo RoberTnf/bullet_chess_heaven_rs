@@ -64,7 +64,11 @@ pub fn spawn_player(
                     upgraded_value: globals::PLAYER_DAMAGE,
                 }),
                 state: PieceState::Idle,
-                upgrades: Upgrades(vec![get_movement_upgrade(&MovementType::King)]),
+                upgrades: Upgrades(vec![
+                    get_movement_upgrade(&MovementType::King),
+                    get_movement_upgrade(&MovementType::BlackPawn),
+                    get_movement_upgrade(&MovementType::WhitePawn),
+                ]),
                 team: Team::Player,
             },
             Player,

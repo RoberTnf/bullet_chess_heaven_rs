@@ -19,15 +19,10 @@ pub fn apply_side_effect(
 ) {
     for side_effect in side_effect_event.read() {
         if let SideEffect::AttackRandomTarget {
-            limited_per_turn,
             damage,
             generator_event,
         } = side_effect
         {
-            if limited_per_turn.is_some() {
-                todo!("limited_per_turn not implemented");
-            }
-
             let (_, attacker_team, _) = pieces.get(generator_event.attacker).unwrap();
             let enemies = pieces.iter().filter(|(_, &team, _)| team != *attacker_team);
             let (target_pos, _, target_entity) = enemies.choose(&mut rand::thread_rng()).unwrap();
@@ -42,6 +37,7 @@ pub fn apply_side_effect(
                 ),
                 movement_type: generator_event.movement_type.clone(),
                 delay: generator_event.delay,
+                origin: generator_event.origin,
                 with_unique_upgrade: false,
             });
         }

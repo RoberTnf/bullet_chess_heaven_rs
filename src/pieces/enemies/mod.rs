@@ -14,9 +14,6 @@ pub mod queen;
 pub mod rook;
 pub mod spawn;
 
-#[derive(Component)]
-pub struct Enemy;
-
 #[derive(Clone)]
 pub struct PieceInfo {
     pub health: f32,
@@ -41,8 +38,15 @@ impl Plugin for EnemyPlugin {
         );
         app.add_systems(
             Update,
-            ai::ai_system
+            ai::ai_system_enemy
                 .run_if(in_state(TurnState::EnemyAI))
+                .run_if(in_state(GamePauseState::Playing))
+                .run_if(in_state(GameState::Game)),
+        );
+        app.add_systems(
+            Update,
+            ai::ai_system_player
+                .run_if(in_state(TurnState::PlayerAI))
                 .run_if(in_state(GamePauseState::Playing))
                 .run_if(in_state(GameState::Game)),
         );

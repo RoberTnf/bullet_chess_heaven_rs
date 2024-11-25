@@ -15,7 +15,7 @@ pub struct BlocksMovement;
 #[derive(Component, Default)]
 pub struct Piece;
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub enum PieceState {
     Idle,
     Moving {
@@ -33,7 +33,7 @@ pub enum PieceState {
     AttackingWithNewSprite,
 }
 
-#[derive(Component, Eq, PartialEq, Copy, Clone)]
+#[derive(Component, Eq, PartialEq, Copy, Clone, Hash)]
 pub enum Team {
     Player,
     Enemy,

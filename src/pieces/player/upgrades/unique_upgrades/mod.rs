@@ -1,22 +1,35 @@
 use bevy::prelude::*;
 
 use crate::{
-    globals::{UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER, UNIQUE_UPGRADE_DAMAGE_MULTIPLIER},
-    pieces::{attack::AttackPieceEvent, movement_type::MovementType},
-    states::game_state::GameState,
+    globals::{
+        CONVERT_ENEMY_TURNS_TO_CONVERT, UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER,
+        UNIQUE_UPGRADE_DAMAGE_MULTIPLIER,
+    },
+    pieces::{attack::AttackPieceEvent, common::Team, movement_type::MovementType},
+    states::{game_state::GameState, turn_state::TurnState},
 };
 
 use super::data::Upgrades;
 mod attack_random_target;
+mod chain;
+pub mod convert_enemy;
 
 #[derive(Event)]
 pub enum SideEffect {
     AttackRandomTarget {
-        limited_per_turn: Option<usize>,
         damage: f32,
         generator_event: AttackPieceEvent,
     },
-    SpawnAlly {},
+    Chain {
+        damage: f32,
+        generator_event: AttackPieceEvent,
+    },
+    ConvertPiece {
+        turns_to_convert: usize,
+        team: Team,
+        entity: Entity,
+    },
+    Nothing,
 }
 
 pub fn apply_unique_upgrades(
@@ -30,7 +43,7 @@ pub fn apply_unique_upgrades(
             "Applying unique upgrade for movement type: {:?}, count: {}",
             attack.movement_type, count
         );
-        attack.damage += UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * count as f32;
+        attack.damage += UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * (count - 1) as f32;
 
         if count >= UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER {
             let side_effect = fetch_side_effect(attack);
@@ -41,11 +54,21 @@ pub fn apply_unique_upgrades(
 
 fn fetch_side_effect(attack: &AttackPieceEvent) -> SideEffect {
     match attack.movement_type {
-        MovementType::Knight => SideEffect::AttackRandomTarget {
-            limited_per_turn: None,
+        MovementType::Knight => SideEffect::Chain {
             damage: attack.damage,
             generator_event: attack.clone(),
         },
+        MovementType::BlackPawn => SideEffect::ConvertPiece {
+            turns_to_convert: CONVERT_ENEMY_TURNS_TO_CONVERT,
+            team: Team::Player,
+            entity: attack.target,
+        },
+        MovementType::WhitePawn => SideEffect::ConvertPiece {
+            turns_to_convert: CONVERT_ENEMY_TURNS_TO_CONVERT,
+            team: Team::Player,
+            entity: attack.target,
+        },
+        MovementType::King => SideEffect::Nothing,
         _ => todo!("Side effect for this movement type not implemented"),
     }
 }
@@ -57,9 +80,17 @@ impl Plugin for UniqueUpgradesPlugin {
         app.add_event::<SideEffect>();
         app.add_systems(
             Update,
-            attack_random_target::apply_side_effect
+            (
+                attack_random_target::apply_side_effect,
+                chain::apply_side_effect,
+                convert_enemy::apply_side_effect,
+            )
                 .run_if(in_state(GameState::Game))
-                .run_if(on_event::<AttackPieceEvent>()),
+                .run_if(on_event::<SideEffect>()),
+        );
+        app.add_systems(
+            OnEnter(TurnState::PlayerInput),
+            convert_enemy::decrement_turns_to_convert.run_if(in_state(GameState::Game)),
         );
     }
 }

@@ -33,8 +33,11 @@ use rand::prelude::*;
 
 use super::{
     pawn::{BLACK_PAWN_INFO, WHITE_PAWN_INFO},
-    Enemy, PieceInfo,
+    PieceInfo,
 };
+
+#[derive(Component)]
+pub struct AIControlled;
 
 fn get_random_piece_info(turn_info: &Res<TurnInfo>) -> PieceInfo {
     let pieces = [
@@ -74,7 +77,7 @@ fn get_random_piece_info(turn_info: &Res<TurnInfo>) -> PieceInfo {
 
 pub fn spawn_enemies(
     mut commands: Commands,
-    enemies: Query<Entity, With<Enemy>>,
+    pieces: Query<(Entity, &Team), With<Piece>>,
     asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
     piece_position_query: Query<&BoardPosition, With<Piece>>,
@@ -82,8 +85,14 @@ pub fn spawn_enemies(
     turn_info: Res<TurnInfo>,
 ) {
     debug!("Spawning enemies");
-    let num_enemies = enemies.iter().count();
-    let enemies_to_spawn = (TARGET_NUM_ENEMIES - num_enemies).clamp(0, PER_TURN_ENEMY_SPAWN_COUNT);
+
+    let num_enemies = pieces
+        .iter()
+        .filter(|(_, &team)| team == Team::Enemy)
+        .count();
+    let enemies_to_spawn = TARGET_NUM_ENEMIES
+        .saturating_sub(num_enemies)
+        .clamp(0, PER_TURN_ENEMY_SPAWN_COUNT);
     let mut occupied_positions = HashSet::from_iter(piece_position_query.iter().copied());
     let all_positions = vec![
         PositionAvailable::Top,
@@ -122,9 +131,9 @@ pub fn spawn_enemies(
                     upgrades: Upgrades(vec![get_movement_upgrade(&piece_info.movement_type)]),
                     team: Team::Enemy,
                 },
-                Enemy,
                 Name::new("Enemy"),
                 StateScoped(GameState::Game),
+                AIControlled,
                 PieceValue {
                     value: piece_info.value,
                 },

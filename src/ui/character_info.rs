@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 use crate::{
     globals::{
-        GOLD_UI_COLOR_DURATION, SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE, UI_HEADER_FONT_SIZE,
-        UI_PIECE_SPRITE_SIZE_INFO,
+        GOLD_UI_COLOR_DURATION, PRIMARY_COLOR, SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE,
+        UI_HEADER_FONT_SIZE, UI_PIECE_SPRITE_SIZE_INFO, UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER,
     },
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
@@ -168,8 +168,16 @@ fn update_movement_types_information(
         commands.entity(entity).despawn_recursive();
     }
     // Spawn all labels
-    for (movement_type, count) in movement_types.iter() {
-        let player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
+    for (movement_type, &count) in movement_types.iter() {
+        let player_sprite_index;
+        let text_color;
+        if count >= UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER {
+            player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
+            text_color = PRIMARY_COLOR;
+        } else {
+            player_sprite_index = movement_type.sprite_index();
+            text_color = Color::srgb(1.0, 1.0, 1.0);
+        };
         debug!("Spawning movement type in UI: {}", player_sprite_index);
         commands.entity(container_entity).with_children(|parent| {
             parent
@@ -206,7 +214,7 @@ fn update_movement_types_information(
                         TextStyle {
                             font_size: UI_FONT_SIZE,
                             font: asset_server.load(UI_FONT),
-                            ..default()
+                            color: text_color,
                         },
                     ),));
                 });
