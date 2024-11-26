@@ -19,7 +19,7 @@ use super::{
         spawn::Player,
         upgrades::{
             stats::{Stat, StatVariant},
-            unique_upgrades::convert_enemy::Converted,
+            unique_upgrades::immortal::Immortal,
         },
     },
 };
@@ -178,7 +178,7 @@ pub fn health_change_system(
 pub fn death_system(
     health_query: Query<
         (&Health, Entity, &Name),
-        (Without<DeathAnimation>, Without<Player>, Without<Converted>),
+        (Without<DeathAnimation>, Without<Player>, Without<Immortal>),
     >,
     mut commands: Commands,
     mut death_event_writer: EventWriter<PieceDeathEvent>,

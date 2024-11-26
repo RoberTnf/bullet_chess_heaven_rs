@@ -13,7 +13,7 @@ use super::data::Upgrades;
 mod attack_random_target;
 mod chain;
 pub mod convert_enemy;
-
+pub mod immortal;
 #[derive(Event)]
 pub enum SideEffect {
     AttackRandomTarget {
@@ -28,6 +28,9 @@ pub enum SideEffect {
         turns_to_convert: usize,
         team: Team,
         entity: Entity,
+    },
+    Pierce {
+        pierce_count: Option<usize>,
     },
     Nothing,
 }
@@ -68,6 +71,7 @@ fn fetch_side_effect(attack: &AttackPieceEvent) -> SideEffect {
             team: Team::Player,
             entity: attack.target,
         },
+        MovementType::Bishop => SideEffect::Pierce { pierce_count: None },
         MovementType::King => SideEffect::Nothing,
         _ => todo!("Side effect for this movement type not implemented"),
     }
@@ -90,7 +94,11 @@ impl Plugin for UniqueUpgradesPlugin {
         );
         app.add_systems(
             OnEnter(TurnState::PlayerInput),
-            convert_enemy::decrement_turns_to_convert.run_if(in_state(GameState::Game)),
+            (
+                convert_enemy::decrement_turns_to_convert,
+                immortal::decrement_turns_remaining,
+            )
+                .run_if(in_state(GameState::Game)),
         );
     }
 }

@@ -191,11 +191,16 @@ fn execute_ai(
                     if enables_attack {
                         0
                     } else {
-                        enemy_pieces_positions
+                        let min_distance = enemy_pieces_positions
                             .iter()
                             .map(|player_pos| pos.distance(*player_pos))
-                            .min()
-                            .unwrap()
+                            .min();
+                        if let Some(min_distance) = min_distance {
+                            min_distance
+                        } else {
+                            // if there are no enemy pieces, disregard this logic
+                            i32::MAX
+                        }
                     }
                 })
                 .expect("There should be at least one valid move");

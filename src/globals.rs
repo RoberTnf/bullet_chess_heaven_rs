@@ -110,6 +110,6 @@ pub const SHOP_KEY: KeyCode = KeyCode::KeyS; // Key to toggle the shop
 pub const REFRESH_SHOP_KEY: KeyCode = KeyCode::KeyR; // Key to refresh the shop
 
 // Upgrade settings
-pub const UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER: usize = 1;
+pub const UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER: usize = 2;
 pub const UNIQUE_UPGRADE_DAMAGE_MULTIPLIER: f32 = 0.1;
-pub const CONVERT_ENEMY_TURNS_TO_CONVERT: usize = 4;
+pub const CONVERT_ENEMY_TURNS_TO_CONVERT: usize = 3;

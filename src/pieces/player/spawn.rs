@@ -66,8 +66,13 @@ pub fn spawn_player(
                 state: PieceState::Idle,
                 upgrades: Upgrades(vec![
                     get_movement_upgrade(&MovementType::King),
+                    get_movement_upgrade(&MovementType::King),
                     get_movement_upgrade(&MovementType::BlackPawn),
                     get_movement_upgrade(&MovementType::WhitePawn),
+                    get_movement_upgrade(&MovementType::BlackPawn),
+                    get_movement_upgrade(&MovementType::WhitePawn),
+                    get_movement_upgrade(&MovementType::Knight),
+                    get_movement_upgrade(&MovementType::Knight),
                 ]),
                 team: Team::Player,
             },
