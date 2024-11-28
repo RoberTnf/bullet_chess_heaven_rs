@@ -1,4 +1,4 @@
-use bevy::{a11y::accesskit::TextAlign, prelude::*};
+use bevy::prelude::*;
 
 use crate::{
     board::highlight::HighlightCache,
@@ -17,6 +17,7 @@ use crate::{
             upgrades::{
                 data::{Effect, Upgrade, Upgrades, UPGRADES_MOVEMENT, UPGRADES_STATS},
                 stats::StatVariant,
+                unique_upgrades::limit::MovementTypeLimit,
             },
         },
     },
@@ -124,15 +125,33 @@ fn buy_upgrade(
     upgrade: Query<&Upgrade>,
     mut gold: ResMut<Gold>,
     mut refresh_event_writer: EventWriter<RefreshShop>,
-    mut player_upgrades: Query<&mut Upgrades, With<Player>>,
+    mut player_upgrades_query: Query<(&mut Upgrades, &MovementTypeLimit), With<Player>>,
     mut apply_upgrades_event_writer: EventWriter<ApplyUpgrades>,
 ) {
     for event in event_reader.read() {
         if event.function == ButtonFunction::BuyUpgrade {
             let upgrade = upgrade.get(event.entity).expect("Upgrade not found");
             if gold.amount >= upgrade.cost {
+                if let Effect::MovementType(movement_types) = &upgrade.effect {
+                    let (player_upgrades, player_limit) = player_upgrades_query
+                        .get_single()
+                        .expect("Player upgrades not found");
+                    let movement_types_set = player_upgrades.get_movement_types_set();
+                    if !movement_types_set
+                        .contains(movement_types.get(0).expect("Movement type not found"))
+                    {
+                        let limit = player_limit.limit;
+                        let current_count = movement_types_set.len();
+                        println!("{:?} {:?} {:?}", limit, current_count, movement_types_set);
+                        if current_count >= limit {
+                            debug!("Player already has the maximum number of movement types");
+                            return;
+                        }
+                    }
+                }
                 gold.amount -= upgrade.cost;
-                player_upgrades.single_mut().0.push(upgrade.clone());
+                let (mut player_upgrades, _) = player_upgrades_query.single_mut();
+                player_upgrades.0.push(upgrade.clone());
                 debug!("Bought upgrade: {}", upgrade.display_name);
                 refresh_event_writer.send(RefreshShop { cost: 0 });
                 apply_upgrades_event_writer.send(ApplyUpgrades(upgrade.clone()));
@@ -146,7 +165,7 @@ fn buy_upgrade(
 fn update_shop_description(
     mut hover_event_reader: EventReader<ButtonHoverEvent>,
     mut description_ui: Query<&mut Text, With<ShopDescriptionUI>>,
-    upgrade: Query<&Upgrade>,
+    upgrade_query: Query<&Upgrade>,
     asset_server: Res<AssetServer>,
 ) {
     let font = asset_server.load(UI_FONT);
@@ -155,20 +174,24 @@ fn update_shop_description(
             let mut description_ui = description_ui
                 .get_single_mut()
                 .expect("Description UI not found");
-            let upgrade = upgrade.get(event.entity).expect("Upgrade not found");
-            description_ui.sections = upgrade
-                .description
-                .sections
-                .iter()
-                .map(|s| {
-                    let mut section = s.clone();
-                    section.style = TextStyle {
-                        font: font.clone(),
-                        ..section.style
-                    };
-                    section
-                })
-                .collect();
+            // I never figured out why sometimes the entity is not found,
+            // but given that it is not critical to the game, I will just
+            // ignore the error
+            if let Ok(upgrade) = upgrade_query.get(event.entity) {
+                description_ui.sections = upgrade
+                    .description
+                    .sections
+                    .iter()
+                    .map(|s| {
+                        let mut section = s.clone();
+                        section.style = TextStyle {
+                            font: font.clone(),
+                            ..section.style
+                        };
+                        section
+                    })
+                    .collect();
+            }
         }
     }
 }
@@ -178,6 +201,7 @@ fn apply_upgrades(
     mut event_reader: EventReader<ApplyUpgrades>,
     mut highlight_cache: ResMut<HighlightCache>,
 ) {
+    debug!("Applying upgrades");
     for upgrade in event_reader.read() {
         let (upgrades, mut health, mut attack) = player.single_mut();
         match &upgrade.0.effect {
@@ -216,6 +240,7 @@ fn update_shop_system(
     }
 
     for event in refresh_event.read() {
+        debug!("Refreshing shop");
         if gold.amount >= event.cost {
             gold.amount -= event.cost;
             update_shop(&mut shop_upgrades);
@@ -424,9 +449,9 @@ impl Plugin for ShopPlugin {
         app.add_systems(
             Update,
             (
+                buy_upgrade.run_if(on_event::<ButtonPressedEvent>()),
                 update_shop_system,
                 display_shop,
-                buy_upgrade.run_if(on_event::<ButtonPressedEvent>()),
                 update_shop_description.run_if(on_event::<ButtonHoverEvent>()),
             )
                 .run_if(in_state(GameState::Game))

@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use limit::apply_movement_type_limit;
 
 use crate::{
     globals::{
@@ -7,6 +8,7 @@ use crate::{
     },
     pieces::{attack::AttackPieceEvent, common::Team, movement_type::MovementType},
     states::{game_state::GameState, turn_state::TurnState},
+    ui::shop::ApplyUpgrades,
 };
 
 use super::data::Upgrades;
@@ -15,6 +17,7 @@ pub mod block;
 mod chain;
 pub mod convert_enemy;
 pub mod immortal;
+pub mod limit;
 mod pierce;
 
 #[derive(Event)]
@@ -118,6 +121,12 @@ impl Plugin for UniqueUpgradesPlugin {
                 immortal::decrement_turns_remaining,
             )
                 .run_if(in_state(GameState::Game)),
+        );
+        app.add_systems(
+            Update,
+            apply_movement_type_limit
+                .run_if(in_state(GameState::Game))
+                .run_if(on_event::<ApplyUpgrades>()),
         );
     }
 }
