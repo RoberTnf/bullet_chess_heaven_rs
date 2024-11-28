@@ -55,7 +55,7 @@ pub fn apply_side_effect(
                     let d2 = get_direction(generator_event.destination, generator_event.origin);
                     d1 == d2
                 })
-                .map(|target| *target)
+                .copied()
                 .collect();
 
             for target in valid_targets {

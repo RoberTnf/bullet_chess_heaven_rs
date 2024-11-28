@@ -17,7 +17,7 @@ pub fn apply_side_effect(
     for event in side_effect_event.read() {
         if let SideEffect::Block { amount, entity } = event {
             // ensure the entity is a piece
-            if let Ok(_) = pieces.get(*entity) {
+            if pieces.get(*entity).is_ok() {
                 commands.entity(*entity).insert(Block { amount: *amount });
             }
         }

@@ -138,7 +138,7 @@ fn buy_upgrade(
                         .expect("Player upgrades not found");
                     let movement_types_set = player_upgrades.get_movement_types_set();
                     if !movement_types_set
-                        .contains(movement_types.get(0).expect("Movement type not found"))
+                        .contains(movement_types.first().expect("Movement type not found"))
                     {
                         let limit = player_limit.limit;
                         let current_count = movement_types_set.len();

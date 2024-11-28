@@ -488,7 +488,7 @@ pub static UPGRADES_STATS: Lazy<Vec<Upgrade>> = Lazy::new(|| {
                     },
                 },
                 TextSection {
-                    value: format!(" by {}.", 10).into(),
+                    value: format!(" by {}.", 10),
                     style: TextStyle {
                         font_size: UI_FONT_SIZE,
                         ..default()
