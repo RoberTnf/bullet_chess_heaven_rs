@@ -19,7 +19,7 @@ use super::{
         spawn::Player,
         upgrades::{
             stats::{Stat, StatVariant},
-            unique_upgrades::immortal::Immortal,
+            unique_upgrades::{block::Block, immortal::Immortal},
         },
     },
 };
@@ -117,6 +117,8 @@ pub fn spawn_health_change_text(
                 } else {
                     PRIMARY_COLOR
                 }
+            } else if *change == 0.0 {
+                Color::srgba(0.7, 0.7, 0.7, 1.0)
             } else if *team == Team::Player {
                 Color::srgba(0.0, 1.0, 0.0, 1.0)
             } else {
@@ -161,14 +163,19 @@ pub fn spawn_health_change_text(
 
 pub fn health_change_system(
     mut health_change_event_reader: EventReader<PieceHealthChangeEvent>,
-    mut health_query: Query<&mut Health>,
+    mut health_query: Query<(&mut Health, &mut Block)>,
 ) {
     for event in health_change_event_reader.read() {
         if event.change < 0.0 {
-            if let Ok(mut health) = health_query.get_mut(event.entity) {
+            if let Ok((mut health, mut block)) = health_query.get_mut(event.entity) {
+                if block.amount > 0 {
+                    block.amount -= 1;
+                    health.take_damage(0.0);
+                    return;
+                }
                 health.take_damage(-event.change);
             }
-        } else if let Ok(mut health) = health_query.get_mut(event.entity) {
+        } else if let Ok((mut health, _)) = health_query.get_mut(event.entity) {
             health.heal(event.change);
         }
     }

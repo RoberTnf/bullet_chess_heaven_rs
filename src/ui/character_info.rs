@@ -7,9 +7,15 @@ use crate::{
     },
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
+        damage::Attack,
         health::Health,
         movement_type::MovementType,
-        player::{experience::PlayerLevel, gold::Gold, spawn::Player, upgrades::data::Upgrades},
+        player::{
+            experience::PlayerLevel,
+            gold::Gold,
+            spawn::Player,
+            upgrades::{data::Upgrades, unique_upgrades::block::Block},
+        },
     },
     states::game_state::GameState,
     utils::math::lerp,
@@ -22,6 +28,9 @@ struct CharacterInfoNode;
 
 #[derive(Component)]
 struct HealthUILabel;
+
+#[derive(Component)]
+struct AttackUILabel;
 
 #[derive(Component)]
 struct MovementTypesUIContainer;
@@ -93,15 +102,26 @@ pub fn setup_character_info(
                         ));
                         parent.spawn((
                             TextBundle::from_section(
-                                "LevelPlaceholder",
+                                "AttackPlaceholder",
                                 TextStyle {
                                     font_size: UI_FONT_SIZE,
                                     font: asset_server.load(UI_FONT),
                                     ..default()
                                 },
                             ),
-                            LevelUILabel,
+                            AttackUILabel,
                         ));
+                        // parent.spawn((
+                        //     TextBundle::from_section(
+                        //         "LevelPlaceholder",
+                        //         TextStyle {
+                        //             font_size: UI_FONT_SIZE,
+                        //             font: asset_server.load(UI_FONT),
+                        //             ..default()
+                        //         },
+                        //     ),
+                        //     LevelUILabel,
+                        // ));
                         parent.spawn((
                             TextBundle::from_section(
                                 "ExpPlaceholder",
@@ -223,15 +243,31 @@ fn update_movement_types_information(
 }
 
 fn update_health_information(
-    health: Query<&Health, With<Player>>,
+    health: Query<(&Health, &Block), With<Player>>,
     mut query: Query<&mut Text, With<HealthUILabel>>,
 ) {
     let mut text = query.get_single_mut().unwrap();
-    let health = health.single();
+    let (health, block) = health.single();
+
     text.sections[0].value = format!(
         "Health: {} / {}",
         health.value, health.max_value.upgraded_value
     );
+    if block.amount > 0 {
+        text.sections[0].value = format!(
+            "Health: {} / {}\nBlock({})",
+            health.value, health.max_value.upgraded_value, block.amount
+        );
+    }
+}
+
+fn update_attack_information(
+    mut query: Query<&mut Text, With<AttackUILabel>>,
+    attack: Query<&Attack, With<Player>>,
+) {
+    let mut text = query.get_single_mut().unwrap();
+    let attack = attack.single();
+    text.sections[0].value = format!("Attack: {}", attack.0.upgraded_value);
 }
 
 fn update_level_information(
@@ -284,7 +320,8 @@ impl Plugin for CharacterInfoPlugin {
             (
                 update_health_information,
                 update_movement_types_information.run_if(on_event::<ApplyUpgrades>()),
-                update_level_information,
+                update_attack_information.run_if(on_event::<ApplyUpgrades>()),
+                // update_level_information,
                 update_gold_information,
             )
                 .run_if(in_state(GameState::Game)),

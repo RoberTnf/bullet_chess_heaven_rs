@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{a11y::accesskit::TextAlign, prelude::*};
 
 use crate::{
     board::highlight::HighlightCache,
@@ -25,7 +25,7 @@ use crate::{
 };
 
 use super::{
-    button::{ButtonFunction, ButtonPressedEvent},
+    button::{ButtonFunction, ButtonHoverEvent, ButtonPressedEvent},
     right_side::get_shop_button,
     RootUINode,
 };
@@ -143,6 +143,36 @@ fn buy_upgrade(
     }
 }
 
+fn update_shop_description(
+    mut hover_event_reader: EventReader<ButtonHoverEvent>,
+    mut description_ui: Query<&mut Text, With<ShopDescriptionUI>>,
+    upgrade: Query<&Upgrade>,
+    asset_server: Res<AssetServer>,
+) {
+    let font = asset_server.load(UI_FONT);
+    for event in hover_event_reader.read() {
+        if event.function == ButtonFunction::BuyUpgrade {
+            let mut description_ui = description_ui
+                .get_single_mut()
+                .expect("Description UI not found");
+            let upgrade = upgrade.get(event.entity).expect("Upgrade not found");
+            description_ui.sections = upgrade
+                .description
+                .sections
+                .iter()
+                .map(|s| {
+                    let mut section = s.clone();
+                    section.style = TextStyle {
+                        font: font.clone(),
+                        ..section.style
+                    };
+                    section
+                })
+                .collect();
+        }
+    }
+}
+
 fn apply_upgrades(
     mut player: Query<(&Upgrades, &mut Health, &mut Attack), With<Player>>,
     mut event_reader: EventReader<ApplyUpgrades>,
@@ -199,6 +229,9 @@ struct RefreshShopUI;
 #[derive(Component)]
 pub struct ShopUpgradeUI;
 
+#[derive(Component)]
+struct ShopDescriptionUI;
+
 fn display_shop(
     shop_upgrades: Res<ShopUpgrades>,
     mut commands: Commands,
@@ -238,6 +271,9 @@ fn display_shop(
                             flex_direction: FlexDirection::Column,
                             width: Val::Percent(100.0),
                             align_items: AlignItems::Center,
+                            row_gap: Val::Px(4.0),
+                            justify_content: JustifyContent::Center,
+                            align_content: AlignContent::Center,
                             padding: UiRect::all(Val::Px(4.0)),
                             border: UiRect::all(Val::Px(1.0)),
                             ..default()
@@ -250,14 +286,17 @@ fn display_shop(
                     upgrade.clone(),
                 ))
                 .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        upgrade.display_name.clone(),
-                        TextStyle {
-                            font_size: UI_FONT_SIZE,
-                            font: asset_server.load(UI_FONT),
-                            ..default()
-                        },
-                    ));
+                    parent.spawn(
+                        TextBundle::from_section(
+                            upgrade.display_name.clone(),
+                            TextStyle {
+                                font_size: UI_FONT_SIZE,
+                                font: asset_server.load(UI_FONT),
+                                ..default()
+                            },
+                        )
+                        .with_text_justify(JustifyText::Center),
+                    );
                     parent.spawn(TextBundle::from_section(
                         format!("${}", upgrade.cost),
                         TextStyle {
@@ -287,6 +326,35 @@ fn display_shop(
                 .entity(upgrades_container)
                 .add_child(shop_upgrade_ui);
         }
+        let description_box = commands
+            .spawn((
+                NodeBundle {
+                    style: Style {
+                        padding: UiRect::all(Val::Px(4.0)),
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        ..default()
+                    },
+                    background_color: BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
+                    ..default()
+                },
+                ShopUpgradeUI,
+            ))
+            .with_children(|parent| {
+                parent.spawn((
+                    TextBundle::from_section(
+                        "",
+                        TextStyle {
+                            font_size: UI_FONT_SIZE,
+                            font: asset_server.load(UI_FONT),
+                            ..default()
+                        },
+                    ),
+                    ShopDescriptionUI,
+                ));
+            })
+            .id();
+        commands.entity(shop_node).add_child(description_box);
         let refresh_button = commands
             .spawn((
                 ButtonBundle {
@@ -355,7 +423,12 @@ impl Plugin for ShopPlugin {
         );
         app.add_systems(
             Update,
-            (update_shop_system, display_shop, buy_upgrade)
+            (
+                update_shop_system,
+                display_shop,
+                buy_upgrade.run_if(on_event::<ButtonPressedEvent>()),
+                update_shop_description.run_if(on_event::<ButtonHoverEvent>()),
+            )
                 .run_if(in_state(GameState::Game))
                 .run_if(in_state(ShopState::Open)),
         );

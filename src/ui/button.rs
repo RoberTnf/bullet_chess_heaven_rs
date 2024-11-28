@@ -15,6 +15,12 @@ pub struct ButtonPressedEvent {
     pub entity: Entity,
 }
 
+#[derive(Event, Clone)]
+pub struct ButtonHoverEvent {
+    pub entity: Entity,
+    pub function: ButtonFunction,
+}
+
 #[derive(Component, Clone, Eq, PartialEq)]
 pub enum ButtonFunction {
     RestartGame,
@@ -35,6 +41,7 @@ pub fn button_system(
         (Changed<Interaction>, With<Button>),
     >,
     mut event_writer: EventWriter<ButtonPressedEvent>,
+    mut hover_event_writer: EventWriter<ButtonHoverEvent>,
 ) {
     for (interaction, mut color, mut border_color, button_function, entity) in
         &mut interaction_query
@@ -43,6 +50,10 @@ pub fn button_system(
             Interaction::Hovered => {
                 *color = PRIMARY_COLOR_GRAYED_BRIGHTER.into();
                 border_color.0 = SECONDARY_COLOR;
+                hover_event_writer.send(ButtonHoverEvent {
+                    function: button_function.clone(),
+                    entity,
+                });
             }
             Interaction::Pressed => {
                 event_writer.send(ButtonPressedEvent {
@@ -85,5 +96,6 @@ impl Plugin for ButtonPlugin {
         app.add_systems(Update, button_system);
         app.add_systems(Update, handle_button_pressed);
         app.add_event::<ButtonPressedEvent>();
+        app.add_event::<ButtonHoverEvent>();
     }
 }

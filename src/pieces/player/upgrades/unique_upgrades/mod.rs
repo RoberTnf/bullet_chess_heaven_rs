@@ -11,9 +11,12 @@ use crate::{
 
 use super::data::Upgrades;
 mod attack_random_target;
+pub mod block;
 mod chain;
 pub mod convert_enemy;
 pub mod immortal;
+mod pierce;
+
 #[derive(Event)]
 pub enum SideEffect {
     AttackRandomTarget {
@@ -31,6 +34,12 @@ pub enum SideEffect {
     },
     Pierce {
         pierce_count: Option<usize>,
+        damage: f32,
+        generator_event: AttackPieceEvent,
+    },
+    Block {
+        amount: usize,
+        entity: Entity,
     },
     Nothing,
 }
@@ -71,7 +80,15 @@ fn fetch_side_effect(attack: &AttackPieceEvent) -> SideEffect {
             team: Team::Player,
             entity: attack.target,
         },
-        MovementType::Bishop => SideEffect::Pierce { pierce_count: None },
+        MovementType::Bishop => SideEffect::Pierce {
+            pierce_count: None,
+            damage: attack.damage,
+            generator_event: attack.clone(),
+        },
+        MovementType::Rook => SideEffect::Block {
+            amount: 1,
+            entity: attack.attacker,
+        },
         MovementType::King => SideEffect::Nothing,
         _ => todo!("Side effect for this movement type not implemented"),
     }
@@ -87,7 +104,9 @@ impl Plugin for UniqueUpgradesPlugin {
             (
                 attack_random_target::apply_side_effect,
                 chain::apply_side_effect,
+                pierce::apply_side_effect,
                 convert_enemy::apply_side_effect,
+                block::apply_side_effect,
             )
                 .run_if(in_state(GameState::Game))
                 .run_if(on_event::<SideEffect>()),

@@ -20,6 +20,7 @@ use crate::{
             upgrades::{
                 data::{get_movement_upgrade, Upgrades},
                 stats::{Stat, StatVariant},
+                unique_upgrades::block::Block,
             },
         },
     },
@@ -130,6 +131,7 @@ pub fn spawn_enemies(
                     state: PieceState::Idle,
                     upgrades: Upgrades(vec![get_movement_upgrade(&piece_info.movement_type)]),
                     team: Team::Enemy,
+                    block: Block { amount: 0 },
                 },
                 Name::new("Enemy"),
                 StateScoped(GameState::Game),

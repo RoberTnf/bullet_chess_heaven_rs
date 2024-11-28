@@ -8,7 +8,7 @@ use crate::{
         movement_type::MovementType,
         player::{
             experience::PieceValue,
-            upgrades::data::{get_movement_upgrade, Upgrades},
+            upgrades::data::{get_movement_upgrade, Effect, Upgrades},
         },
     },
 };
@@ -37,7 +37,7 @@ pub fn promotion_system(
                     .0
                     .iter()
                     .map(|u| {
-                        if *u == get_movement_upgrade(&MovementType::WhitePawn) {
+                        if u.effect == Effect::MovementType(vec![MovementType::WhitePawn]) {
                             get_movement_upgrade(&MovementType::King)
                         } else {
                             u.clone()
@@ -56,7 +56,7 @@ pub fn promotion_system(
                     .0
                     .iter()
                     .map(|u| {
-                        if *u == get_movement_upgrade(&MovementType::BlackPawn) {
+                        if u.effect == Effect::MovementType(vec![MovementType::BlackPawn]) {
                             get_movement_upgrade(&MovementType::King)
                         } else {
                             u.clone()

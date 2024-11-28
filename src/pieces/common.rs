@@ -6,7 +6,7 @@ use super::{
     attack::AttackPieceAnimationState,
     damage::Attack,
     health::{Health, PieceHealthChangeEvent},
-    player::upgrades::data::Upgrades,
+    player::upgrades::{data::Upgrades, unique_upgrades::block::Block},
 };
 
 #[derive(Component, Default)]
@@ -52,4 +52,5 @@ pub struct PieceBundle {
     pub state: PieceState,
     pub upgrades: Upgrades,
     pub team: Team,
+    pub block: Block,
 }
