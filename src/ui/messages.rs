@@ -1,28 +1,13 @@
-use std::time::Duration;
-
 use bevy::prelude::*;
 
-use crate::{
-    globals::{UI_FONT, UI_FONT_SIZE},
-    ui::button::ButtonFunction,
-};
+use crate::{globals::UI_FONT_SIZE, ui::button::ButtonFunction};
 
-use super::{button::ButtonPressedEvent, setup_ui, LeftUINode, RootUINode};
+use super::{button::ButtonPressedEvent, setup_ui, LeftUINode};
 
-#[derive(Event, Debug)]
+#[derive(Event, Debug, Default)]
 pub struct MessageEvent {
     pub message: String,
     pub timer: Option<Timer>,
-}
-
-impl Default for MessageEvent {
-    fn default() -> Self {
-        Self {
-            message: String::new(),
-            timer: None,
-            // timer: Some(Timer::new(Duration::from_secs(3), TimerMode::Once)),
-        }
-    }
 }
 
 #[derive(Component)]

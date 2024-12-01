@@ -65,12 +65,15 @@ pub fn setup_character_info(
     let root_node = query.single();
     commands.entity(root_node).with_children(|parent| {
         parent
-            .spawn(Node {
-                padding: UiRect::all(Val::Px(8.0)),
-                row_gap: Val::Px(2.0),
-                flex_direction: FlexDirection::Column,
-                ..default()
-            })
+            .spawn((
+                Node {
+                    padding: UiRect::all(Val::Px(8.0)),
+                    row_gap: Val::Px(2.0),
+                    flex_direction: FlexDirection::Column,
+                    ..default()
+                },
+                BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
+            ))
             .with_children(|parent| {
                 parent
                     .spawn((

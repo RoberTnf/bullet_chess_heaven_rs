@@ -14,6 +14,7 @@ pub static WHITE_ROOK_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: globals::ROOK_SPAWN_WEIGHT,
     spawn_turn: globals::ROOK_SPAWN_TURN,
     value: 5,
+    name: "Rook".to_string(),
 });
 
 pub static BLACK_ROOK_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
@@ -24,4 +25,5 @@ pub static BLACK_ROOK_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: globals::ROOK_SPAWN_WEIGHT,
     spawn_turn: globals::ROOK_SPAWN_TURN,
     value: 5,
+    name: "Rook".to_string(),
 });

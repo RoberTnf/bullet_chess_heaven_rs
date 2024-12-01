@@ -14,6 +14,7 @@ pub static WHITE_QUEEN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: globals::QUEEN_SPAWN_WEIGHT,
     spawn_turn: globals::QUEEN_SPAWN_TURN,
     value: 9,
+    name: "Queen".to_string(),
 });
 
 pub static BLACK_QUEEN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
@@ -24,4 +25,5 @@ pub static BLACK_QUEEN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: globals::QUEEN_SPAWN_WEIGHT,
     spawn_turn: globals::QUEEN_SPAWN_TURN,
     value: 9,
+    name: "Queen".to_string(),
 });

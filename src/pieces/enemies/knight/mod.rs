@@ -14,6 +14,7 @@ pub static WHITE_KNIGHT_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: globals::KNIGHT_SPAWN_WEIGHT,
     spawn_turn: globals::KNIGHT_SPAWN_TURN,
     value: 3,
+    name: "Knight".to_string(),
 });
 
 pub static BLACK_KNIGHT_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
@@ -24,4 +25,5 @@ pub static BLACK_KNIGHT_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: globals::KNIGHT_SPAWN_WEIGHT,
     spawn_turn: globals::KNIGHT_SPAWN_TURN,
     value: 3,
+    name: "Knight".to_string(),
 });

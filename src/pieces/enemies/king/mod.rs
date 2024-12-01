@@ -14,6 +14,7 @@ pub static WHITE_KING_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: KING_SPAWN_WEIGHT,
     spawn_turn: KING_SPAWN_TURN,
     value: 3,
+    name: "King".to_string(),
 });
 
 pub static BLACK_KING_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
@@ -24,4 +25,5 @@ pub static BLACK_KING_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: KING_SPAWN_WEIGHT,
     spawn_turn: KING_SPAWN_TURN,
     value: 3,
+    name: "King".to_string(),
 });

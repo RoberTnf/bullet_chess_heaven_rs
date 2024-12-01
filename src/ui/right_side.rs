@@ -25,6 +25,9 @@ impl Plugin for RightSidePlugin {
     }
 }
 
+#[derive(Component)]
+pub struct HoverInfoNode;
+
 pub fn setup_right_side(
     mut commands: Commands,
     right_side_node: Query<Entity, With<RightUINode>>,
@@ -45,6 +48,21 @@ pub fn setup_right_side(
     commands.entity(right_side_node).add_child(buttons_node);
     let shop_button = get_shop_button(&mut commands, &asset_server, "Shop (S)");
     commands.entity(buttons_node).add_child(shop_button);
+
+    let hover_info_node = commands
+        .spawn((
+            Node {
+                padding: UiRect::all(Val::Px(8.0)),
+                row_gap: Val::Px(2.0),
+                flex_direction: FlexDirection::Column,
+                ..default()
+            },
+            BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
+            HoverInfoNode,
+        ))
+        .id();
+
+    commands.entity(right_side_node).add_child(hover_info_node);
 
     let restart_button = commands
         .spawn((

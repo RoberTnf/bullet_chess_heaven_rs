@@ -85,7 +85,7 @@ pub const BLANK_SPRITE_INDEX: usize = SPRITESHEET_WIDTH * SPRITESHEET_HEIGHT - 1
 
 // UI Settings
 const UI_FONT_SCALE: f32 = 3.0;
-pub const UI_FONT_SIZE: f32 = 12.0 * UI_FONT_SCALE; // Font size for UI elements
+pub const UI_FONT_SIZE: f32 = 10.0 * UI_FONT_SCALE; // Font size for UI elements
 pub const UI_FONT: &str = "fonts/monogram/ttf/monogram-extended.ttf"; // Font for UI elements
 pub const UI_HEADER_FONT_SIZE: f32 = 18.0 * UI_FONT_SCALE; // Font size for UI headers
 pub const DEFEAT_HEADER_FONT_SIZE: f32 = 64.0 * UI_FONT_SCALE; // Font size for defeat text

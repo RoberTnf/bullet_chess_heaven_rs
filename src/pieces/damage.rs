@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::player::upgrades::stats::{Stat, StatVariant};
 
-#[derive(Component, Default)]
+#[derive(Component, Default, Debug)]
 pub struct Attack(pub Stat);
 
 impl Attack {

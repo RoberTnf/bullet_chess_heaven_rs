@@ -5,6 +5,7 @@ use character_info::CharacterInfoPlugin;
 use debug::DebugPlugin;
 use defeat::DefeatPlugin;
 use game_info::GameInfoPlugin;
+use hover_info::HoverInfoPlugin;
 use messages::MessagesPlugin;
 use right_side::RightSidePlugin;
 use shop::ShopPlugin;
@@ -17,6 +18,7 @@ pub mod messages;
 mod right_side;
 pub mod shop;
 use crate::states::turn_state::TurnInfo;
+mod hover_info;
 
 fn display_turn_information(turn_info: Res<TurnInfo>) {
     println!("Turn: {}", turn_info.number);
@@ -78,7 +80,8 @@ impl Plugin for UiPlugin {
             .add_plugins(ButtonPlugin)
             .add_plugins(ShopPlugin)
             .add_plugins(RightSidePlugin)
-            .add_plugins(MessagesPlugin);
+            .add_plugins(MessagesPlugin)
+            .add_plugins(HoverInfoPlugin);
 
         #[cfg(debug_assertions)]
         app.add_plugins(DebugPlugin);

@@ -7,7 +7,7 @@ pub enum StatVariant {
     Attack,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Stat {
     pub base_value: f32,
     pub stat_variant: StatVariant,

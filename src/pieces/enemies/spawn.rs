@@ -120,7 +120,7 @@ pub fn spawn_enemies(
                 Attack::new(piece_info.damage),
                 Upgrades(vec![get_movement_upgrade(&piece_info.movement_type)]),
                 Team::Enemy,
-                Name::new("Enemy"),
+                Name::new(piece_info.name),
                 StateScoped(GameState::Game),
                 AIControlled,
                 PieceValue {

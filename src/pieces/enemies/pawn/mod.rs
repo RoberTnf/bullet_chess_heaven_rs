@@ -12,6 +12,7 @@ pub static WHITE_PAWN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: globals::PAWN_SPAWN_WEIGHT,
     spawn_turn: 1,
     value: 1,
+    name: "White Pawn".to_string(),
 });
 
 pub static BLACK_PAWN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
@@ -22,4 +23,5 @@ pub static BLACK_PAWN_INFO: Lazy<PieceInfo> = Lazy::new(|| PieceInfo {
     spawn_weight: globals::PAWN_SPAWN_WEIGHT,
     spawn_turn: 1,
     value: 1,
+    name: "Black Pawn".to_string(),
 });

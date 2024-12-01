@@ -23,6 +23,7 @@ pub struct PieceInfo {
     pub spawn_weight: f32,
     pub spawn_turn: usize,
     pub value: usize,
+    pub name: String,
 }
 
 pub struct EnemyPlugin;
