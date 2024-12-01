@@ -27,6 +27,7 @@ use crate::{
 
 use super::{
     button::{ButtonFunction, ButtonHoverEvent, ButtonPressedEvent},
+    messages::MessageEvent,
     right_side::get_shop_button,
     RootUINode,
 };
@@ -124,6 +125,7 @@ fn buy_upgrade(
     mut refresh_event_writer: EventWriter<RefreshShop>,
     mut player_upgrades_query: Query<(&mut Upgrades, &MovementTypeLimit), With<Player>>,
     mut apply_upgrades_event_writer: EventWriter<ApplyUpgrades>,
+    mut message_event_writer: EventWriter<MessageEvent>,
 ) {
     for event in event_reader.read() {
         if event.function == ButtonFunction::BuyUpgrade {
@@ -141,7 +143,10 @@ fn buy_upgrade(
                         let current_count = movement_types_set.len();
                         println!("{:?} {:?} {:?}", limit, current_count, movement_types_set);
                         if current_count >= limit {
-                            debug!("Player already has the maximum number of movement types");
+                            message_event_writer.send(MessageEvent {
+                                message: "You already have the maximum number of movement types. Upgrade your existing movement types to unlock new ones.".to_string(),
+                                ..default()
+                            });
                             return;
                         }
                     }
@@ -149,11 +154,13 @@ fn buy_upgrade(
                 gold.amount -= upgrade.cost;
                 let (mut player_upgrades, _) = player_upgrades_query.single_mut();
                 player_upgrades.0.push(upgrade.clone());
-                debug!("Bought upgrade: {}", upgrade.display_name);
                 refresh_event_writer.send(RefreshShop { cost: 0 });
                 apply_upgrades_event_writer.send(ApplyUpgrades(upgrade.clone()));
             } else {
-                debug!("Not enough gold to buy upgrade: {}", upgrade.display_name);
+                message_event_writer.send(MessageEvent {
+                    message: "Not enough gold to buy upgrade.".to_string(),
+                    ..default()
+                });
             }
         }
     }

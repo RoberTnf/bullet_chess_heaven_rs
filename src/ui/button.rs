@@ -27,6 +27,7 @@ pub enum ButtonFunction {
     BuyUpgrade,
     RefreshShop,
     ShowShop,
+    CloseMessage,
 }
 
 pub fn button_system(

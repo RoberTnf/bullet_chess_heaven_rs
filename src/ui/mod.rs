@@ -5,6 +5,7 @@ use character_info::CharacterInfoPlugin;
 use debug::DebugPlugin;
 use defeat::DefeatPlugin;
 use game_info::GameInfoPlugin;
+use messages::MessagesPlugin;
 use right_side::RightSidePlugin;
 use shop::ShopPlugin;
 mod button;
@@ -12,6 +13,7 @@ mod character_info;
 mod debug;
 mod defeat;
 mod game_info;
+pub mod messages;
 mod right_side;
 pub mod shop;
 use crate::states::turn_state::TurnInfo;
@@ -75,7 +77,8 @@ impl Plugin for UiPlugin {
             .add_plugins(DefeatPlugin)
             .add_plugins(ButtonPlugin)
             .add_plugins(ShopPlugin)
-            .add_plugins(RightSidePlugin);
+            .add_plugins(RightSidePlugin)
+            .add_plugins(MessagesPlugin);
 
         #[cfg(debug_assertions)]
         app.add_plugins(DebugPlugin);
