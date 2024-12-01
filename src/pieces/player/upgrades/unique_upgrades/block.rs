@@ -4,7 +4,7 @@ use crate::pieces::common::Piece;
 
 use super::SideEffect;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Block {
     pub amount: usize,
 }

@@ -1,11 +1,13 @@
 use super::data::{Effect, Upgrades};
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Default)]
 pub enum StatVariant {
+    #[default]
     MaxHealth,
     Attack,
 }
 
+#[derive(Default)]
 pub struct Stat {
     pub base_value: f32,
     pub stat_variant: StatVariant,

@@ -5,7 +5,7 @@ use rand::prelude::*;
 
 use crate::globals::{self, BOARD_SIZE};
 
-#[derive(Component, PartialEq, Eq, Hash, Copy, Clone, Debug)]
+#[derive(Component, PartialEq, Eq, Hash, Copy, Clone, Debug, Default)]
 pub struct BoardPosition {
     pub x: i32,
     pub y: i32,

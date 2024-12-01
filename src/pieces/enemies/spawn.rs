@@ -3,7 +3,7 @@ use crate::{
     globals::{ENEMY_Z_INDEX, PER_TURN_ENEMY_SPAWN_COUNT, TARGET_NUM_ENEMIES},
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
-        common::{BlocksMovement, Piece, PieceBundle, PieceState, Team},
+        common::{Piece, Team},
         damage::Attack,
         enemies::{
             bishop::{BLACK_BISHOP_INFO, WHITE_BISHOP_INFO},
@@ -17,11 +17,7 @@ use crate::{
         movement_type::MovementType,
         player::{
             experience::PieceValue,
-            upgrades::{
-                data::{get_movement_upgrade, Upgrades},
-                stats::{Stat, StatVariant},
-                unique_upgrades::block::Block,
-            },
+            upgrades::data::{get_movement_upgrade, Upgrades},
         },
     },
     states::{
@@ -109,30 +105,21 @@ pub fn spawn_enemies(
         let global_position = tile_pos.as_global_position().extend(ENEMY_Z_INDEX);
         let enemy = commands
             .spawn((
-                PieceBundle {
-                    sprite: Sprite {
-                        image: asset_server.load("custom/spritesheet.png"),
-                        texture_atlas: Some(TextureAtlas {
-                            layout: atlas_layout.handle.clone(),
-                            index: piece_info.sprite_index,
-                        }),
-                        ..default()
-                    },
-                    transform: Transform::from_translation(global_position),
-                    blocks_movement: BlocksMovement,
-                    creature: Piece,
-                    board_position: tile_pos,
-                    health: Health::new(piece_info.health),
-                    damage: Attack(Stat {
-                        base_value: piece_info.damage as f32,
-                        stat_variant: StatVariant::Attack,
-                        upgraded_value: piece_info.damage as f32,
+                Piece,
+                Sprite {
+                    image: asset_server.load("custom/spritesheet.png"),
+                    texture_atlas: Some(TextureAtlas {
+                        layout: atlas_layout.handle.clone(),
+                        index: piece_info.sprite_index,
                     }),
-                    state: PieceState::Idle,
-                    upgrades: Upgrades(vec![get_movement_upgrade(&piece_info.movement_type)]),
-                    team: Team::Enemy,
-                    block: Block { amount: 0 },
+                    ..default()
                 },
+                Transform::from_translation(global_position),
+                tile_pos,
+                Health::new(piece_info.health),
+                Attack::new(piece_info.damage),
+                Upgrades(vec![get_movement_upgrade(&piece_info.movement_type)]),
+                Team::Enemy,
                 Name::new("Enemy"),
                 StateScoped(GameState::Game),
                 AIControlled,

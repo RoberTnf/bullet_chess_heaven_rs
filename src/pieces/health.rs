@@ -24,7 +24,7 @@ use super::{
     },
 };
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Health {
     pub value: f32,
     pub changes: Vec<f32>,

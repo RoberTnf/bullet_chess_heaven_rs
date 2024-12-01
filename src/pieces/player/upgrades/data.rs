@@ -36,7 +36,7 @@ pub struct Upgrade {
     pub icon_index: usize,
 }
 
-#[derive(Clone, Debug, Component)]
+#[derive(Clone, Debug, Component, Default)]
 pub struct Upgrades(pub Vec<Upgrade>);
 
 impl Upgrades {

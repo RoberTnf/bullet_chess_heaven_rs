@@ -8,24 +8,14 @@ use crate::globals::{
 use super::health::Health;
 
 #[derive(Component)]
+#[require(Sprite)]
 pub struct Healthbar {
     pub fraction: f32,
 }
 
 #[derive(Component)]
+#[require(Sprite)]
 pub struct EmptyHealthbar;
-
-#[derive(Bundle)]
-pub struct HealthbarBundle {
-    pub healthbar: Healthbar,
-    pub sprite: Sprite,
-}
-
-#[derive(Bundle)]
-pub struct EmptyHealthbarBundle {
-    pub sprite: Sprite,
-    pub empty_healthbar: EmptyHealthbar,
-}
 
 pub fn update_healthbars(
     mut query: Query<(Entity, &mut Healthbar, &mut Transform, &Parent)>,
@@ -60,16 +50,14 @@ pub fn spawn_healthbar(
 ) -> [Entity; 2] {
     let id1 = commands
         .spawn((
-            HealthbarBundle {
-                healthbar: Healthbar { fraction: 1.0 },
-                sprite: Sprite {
-                    texture_atlas: Some(TextureAtlas {
-                        layout: atlas_layout.clone(),
-                        index: FULL_HEALTHBAR_ATLAS_INDEX,
-                    }),
-                    image: asset_server.load("custom/spritesheet.png"),
-                    ..default()
-                },
+            Healthbar { fraction: 1.0 },
+            Sprite {
+                texture_atlas: Some(TextureAtlas {
+                    layout: atlas_layout.clone(),
+                    index: FULL_HEALTHBAR_ATLAS_INDEX,
+                }),
+                image: asset_server.load("custom/spritesheet.png"),
+                ..default()
             },
             Transform::from_translation(Vec3::new(0.0, 0.0, HEALTHBAR_Z_INDEX)),
             Name::new("Healthbar"),
@@ -77,16 +65,14 @@ pub fn spawn_healthbar(
         .id();
     let id2 = commands
         .spawn((
-            EmptyHealthbarBundle {
-                sprite: Sprite {
-                    texture_atlas: Some(TextureAtlas {
-                        layout: atlas_layout.clone(),
-                        index: EMPTY_HEALTHBAR_ATLAS_INDEX,
-                    }),
-                    image: asset_server.load("custom/spritesheet.png"),
-                    ..default()
-                },
-                empty_healthbar: EmptyHealthbar,
+            EmptyHealthbar,
+            Sprite {
+                texture_atlas: Some(TextureAtlas {
+                    layout: atlas_layout.clone(),
+                    index: EMPTY_HEALTHBAR_ATLAS_INDEX,
+                }),
+                image: asset_server.load("custom/spritesheet.png"),
+                ..default()
             },
             Transform::from_translation(Vec3::new(0.0, 0.0, EMPTY_HEALTHBAR_Z_INDEX)),
             Name::new("Empty Healthbar"),

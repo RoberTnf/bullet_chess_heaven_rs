@@ -10,13 +10,21 @@ use super::{
 };
 
 #[derive(Component, Default)]
-pub struct BlocksMovement;
-
-#[derive(Component, Default)]
+#[require(
+    Sprite,
+    BoardPosition,
+    Health,
+    Attack,
+    PieceState,
+    Upgrades,
+    Team,
+    Block
+)]
 pub struct Piece;
 
-#[derive(Component, Clone)]
+#[derive(Component, Clone, Default)]
 pub enum PieceState {
+    #[default]
     Idle,
     Moving {
         origin: Vec3,
@@ -33,24 +41,9 @@ pub enum PieceState {
     AttackingWithNewSprite,
 }
 
-#[derive(Component, Eq, PartialEq, Copy, Clone, Hash)]
+#[derive(Component, Eq, PartialEq, Copy, Clone, Hash, Default)]
 pub enum Team {
+    #[default]
     Player,
     Enemy,
-}
-
-#[derive(Bundle)]
-pub struct PieceBundle {
-    pub sprite: Sprite,
-    pub creature: Piece,
-    pub transform: Transform,
-    // pub movement_types: MovementTypes,
-    pub board_position: BoardPosition,
-    pub health: Health,
-    pub damage: Attack,
-    pub blocks_movement: BlocksMovement,
-    pub state: PieceState,
-    pub upgrades: Upgrades,
-    pub team: Team,
-    pub block: Block,
 }

@@ -6,15 +6,12 @@ use crate::{
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
         attack::AttackAfterMove,
-        common::{BlocksMovement, Piece, PieceBundle, PieceState, Team},
+        common::{Piece, Team},
         damage::Attack,
         health::Health,
         healthbar::spawn_healthbar,
         movement_type::MovementType,
-        player::upgrades::{
-            stats::{Stat, StatVariant},
-            unique_upgrades::{block::Block, limit::MovementTypeLimit},
-        },
+        player::upgrades::unique_upgrades::limit::MovementTypeLimit,
     },
     states::game_state::GameState,
     ui::shop::ApplyUpgrades,
@@ -47,43 +44,24 @@ pub fn spawn_player(
 
     let player_id = commands
         .spawn((
-            PieceBundle {
-                sprite: Sprite {
-                    texture_atlas: Some(TextureAtlas {
-                        layout: atlas_layout.handle.clone(),
-                        index: PLAYER_ATLAS_INDEX,
-                    }),
-                    image: asset_server.load("custom/spritesheet.png"),
-                    ..default()
-                },
-                transform: Transform::from_translation(global_position),
-                blocks_movement: BlocksMovement,
-                creature: Piece,
-                board_position: tile_pos,
-                health: Health::new(globals::PLAYER_HEALTH),
-                damage: Attack(Stat {
-                    base_value: globals::PLAYER_DAMAGE,
-                    stat_variant: StatVariant::Attack,
-                    upgraded_value: globals::PLAYER_DAMAGE,
+            Piece,
+            Sprite {
+                texture_atlas: Some(TextureAtlas {
+                    layout: atlas_layout.handle.clone(),
+                    index: PLAYER_ATLAS_INDEX,
                 }),
-                state: PieceState::Idle,
-                upgrades: Upgrades(vec![
-                    get_movement_upgrade(&MovementType::King),
-                    get_movement_upgrade(&MovementType::King),
-                    // get_movement_upgrade(&MovementType::BlackPawn),
-                    // get_movement_upgrade(&MovementType::WhitePawn),
-                    // get_movement_upgrade(&MovementType::BlackPawn),
-                    // get_movement_upgrade(&MovementType::WhitePawn),
-                    // get_movement_upgrade(&MovementType::Rook),
-                    // get_movement_upgrade(&MovementType::Rook),
-                    // get_movement_upgrade(&MovementType::Bishop),
-                    // get_movement_upgrade(&MovementType::Bishop),
-                    // get_movement_upgrade(&MovementType::Knight),
-                    // get_movement_upgrade(&MovementType::Knight),
-                ]),
-                team: Team::Player,
-                block: Block { amount: 0 },
+                image: asset_server.load("custom/spritesheet.png"),
+                ..default()
             },
+            Transform::from_translation(global_position),
+            tile_pos,
+            Health::new(globals::PLAYER_HEALTH),
+            Attack::new(globals::PLAYER_DAMAGE),
+            Upgrades(vec![
+                get_movement_upgrade(&MovementType::King),
+                get_movement_upgrade(&MovementType::King),
+            ]),
+            Team::Player,
             Player,
             Name::new("Player"),
             StateScoped(GameState::Game),
