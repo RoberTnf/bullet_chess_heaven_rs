@@ -93,7 +93,7 @@ pub fn apply_side_effect(
     }
 
     for side_effect in new_side_effects {
-        commands.add(move |world: &mut World| {
+        commands.queue(move |world: &mut World| {
             world.send_event(side_effect);
         });
     }

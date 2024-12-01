@@ -13,7 +13,7 @@ use crate::{
         movement_type::MovementType,
         player::upgrades::{
             stats::{Stat, StatVariant},
-            unique_upgrades::block::Block,
+            unique_upgrades::{block::Block, limit::MovementTypeLimit},
         },
     },
     states::game_state::GameState,
@@ -48,15 +48,15 @@ pub fn spawn_player(
     let player_id = commands
         .spawn((
             PieceBundle {
-                sprite: SpriteBundle {
-                    texture: asset_server.load("custom/spritesheet.png"),
-                    transform: Transform::from_translation(global_position),
+                sprite: Sprite {
+                    texture_atlas: Some(TextureAtlas {
+                        layout: atlas_layout.handle.clone(),
+                        index: PLAYER_ATLAS_INDEX,
+                    }),
+                    image: asset_server.load("custom/spritesheet.png"),
                     ..default()
                 },
-                atlas: TextureAtlas {
-                    layout: atlas_layout.handle.clone(),
-                    index: PLAYER_ATLAS_INDEX,
-                },
+                transform: Transform::from_translation(global_position),
                 blocks_movement: BlocksMovement,
                 creature: Piece,
                 board_position: tile_pos,
@@ -94,10 +94,11 @@ pub fn spawn_player(
                 speed: globals::PULSE_ANIMATION_SPEED,
             },
             AttackAfterMove,
+            MovementTypeLimit { limit: 2 },
         ))
         .id();
 
     let healthbars = spawn_healthbar(&mut commands, &asset_server, &atlas_layout.handle);
-    commands.entity(player_id).push_children(&healthbars);
+    commands.entity(player_id).add_children(&healthbars);
     apply_upgrades_event_writer.send(ApplyUpgrades(get_movement_upgrade(&MovementType::King)));
 }

@@ -27,36 +27,33 @@ fn show_defeat_screen(
 
     let defeat_node = commands
         .spawn((
-            NodeBundle {
-                style: Style {
-                    width: Val::Vw(100.0),
-                    height: Val::Vh(100.0),
-                    top: Val::Px(0.0),
-                    left: Val::Px(0.0),
-                    position_type: PositionType::Absolute,
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    flex_direction: FlexDirection::Column,
-                    ..default()
-                },
-                background_color: BackgroundColor(Color::srgb(0.0, 0.0, 0.0)),
+            Node {
+                width: Val::Vw(100.0),
+                height: Val::Vh(100.0),
+                top: Val::Px(0.0),
+                left: Val::Px(0.0),
+                position_type: PositionType::Absolute,
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
                 ..default()
             },
+            BackgroundColor(Color::srgb(0.0, 0.0, 0.0)),
             Name::new("DefeatUI"),
             StateScoped(GameState::Defeat),
         ))
         .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                "Defeat",
-                TextStyle {
+            parent.spawn((
+                Text("Defeat".to_string()),
+                TextFont {
                     font_size: DEFEAT_HEADER_FONT_SIZE,
                     font: asset_server.load(UI_FONT),
                     ..default()
                 },
             ));
-            parent.spawn(TextBundle::from_section(
-                format!("Score: {}", score.0),
-                TextStyle {
+            parent.spawn((
+                Text(format!("Score: {}", score.0)),
+                TextFont {
                     font_size: DEFEAT_SCORE_FONT_SIZE,
                     font: asset_server.load(UI_FONT),
                     ..default()
@@ -64,21 +61,19 @@ fn show_defeat_screen(
             ));
             parent
                 .spawn((
-                    ButtonBundle {
-                        style: Style {
-                            padding: UiRect::all(Val::Px(10.0)),
-                            border: UiRect::all(Val::Px(1.0)),
-                            ..default()
-                        },
-                        border_radius: BorderRadius::all(Val::Px(2.0)),
+                    Node {
+                        padding: UiRect::all(Val::Px(10.0)),
+                        border: UiRect::all(Val::Px(1.0)),
                         ..default()
                     },
+                    BorderRadius::all(Val::Px(2.0)),
+                    Button,
                     ButtonFunction::RestartGame,
                 ))
                 .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Restart",
-                        TextStyle {
+                    parent.spawn((
+                        Text("Restart".to_string()),
+                        TextFont {
                             font_size: DEFEAT_SCORE_FONT_SIZE,
                             font: asset_server.load(UI_FONT),
                             ..default()

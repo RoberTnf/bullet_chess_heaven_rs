@@ -126,25 +126,21 @@ pub fn spawn_health_change_text(
             };
 
             commands.spawn((
-                Text2dBundle {
-                    text: Text::from_section(
-                        format!("{}", change),
-                        TextStyle {
-                            font_size: HEALTH_CHANGE_TEXT_FONT_SIZE,
-                            color,
-                            font: asset_server.load(UI_FONT),
-                        },
+                Text2d(format!("{}", change)),
+                Transform {
+                    translation: Vec3::new(
+                        transform.translation.x,
+                        transform.translation.y,
+                        HEALTH_CHANGE_TEXT_Z_INDEX,
                     ),
-                    transform: Transform {
-                        translation: Vec3::new(
-                            transform.translation.x,
-                            transform.translation.y,
-                            HEALTH_CHANGE_TEXT_Z_INDEX,
-                        ),
-                        ..default()
-                    },
                     ..default()
                 },
+                TextFont {
+                    font: asset_server.load(UI_FONT),
+                    font_size: HEALTH_CHANGE_TEXT_FONT_SIZE,
+                    ..default()
+                },
+                TextColor(color),
                 TextAnimation {
                     timer: Timer::from_seconds(
                         HEALTH_CHANGE_TEXT_ANIMATION_DURATION,
@@ -238,7 +234,7 @@ pub fn health_change_text_animation(
                 health_change_text_animation.direction.y,
                 0.0,
             ) * health_change_text_animation.speed
-                * time.delta_seconds();
+                * time.delta_secs();
         }
     }
 }

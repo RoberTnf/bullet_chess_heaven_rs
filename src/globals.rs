@@ -114,4 +114,8 @@ pub const UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER: usize = 2;
 pub const UNIQUE_UPGRADE_DAMAGE_MULTIPLIER: f32 = 0.1;
 pub const CONVERT_ENEMY_TURNS_TO_CONVERT: usize = 3;
 
-pub const MOVEMENT_TYPE_LIMITS: [(usize, usize); 3] = [(0, 2), (10, 3), (25, 4)];
+pub const MOVEMENT_TYPE_LIMITS: [(usize, usize); 3] = [
+    (0, 2),
+    (UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER * 2, 3),
+    (UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER * 5, 4),
+];

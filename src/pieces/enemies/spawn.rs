@@ -110,15 +110,15 @@ pub fn spawn_enemies(
         let enemy = commands
             .spawn((
                 PieceBundle {
-                    sprite: SpriteBundle {
-                        texture: asset_server.load("custom/spritesheet.png"),
-                        transform: Transform::from_translation(global_position),
+                    sprite: Sprite {
+                        image: asset_server.load("custom/spritesheet.png"),
+                        texture_atlas: Some(TextureAtlas {
+                            layout: atlas_layout.handle.clone(),
+                            index: piece_info.sprite_index,
+                        }),
                         ..default()
                     },
-                    atlas: TextureAtlas {
-                        layout: atlas_layout.handle.clone(),
-                        index: piece_info.sprite_index,
-                    },
+                    transform: Transform::from_translation(global_position),
                     blocks_movement: BlocksMovement,
                     creature: Piece,
                     board_position: tile_pos,
@@ -143,7 +143,7 @@ pub fn spawn_enemies(
             .id();
 
         let healthbars = spawn_healthbar(&mut commands, &asset_server, &atlas_layout.handle);
-        commands.entity(enemy).push_children(&healthbars);
+        commands.entity(enemy).add_children(&healthbars);
     }
     next_turn_state.set(TurnState::PlayerInput);
 }

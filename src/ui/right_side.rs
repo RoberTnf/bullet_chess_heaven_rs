@@ -19,7 +19,7 @@ impl Plugin for RightSidePlugin {
             Update,
             on_click_toggle_shop
                 .run_if(in_state(GameState::Game))
-                .run_if(on_event::<ButtonPressedEvent>()),
+                .run_if(on_event::<ButtonPressedEvent>),
         );
         app.add_event::<ButtonPressedEvent>();
     }
@@ -32,16 +32,15 @@ pub fn setup_right_side(
 ) {
     let right_side_node = right_side_node.single();
     let buttons_node = commands
-        .spawn(NodeBundle {
-            style: Style {
+        .spawn((
+            Node {
                 padding: UiRect::all(Val::Px(2.0)),
                 row_gap: Val::Px(2.0),
                 flex_direction: FlexDirection::Column,
                 ..default()
             },
-            background_color: BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
-            ..default()
-        })
+            BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
+        ))
         .id();
     commands.entity(right_side_node).add_child(buttons_node);
     let shop_button = get_shop_button(&mut commands, &asset_server, "Shop (S)");
@@ -49,23 +48,21 @@ pub fn setup_right_side(
 
     let restart_button = commands
         .spawn((
-            ButtonBundle {
-                style: Style {
-                    padding: UiRect::all(Val::Px(10.0)),
-                    border: UiRect::all(Val::Px(1.0)),
-                    width: Val::Percent(100.0),
-                    justify_content: JustifyContent::Center,
-                    ..default()
-                },
-                border_radius: BorderRadius::all(Val::Px(2.0)),
+            Node {
+                padding: UiRect::all(Val::Px(10.0)),
+                border: UiRect::all(Val::Px(1.0)),
+                width: Val::Percent(100.0),
+                justify_content: JustifyContent::Center,
                 ..default()
             },
+            Button,
+            BorderRadius::all(Val::Px(2.0)),
             ButtonFunction::RestartGame,
         ))
         .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                "Restart",
-                TextStyle {
+            parent.spawn((
+                Text("Restart".to_string()),
+                TextFont {
                     font_size: UI_FONT_SIZE,
                     font: asset_server.load(UI_FONT),
                     ..default()
@@ -83,26 +80,24 @@ pub fn get_shop_button(
 ) -> Entity {
     commands
         .spawn((
-            ButtonBundle {
-                style: Style {
-                    flex_direction: FlexDirection::Column,
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    padding: UiRect::all(Val::Px(4.0)),
-                    border: UiRect::all(Val::Px(1.0)),
-                    width: Val::Percent(100.0),
-                    ..default()
-                },
-                border_radius: BorderRadius::all(Val::Px(2.0)),
-                background_color: BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
+            Node {
+                flex_direction: FlexDirection::Column,
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                padding: UiRect::all(Val::Px(4.0)),
+                border: UiRect::all(Val::Px(1.0)),
+                width: Val::Percent(100.0),
                 ..default()
             },
+            BorderRadius::all(Val::Px(2.0)),
+            BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
+            Button,
             ButtonFunction::ShowShop,
         ))
         .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                text,
-                TextStyle {
+            parent.spawn((
+                Text(text.to_string()),
+                TextFont {
                     font_size: UI_FONT_SIZE,
                     font: asset_server.load(UI_FONT),
                     ..default()

@@ -41,9 +41,9 @@ pub enum Team {
 
 #[derive(Bundle)]
 pub struct PieceBundle {
-    pub sprite: SpriteBundle,
-    pub atlas: TextureAtlas,
+    pub sprite: Sprite,
     pub creature: Piece,
+    pub transform: Transform,
     // pub movement_types: MovementTypes,
     pub board_position: BoardPosition,
     pub health: Health,

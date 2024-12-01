@@ -26,45 +26,40 @@ pub fn setup_game_info(
     let root_node = query.single();
     commands.entity(root_node).with_children(|parent| {
         parent
-            .spawn(NodeBundle {
-                style: Style {
+            .spawn((
+                Node {
                     padding: UiRect::all(Val::Px(8.0)),
                     row_gap: Val::Px(2.0),
                     flex_direction: FlexDirection::Column,
                     ..default()
                 },
-                background_color: BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
-                ..default()
-            })
+                BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
+            ))
             .with_children(|parent| {
-                parent.spawn(TextBundle::from_section(
-                    "Game",
-                    TextStyle {
+                parent.spawn((
+                    Text("Game".to_string()),
+                    TextFont {
                         font_size: UI_HEADER_FONT_SIZE,
                         font: asset_server.load(UI_FONT),
                         ..default()
                     },
                 ));
                 parent.spawn((
-                    TextBundle::from_section(
-                        "TurnPlaceholder",
-                        TextStyle {
-                            font_size: UI_FONT_SIZE,
-                            font: asset_server.load(UI_FONT),
-                            ..default()
-                        },
-                    ),
+                    Text("TurnPlaceholder".to_string()),
+                    TextFont {
+                        font_size: UI_FONT_SIZE,
+                        font: asset_server.load(UI_FONT),
+                        ..default()
+                    },
                     TurnUILabel,
                 ));
                 parent.spawn((
-                    TextBundle::from_section(
-                        "ScorePlaceholder",
-                        TextStyle {
-                            font_size: UI_FONT_SIZE,
-                            font: asset_server.load(UI_FONT),
-                            ..default()
-                        },
-                    ),
+                    Text("ScorePlaceholder".to_string()),
+                    TextFont {
+                        font_size: UI_FONT_SIZE,
+                        font: asset_server.load(UI_FONT),
+                        ..default()
+                    },
                     ScoreUILabel,
                 ));
             });
@@ -76,7 +71,7 @@ fn update_turn_information(
     mut query: Query<&mut Text, With<TurnUILabel>>,
 ) {
     let mut text = query.get_single_mut().unwrap();
-    text.sections[0].value = format!("Turn: {}", turn_info.number);
+    text.0 = format!("Turn: {}", turn_info.number);
 }
 
 fn update_score_information(
@@ -84,7 +79,7 @@ fn update_score_information(
     mut query: Query<&mut Text, With<ScoreUILabel>>,
 ) {
     let mut text = query.get_single_mut().unwrap();
-    text.sections[0].value = format!("Score: {}", score.0);
+    text.0 = format!("Score: {}", score.0);
 }
 
 pub struct GameInfoPlugin;

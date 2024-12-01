@@ -34,41 +34,31 @@ fn setup_ui(mut commands: Commands) {
     // root node
     commands
         .spawn((
-            NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
-                    justify_content: JustifyContent::SpaceBetween,
-                    ..default()
-                },
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                justify_content: JustifyContent::SpaceBetween,
                 ..default()
             },
             RootUINode,
         ))
         .with_children(|parent| {
             parent.spawn((
-                NodeBundle {
-                    style: Style {
-                        width: Val::Percent(25.0),
-                        flex_direction: FlexDirection::Column,
-                        justify_content: JustifyContent::SpaceBetween,
-                        padding: UiRect::all(Val::Px(16.0)),
-                        ..default()
-                    },
-                    // background_color: BackgroundColor(Color::srgb(0.15, 0.15, 0.15)),
+                Node {
+                    width: Val::Percent(25.0),
+                    flex_direction: FlexDirection::Column,
+                    justify_content: JustifyContent::SpaceBetween,
+                    padding: UiRect::all(Val::Px(16.0)),
                     ..default()
                 },
                 LeftUINode,
             ));
             parent.spawn((
-                NodeBundle {
-                    style: Style {
-                        width: Val::Percent(25.0),
-                        flex_direction: FlexDirection::Column,
-                        justify_content: JustifyContent::SpaceBetween,
-                        padding: UiRect::all(Val::Px(16.0)),
-                        ..default()
-                    },
+                Node {
+                    width: Val::Percent(25.0),
+                    flex_direction: FlexDirection::Column,
+                    justify_content: JustifyContent::SpaceBetween,
+                    padding: UiRect::all(Val::Px(16.0)),
                     ..default()
                 },
                 RightUINode,

@@ -18,14 +18,12 @@ pub struct EmptyHealthbar;
 #[derive(Bundle)]
 pub struct HealthbarBundle {
     pub healthbar: Healthbar,
-    pub sprite: SpriteBundle,
-    pub atlas: TextureAtlas,
+    pub sprite: Sprite,
 }
 
 #[derive(Bundle)]
 pub struct EmptyHealthbarBundle {
-    pub sprite: SpriteBundle,
-    pub atlas: TextureAtlas,
+    pub sprite: Sprite,
     pub empty_healthbar: EmptyHealthbar,
 }
 
@@ -64,37 +62,33 @@ pub fn spawn_healthbar(
         .spawn((
             HealthbarBundle {
                 healthbar: Healthbar { fraction: 1.0 },
-                sprite: SpriteBundle {
-                    texture: asset_server.load("custom/spritesheet.png"),
-                    transform: Transform::from_translation(Vec3::new(0.0, 0.0, HEALTHBAR_Z_INDEX)),
+                sprite: Sprite {
+                    texture_atlas: Some(TextureAtlas {
+                        layout: atlas_layout.clone(),
+                        index: FULL_HEALTHBAR_ATLAS_INDEX,
+                    }),
+                    image: asset_server.load("custom/spritesheet.png"),
                     ..default()
                 },
-                atlas: TextureAtlas {
-                    layout: atlas_layout.clone(),
-                    index: FULL_HEALTHBAR_ATLAS_INDEX,
-                },
             },
+            Transform::from_translation(Vec3::new(0.0, 0.0, HEALTHBAR_Z_INDEX)),
             Name::new("Healthbar"),
         ))
         .id();
     let id2 = commands
         .spawn((
             EmptyHealthbarBundle {
-                sprite: SpriteBundle {
-                    texture: asset_server.load("custom/spritesheet.png"),
-                    transform: Transform::from_translation(Vec3::new(
-                        0.0,
-                        0.0,
-                        EMPTY_HEALTHBAR_Z_INDEX,
-                    )),
+                sprite: Sprite {
+                    texture_atlas: Some(TextureAtlas {
+                        layout: atlas_layout.clone(),
+                        index: EMPTY_HEALTHBAR_ATLAS_INDEX,
+                    }),
+                    image: asset_server.load("custom/spritesheet.png"),
                     ..default()
-                },
-                atlas: TextureAtlas {
-                    layout: atlas_layout.clone(),
-                    index: EMPTY_HEALTHBAR_ATLAS_INDEX,
                 },
                 empty_healthbar: EmptyHealthbar,
             },
+            Transform::from_translation(Vec3::new(0.0, 0.0, EMPTY_HEALTHBAR_Z_INDEX)),
             Name::new("Empty Healthbar"),
         ))
         .id();

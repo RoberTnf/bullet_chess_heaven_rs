@@ -34,7 +34,6 @@ fn main() {
                     ..default()
                 }),
         )
-        .insert_resource(Msaa::Off)
         // Game
         .add_plugins((
             plugins::startup::StartupPlugin,

@@ -112,7 +112,7 @@ impl Plugin for UniqueUpgradesPlugin {
                 block::apply_side_effect,
             )
                 .run_if(in_state(GameState::Game))
-                .run_if(on_event::<SideEffect>()),
+                .run_if(on_event::<SideEffect>),
         );
         app.add_systems(
             OnEnter(TurnState::PlayerInput),
@@ -126,7 +126,7 @@ impl Plugin for UniqueUpgradesPlugin {
             Update,
             apply_movement_type_limit
                 .run_if(in_state(GameState::Game))
-                .run_if(on_event::<ApplyUpgrades>()),
+                .run_if(on_event::<ApplyUpgrades>),
         );
     }
 }

@@ -164,19 +164,19 @@ pub fn update_highlight_tiles(
                 Name::new("Highlight Hovered Tile"),
                 StateScoped(GameState::Game),
                 HighlightHoveredTile,
-                SpriteBundle {
-                    texture: asset_server.load("custom/spritesheet.png"),
-                    transform: Transform::from_translation(
-                        hovered_tile
-                            .as_global_position()
-                            .extend(globals::HIGHLIGHT_Z_INDEX),
-                    ),
+                Sprite {
+                    texture_atlas: Some(TextureAtlas {
+                        layout: atlas_layout.handle.clone(),
+                        index: 23,
+                    }),
+                    image: asset_server.load("custom/spritesheet.png"),
                     ..default()
                 },
-                TextureAtlas {
-                    layout: atlas_layout.handle.clone(),
-                    index: 23,
-                },
+                Transform::from_translation(
+                    hovered_tile
+                        .as_global_position()
+                        .extend(globals::HIGHLIGHT_Z_INDEX),
+                ),
             ));
         }
     }
@@ -200,17 +200,17 @@ pub fn update_highlight_tiles(
                     board_position.x, board_position.y
                 )),
                 StateScoped(GameState::Game),
-                SpriteBundle {
-                    texture: asset_server.load("custom/spritesheet.png"),
-                    transform: Transform::from_translation(global_position),
+                HighlightTileAttack,
+                Sprite {
+                    texture_atlas: Some(TextureAtlas {
+                        layout: atlas_layout.handle.clone(),
+                        index: 6,
+                    }),
+                    image: asset_server.load("custom/spritesheet.png"),
                     ..default()
                 },
-                TextureAtlas {
-                    layout: atlas_layout.handle.clone(),
-                    index: 6,
-                },
+                Transform::from_translation(global_position),
                 *board_position,
-                HighlightTileAttack,
             ));
         }
     }
@@ -232,17 +232,17 @@ pub fn update_highlight_tiles(
                         board_position.x, board_position.y
                     )),
                     StateScoped(GameState::Game),
-                    SpriteBundle {
-                        texture: asset_server.load("custom/spritesheet.png"),
-                        transform: Transform::from_translation(global_position),
+                    HighlightTileMove,
+                    Sprite {
+                        texture_atlas: Some(TextureAtlas {
+                            layout: atlas_layout.handle.clone(),
+                            index: 3,
+                        }),
+                        image: asset_server.load("custom/spritesheet.png"),
                         ..default()
                     },
-                    TextureAtlas {
-                        layout: atlas_layout.handle.clone(),
-                        index: 3,
-                    },
+                    Transform::from_translation(global_position),
                     *board_position,
-                    HighlightTileMove,
                 ));
             }
         }

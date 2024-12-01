@@ -14,17 +14,9 @@ use crate::{
 };
 
 pub fn promotion_system(
-    mut pieces: Query<
-        (
-            &mut Upgrades,
-            &BoardPosition,
-            &mut PieceValue,
-            &mut TextureAtlas,
-        ),
-        With<Piece>,
-    >,
+    mut pieces: Query<(&mut Upgrades, &BoardPosition, &mut PieceValue, &mut Sprite), With<Piece>>,
 ) {
-    for (mut upgrades, pos, mut value, mut atlas) in pieces.iter_mut() {
+    for (mut upgrades, pos, mut value, mut sprite) in pieces.iter_mut() {
         let movement_types = upgrades.get_movement_types_set();
         let is_white_pawn =
             movement_types.contains(&MovementType::WhitePawn) && movement_types.len() == 1;
@@ -45,7 +37,8 @@ pub fn promotion_system(
                     })
                     .collect(),
             );
-            atlas.index = BLACK_KING_INFO.sprite_index;
+            sprite.texture_atlas.as_mut().unwrap().index = BLACK_KING_INFO.sprite_index;
+
             *value = PieceValue {
                 value: BLACK_KING_INFO.value,
             };
@@ -64,7 +57,7 @@ pub fn promotion_system(
                     })
                     .collect(),
             );
-            atlas.index = WHITE_KING_INFO.sprite_index;
+            sprite.texture_atlas.as_mut().unwrap().index = WHITE_KING_INFO.sprite_index;
             *value = PieceValue {
                 value: WHITE_KING_INFO.value,
             };

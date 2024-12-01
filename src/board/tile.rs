@@ -5,20 +5,14 @@ use crate::{
     states::game_state::GameState,
 };
 
-#[derive(Bundle)]
-pub struct TileBundle {
-    pub sprite: SpriteBundle,
-    pub atlas: TextureAtlas,
-    pub tile: Tile,
-}
-
 #[derive(Component)]
+#[require(Sprite)]
 pub struct Tile;
 
 pub fn spawn_board(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     atlas_layout: Res<SpriteSheetAtlas>,
+    asset_server: Res<AssetServer>,
 ) {
     debug!("Spawning board");
     for x in 0..globals::BOARD_SIZE {
@@ -30,18 +24,16 @@ pub fn spawn_board(
             commands.spawn((
                 Name::new(format!("Tile ({}, {})", x, y)),
                 StateScoped(GameState::Game),
-                TileBundle {
-                    sprite: SpriteBundle {
-                        texture: asset_server.load("custom/spritesheet.png"),
-                        transform: Transform::from_translation(global_position),
-                        ..default()
-                    },
-                    atlas: TextureAtlas {
+                Tile,
+                Sprite {
+                    texture_atlas: Some(TextureAtlas {
                         layout: atlas_layout.handle.clone(),
                         index: if tile_position.is_white() { 2 } else { 1 },
-                    },
-                    tile: Tile,
+                    }),
+                    image: asset_server.load("custom/spritesheet.png"),
+                    ..default()
                 },
+                Transform::from_translation(global_position),
                 tile_position,
             ));
         }

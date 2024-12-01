@@ -65,7 +65,7 @@ pub fn move_pieces_animation(
         } = state.as_mut()
         {
             let current_position = transform.translation;
-            let lerp_value = TWEEN_MOVE_ANIMATION_SPEED * time.delta_seconds();
+            let lerp_value = TWEEN_MOVE_ANIMATION_SPEED * time.delta_secs();
             let distance = destination.distance_squared(current_position);
 
             // if less than 1 pixel away, snap to destination

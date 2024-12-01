@@ -41,7 +41,7 @@ fn mouse_position_to_tile_position(
 ) -> Option<BoardPosition> {
     window
         .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
+        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor).ok())
         .and_then(BoardPosition::from_world_position)
 }
 

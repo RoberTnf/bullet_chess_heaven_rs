@@ -48,6 +48,7 @@ pub enum AttackPieceAnimationState {
 pub struct AttackAfterMove;
 
 #[derive(Component)]
+#[require(Transform)]
 pub struct AttackingWithNewSprite {
     pub destination: BoardPosition,
     pub origin: BoardPosition,
@@ -73,22 +74,19 @@ pub fn attack_piece_system(
         if let Some(sprite_index) = event.sprite_index {
             *attacker_state = PieceState::AttackingWithNewSprite;
             let entity = commands
-                .spawn((
-                    AttackingWithNewSprite {
-                        destination: event.destination,
-                        origin: event.origin,
-                        sprite_index,
-                        animation_state: AttackPieceAnimationState::Delayed(Timer::new(
-                            Duration::from_secs_f32(event.delay.unwrap_or(0.0)),
-                            TimerMode::Once,
-                        )),
-                        piece_health_change_event: PieceHealthChangeEvent {
-                            entity: event.target,
-                            change: -event.damage,
-                        },
+                .spawn((AttackingWithNewSprite {
+                    destination: event.destination,
+                    origin: event.origin,
+                    sprite_index,
+                    animation_state: AttackPieceAnimationState::Delayed(Timer::new(
+                        Duration::from_secs_f32(event.delay.unwrap_or(0.0)),
+                        TimerMode::Once,
+                    )),
+                    piece_health_change_event: PieceHealthChangeEvent {
+                        entity: event.target,
+                        change: -event.damage,
                     },
-                    TransformBundle::default(),
-                ))
+                },))
                 .id();
             commands.entity(event.attacker).add_child(entity);
             debug!("Added AttackingWithNewSprite to {}", event.attacker);
@@ -126,7 +124,7 @@ pub fn attack_piece_animation_system(
             let direction = (destination_global_position - origin_global_position).normalize();
             let truncated_translation = transform.translation.truncate();
             let speed = original_distance * 2.0 / ATTACK_ANIMATION_DURATION;
-            let delta = direction * speed * time.delta_seconds();
+            let delta = direction * speed * time.delta_secs();
 
             // work in 2D except for the end
             let original_z = transform.translation.z;
@@ -214,7 +212,7 @@ fn attacking_with_new_sprite_animation_system(
                     &mut commands,
                     piece_transform,
                     attacking_sprite.as_mut(),
-                    time.delta_seconds(),
+                    time.delta_secs(),
                     &mut event_writer,
                 );
             }
@@ -267,20 +265,23 @@ fn spawn_attack_sprite(
 ) {
     let origin_offset =
         attacking_sprite.origin.as_global_position() - piece_transform.translation.truncate();
-    let sprite = SpriteBundle {
-        texture: asset_server.load("custom/spritesheet.png"),
-        // TODO: Fix invisible
-        transform: Transform {
-            translation: origin_offset.extend(piece_transform.translation.z),
-            ..default()
-        },
-        ..default()
-    };
-    let atlas = TextureAtlas {
-        layout: atlas_layout.handle.clone(),
-        index: attacking_sprite.sprite_index,
-    };
-    let sprite_entity = commands.spawn((sprite, atlas, AttackingSprite)).id();
+    let sprite_entity = commands
+        .spawn((
+            Sprite {
+                texture_atlas: Some(TextureAtlas {
+                    layout: atlas_layout.handle.clone(),
+                    index: attacking_sprite.sprite_index,
+                }),
+                image: asset_server.load("custom/spritesheet.png"),
+                ..default()
+            },
+            AttackingSprite,
+            Transform {
+                translation: origin_offset.extend(piece_transform.translation.z),
+                ..default()
+            },
+        ))
+        .id();
     commands.entity(parent).add_child(sprite_entity);
 }
 

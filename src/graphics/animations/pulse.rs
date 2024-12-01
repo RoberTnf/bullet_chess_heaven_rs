@@ -9,7 +9,7 @@ pub fn animate_pulse_scale(
     time: Res<Time>,
 ) {
     for (mut transform, mut pulse_size) in player_query.iter_mut() {
-        let next_progress = pulse_size.progress + pulse_size.speed * time.delta_seconds();
+        let next_progress = pulse_size.progress + pulse_size.speed * time.delta_secs();
 
         let t = next_progress.sin();
         let size = pulse_size.start_size + (pulse_size.final_size - pulse_size.start_size) * t;

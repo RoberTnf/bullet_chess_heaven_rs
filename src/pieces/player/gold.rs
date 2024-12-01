@@ -49,21 +49,14 @@ pub fn spawn_gold(
                 timer: Timer::from_seconds(GOLD_ANIMATION_DURATION, TimerMode::Once),
                 ..default()
             },
-            Text2dBundle {
-                text: Text::from_section(
-                    format!("+{}$", enemy_value.value),
-                    TextStyle {
-                        font_size: GOLD_FONT_SIZE,
-                        color: Color::linear_rgb(0.0, 1.0, 0.0),
-                        font: asset_server.load(UI_FONT),
-                    },
-                ),
-                transform: Transform {
-                    translation: gold_position,
-                    ..default()
-                },
+            Text2d(format!("+{}$", enemy_value.value)),
+            TextFont {
+                font: asset_server.load(UI_FONT),
+                font_size: GOLD_FONT_SIZE,
                 ..default()
             },
+            Transform::from_translation(gold_position),
+            TextColor(Color::linear_rgb(0.0, 1.0, 0.0)),
         ));
         gold.amount += enemy_value.value;
     });
@@ -79,7 +72,7 @@ pub struct GoldPlugin;
 impl Plugin for GoldPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Gold::new(STARTING_GOLD));
-        app.add_systems(Update, spawn_gold.run_if(on_event::<PieceDeathEvent>()));
+        app.add_systems(Update, spawn_gold.run_if(on_event::<PieceDeathEvent>));
         app.add_systems(OnEnter(GameState::Game), reset_gold);
     }
 }
