@@ -81,6 +81,7 @@ pub const PER_TURN_ENEMY_SPAWN_COUNT: usize = 2; // Number of enemies to spawn p
 pub const SPRITESHEET_WIDTH: usize = 20; // Width of the spritesheet
 pub const SPRITESHEET_HEIGHT: usize = 20; // Height of the spritesheet
 pub const WIP_SPRITE_INDEX: usize = 19; // Index of the wip sprite in the spritesheet
+pub const BLANK_SPRITE_INDEX: usize = SPRITESHEET_WIDTH * SPRITESHEET_HEIGHT - 1; // Index of the blank sprite in the spritesheet
 
 // UI Settings
 const UI_FONT_SCALE: f32 = 3.0;

@@ -2,8 +2,9 @@ use bevy::prelude::*;
 
 use crate::{
     globals::{
-        GOLD_UI_COLOR_DURATION, PRIMARY_COLOR, SPRITESHEET_WIDTH, UI_FONT, UI_FONT_SIZE,
-        UI_HEADER_FONT_SIZE, UI_PIECE_SPRITE_SIZE_INFO, UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER,
+        BLANK_SPRITE_INDEX, GOLD_UI_COLOR_DURATION, PRIMARY_COLOR, SPRITESHEET_WIDTH, UI_FONT,
+        UI_FONT_SIZE, UI_HEADER_FONT_SIZE, UI_PIECE_SPRITE_SIZE_INFO,
+        UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER,
     },
     graphics::spritesheet::SpriteSheetAtlas,
     pieces::{
@@ -164,8 +165,6 @@ fn update_movement_types_information(
     commands.entity(container_entity).despawn_descendants();
 
     for i in 0..limit.limit {
-        let player_sprite_index;
-        let text_color;
         let movement_container = commands
             .spawn((
                 Node {
@@ -182,57 +181,66 @@ fn update_movement_types_information(
             .entity(container_entity)
             .add_child(movement_container);
 
-        if let Some((movement_type, count)) = movement_types.iter().nth(i) {
-            if *count >= UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER {
-                player_sprite_index = movement_type.sprite_index() + SPRITESHEET_WIDTH;
-                text_color = PRIMARY_COLOR;
+        let (player_sprite_index, text_color, count) =
+            if let Some((movement_type, count)) = movement_types.iter().nth(i) {
+                if *count >= UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER {
+                    (
+                        movement_type.sprite_index() + SPRITESHEET_WIDTH,
+                        PRIMARY_COLOR,
+                        *count,
+                    )
+                } else {
+                    (
+                        movement_type.sprite_index(),
+                        Color::srgb(1.0, 1.0, 1.0),
+                        *count,
+                    )
+                }
             } else {
-                player_sprite_index = movement_type.sprite_index();
-                text_color = Color::srgb(1.0, 1.0, 1.0);
+                (BLANK_SPRITE_INDEX, Color::srgba(0.2, 0.2, 0.2, 0.0), 0)
             };
-            debug!("Spawning movement type in UI: {}", player_sprite_index);
-            let movement_label = commands
-                .spawn((
-                    Node {
-                        flex_wrap: FlexWrap::Wrap,
+        debug!("Spawning movement type in UI: {}", player_sprite_index);
+        let movement_label = commands
+            .spawn((
+                Node {
+                    flex_wrap: FlexWrap::Wrap,
+                    ..default()
+                },
+                MovementTypesUILabel {
+                    sprite_index: player_sprite_index,
+                },
+            ))
+            .with_children(|parent| {
+                parent.spawn((
+                    ImageNode {
+                        image: asset_server.load("custom/spritesheet.png"),
+                        texture_atlas: Some(TextureAtlas {
+                            layout: atlas_layout.handle.clone(),
+                            index: player_sprite_index,
+                        }),
                         ..default()
                     },
-                    MovementTypesUILabel {
-                        sprite_index: player_sprite_index,
+                    Node {
+                        width: Val::Px(UI_PIECE_SPRITE_SIZE_INFO),
+                        height: Val::Px(UI_PIECE_SPRITE_SIZE_INFO),
+                        ..default()
                     },
-                ))
-                .with_children(|parent| {
-                    parent.spawn((
-                        ImageNode {
-                            image: asset_server.load("custom/spritesheet.png"),
-                            texture_atlas: Some(TextureAtlas {
-                                layout: atlas_layout.handle.clone(),
-                                index: player_sprite_index,
-                            }),
-                            ..default()
-                        },
-                        Node {
-                            width: Val::Px(UI_PIECE_SPRITE_SIZE_INFO),
-                            height: Val::Px(UI_PIECE_SPRITE_SIZE_INFO),
-                            ..default()
-                        },
-                    ));
-                    parent.spawn((
-                        Text(count.to_string()),
-                        TextFont {
-                            font_size: UI_FONT_SIZE,
-                            font: asset_server.load(UI_FONT),
-                            ..default()
-                        },
-                        TextColor(text_color),
-                    ));
-                })
-                .id();
+                ));
+                parent.spawn((
+                    Text(count.to_string()),
+                    TextFont {
+                        font_size: UI_FONT_SIZE,
+                        font: asset_server.load(UI_FONT),
+                        ..default()
+                    },
+                    TextColor(text_color),
+                ));
+            })
+            .id();
 
-            commands
-                .entity(movement_container)
-                .add_child(movement_label);
-        }
+        commands
+            .entity(movement_container)
+            .add_child(movement_label);
     }
 }
 

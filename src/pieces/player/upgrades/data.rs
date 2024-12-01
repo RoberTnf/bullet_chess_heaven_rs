@@ -29,7 +29,7 @@ use once_cell::sync::Lazy;
 pub struct Upgrade {
     weight: f32,
     pub display_name: String,
-    pub description: Vec<(Text, TextColor)>,
+    pub description: Vec<(TextSpan, TextColor)>,
     pub cost: usize,
     pub rarity: Rarity,
     pub effect: Effect,
@@ -84,7 +84,7 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             weight: 0.0,
             display_name: "White Pawn Movement".to_string(),
             description: vec![(
-                Text("White Pawn movement".to_string()),
+                TextSpan("White Pawn movement".to_string()),
                 TextColor::default(),
             )],
             cost: (WHITE_PAWN_INFO.value as f32 * SHOP_PIECE_VALUE_GOLD_MULTIPLIER) as usize,
@@ -96,7 +96,7 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             weight: 0.0,
             display_name: "Black Pawn Movement".to_string(),
             description: vec![(
-                Text("Black Pawn movement".to_string()),
+                TextSpan("Black Pawn movement".to_string()),
                 TextColor::default(),
             )],
             cost: (BLACK_PAWN_INFO.value as f32 * SHOP_PIECE_VALUE_GOLD_MULTIPLIER) as usize,
@@ -109,27 +109,27 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             display_name: "Pawn Movement".to_string(),
             description: vec![
                 (
-                    Text("Allows the player to move and attack like a pawn.\n\n".to_string()),
+                    TextSpan("Allows the player to move and attack like a pawn.\n".to_string()),
                     TextColor::default(),
                 ),
-                (Text("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
                 (
-                    Text(format!(
-                        " Increases pawn damage by {}% per level.\n\n",
+                    TextSpan(format!(
+                        " Increases pawn damage by {}% per level.\n",
                         UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * 100.0
                     )),
                     TextColor::default(),
                 ),
                 (
-                    Text(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
+                    TextSpan(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
                     TextColor(PRIMARY_COLOR),
                 ),
                 (
-                    Text(" Converts enemies to allies on hit for ".to_string()),
+                    TextSpan(" Converts enemies to allies on hit for ".to_string()),
                     TextColor::default(),
                 ),
                 (
-                    Text(format!("{} turns.", CONVERT_ENEMY_TURNS_TO_CONVERT)),
+                    TextSpan(format!("{} turns.", CONVERT_ENEMY_TURNS_TO_CONVERT)),
                     TextColor(PRIMARY_COLOR),
                 ),
             ],
@@ -143,22 +143,22 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             display_name: "King Movement".to_string(),
             description: vec![
                 (
-                    Text("Allows the player to move and attack like a king.\n\n".to_string()),
+                    TextSpan("Allows the player to move and attack like a king.\n".to_string()),
                     TextColor::default(),
                 ),
-                (Text("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
                 (
-                    Text(format!(
-                        " Increases king damage by {}% per level.\n\n",
+                    TextSpan(format!(
+                        " Increases king damage by {}% per level.\n",
                         UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * 100.0
                     )),
                     TextColor::default(),
                 ),
                 (
-                    Text(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
+                    TextSpan(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
                     TextColor(PRIMARY_COLOR),
                 ),
-                (Text(" WIP".to_string()), TextColor::default()),
+                (TextSpan(" WIP".to_string()), TextColor::default()),
             ],
             cost: (WHITE_KING_INFO.value as f32 * SHOP_PIECE_VALUE_GOLD_MULTIPLIER) as usize,
             rarity: Rarity::Common,
@@ -170,22 +170,22 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             display_name: "Queen Movement".to_string(),
             description: vec![
                 (
-                    Text("Allows the player to move and attack like a queen.\n\n".to_string()),
+                    TextSpan("Allows the player to move and attack like a queen.\n".to_string()),
                     TextColor::default(),
                 ),
-                (Text("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
                 (
-                    Text(format!(
-                        " Increases queen damage by {}% per level.\n\n",
+                    TextSpan(format!(
+                        " Increases queen damage by {}% per level.\n",
                         UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * 100.0
                     )),
                     TextColor::default(),
                 ),
                 (
-                    Text(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
+                    TextSpan(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
                     TextColor(PRIMARY_COLOR),
                 ),
-                (Text(" WIP".to_string()), TextColor::default()),
+                (TextSpan(" WIP".to_string()), TextColor::default()),
             ],
             cost: (WHITE_QUEEN_INFO.value as f32 * SHOP_PIECE_VALUE_GOLD_MULTIPLIER) as usize,
             rarity: Rarity::Common,
@@ -197,24 +197,27 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             display_name: "Knight Movement".to_string(),
             description: vec![
                 (
-                    Text("Allows the player to move and attack like a knight.\n\n".to_string()),
+                    TextSpan("Allows the player to move and attack like a knight.\n".to_string()),
                     TextColor::default(),
                 ),
-                (Text("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
                 (
-                    Text(format!(
-                        " Increases knight damage by {}% per level.\n\n",
+                    TextSpan(format!(
+                        " Increases knight damage by {}% per level.\n",
                         UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * 100.0
                     )),
                     TextColor::default(),
                 ),
                 (
-                    Text(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
+                    TextSpan(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
                     TextColor(PRIMARY_COLOR),
                 ),
-                (Text(" Knight attacks ".to_string()), TextColor::default()),
-                (Text("Chain".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(" once.".to_string()), TextColor::default()),
+                (
+                    TextSpan(" Knight attacks ".to_string()),
+                    TextColor::default(),
+                ),
+                (TextSpan("Chain".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(" once.".to_string()), TextColor::default()),
             ],
             cost: (WHITE_KNIGHT_INFO.value as f32 * SHOP_PIECE_VALUE_GOLD_MULTIPLIER) as usize,
             rarity: Rarity::Common,
@@ -226,24 +229,27 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             display_name: "Bishop Movement".to_string(),
             description: vec![
                 (
-                    Text("Allows the player to move and attack like a bishop.\n\n".to_string()),
+                    TextSpan("Allows the player to move and attack like a bishop.\n".to_string()),
                     TextColor::default(),
                 ),
-                (Text("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
                 (
-                    Text(format!(
-                        " Increases bishop damage by {}% per level.\n\n",
+                    TextSpan(format!(
+                        " Increases bishop damage by {}% per level.\n",
                         UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * 100.0
                     )),
                     TextColor::default(),
                 ),
                 (
-                    Text(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
+                    TextSpan(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
                     TextColor(PRIMARY_COLOR),
                 ),
-                (Text(" Bishop attacks ".to_string()), TextColor::default()),
-                (Text("Pierce".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(" enemies.".to_string()), TextColor::default()),
+                (
+                    TextSpan(" Bishop attacks ".to_string()),
+                    TextColor::default(),
+                ),
+                (TextSpan("Pierce".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(" enemies.".to_string()), TextColor::default()),
             ],
             cost: (WHITE_BISHOP_INFO.value as f32 * SHOP_PIECE_VALUE_GOLD_MULTIPLIER) as usize,
             rarity: Rarity::Common,
@@ -255,28 +261,28 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             display_name: "Rook Movement".to_string(),
             description: vec![
                 (
-                    Text("Allows the player to move and attack like a rook.\n\n".to_string()),
+                    TextSpan("Allows the player to move and attack like a rook.\n".to_string()),
                     TextColor::default(),
                 ),
-                (Text("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan("Level 2+:".to_string()), TextColor(PRIMARY_COLOR)),
                 (
-                    Text(format!(
-                        " Increases rook damage by {}% per level.\n\n",
+                    TextSpan(format!(
+                        " Increases rook damage by {}% per level.\n",
                         UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * 100.0
                     )),
                     TextColor::default(),
                 ),
                 (
-                    Text(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
+                    TextSpan(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
                     TextColor(PRIMARY_COLOR),
                 ),
                 (
-                    Text(" Rook attacks grant ".to_string()),
+                    TextSpan(" Rook attacks grant ".to_string()),
                     TextColor::default(),
                 ),
-                (Text("Block(1)".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan("Block(1)".to_string()), TextColor(PRIMARY_COLOR)),
                 (
-                    Text(". It does not stack.".to_string()),
+                    TextSpan(". It does not stack.".to_string()),
                     TextColor::default(),
                 ),
             ],
@@ -294,9 +300,12 @@ pub static UPGRADES_STATS: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             weight: 1.0,
             display_name: "Health +10".to_string(),
             description: vec![
-                (Text("Increases maximum ".to_string()), TextColor::default()),
-                (Text("Health".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(" by 10.".to_string()), TextColor::default()),
+                (
+                    TextSpan("Increases maximum ".to_string()),
+                    TextColor::default(),
+                ),
+                (TextSpan("Health".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(" by 10.".to_string()), TextColor::default()),
             ],
             cost: 100,
             rarity: Rarity::Common,
@@ -311,11 +320,14 @@ pub static UPGRADES_STATS: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             weight: 0.3,
             display_name: "Health +20".to_string(),
             description: vec![
-                (Text("Increases maximum ".to_string()), TextColor::default()),
-                (Text("Health".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(" by ".to_string()), TextColor::default()),
-                (Text("20".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(".".to_string()), TextColor::default()),
+                (
+                    TextSpan("Increases maximum ".to_string()),
+                    TextColor::default(),
+                ),
+                (TextSpan("Health".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(" by ".to_string()), TextColor::default()),
+                (TextSpan("20".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(".".to_string()), TextColor::default()),
             ],
             cost: 150,
             icon_index: WIP_SPRITE_INDEX,
@@ -330,11 +342,11 @@ pub static UPGRADES_STATS: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             weight: 1.0,
             display_name: "Attack +1".to_string(),
             description: vec![
-                (Text("Increases ".to_string()), TextColor::default()),
-                (Text("Attack".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(" by ".to_string()), TextColor::default()),
-                (Text("1".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(".".to_string()), TextColor::default()),
+                (TextSpan("Increases ".to_string()), TextColor::default()),
+                (TextSpan("Attack".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(" by ".to_string()), TextColor::default()),
+                (TextSpan("1".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(".".to_string()), TextColor::default()),
             ],
             cost: 100,
             icon_index: WIP_SPRITE_INDEX,
@@ -349,11 +361,11 @@ pub static UPGRADES_STATS: Lazy<Vec<Upgrade>> = Lazy::new(|| {
             weight: 0.3,
             display_name: "Attack +2".to_string(),
             description: vec![
-                (Text("Increases ".to_string()), TextColor::default()),
-                (Text("Attack".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(" by ".to_string()), TextColor::default()),
-                (Text("2".to_string()), TextColor(PRIMARY_COLOR)),
-                (Text(".".to_string()), TextColor::default()),
+                (TextSpan("Increases ".to_string()), TextColor::default()),
+                (TextSpan("Attack".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(" by ".to_string()), TextColor::default()),
+                (TextSpan("2".to_string()), TextColor(PRIMARY_COLOR)),
+                (TextSpan(".".to_string()), TextColor::default()),
             ],
             cost: 150,
             icon_index: WIP_SPRITE_INDEX,

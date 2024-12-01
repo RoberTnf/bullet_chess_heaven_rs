@@ -166,7 +166,6 @@ fn update_shop_description(
     asset_server: Res<AssetServer>,
     mut commands: Commands,
 ) {
-    let font = asset_server.load(UI_FONT);
     for event in hover_event_reader.read() {
         if event.function == ButtonFunction::BuyUpgrade {
             let description_ui = description_ui
@@ -183,7 +182,8 @@ fn update_shop_description(
                             text.clone(),
                             *text_color,
                             TextFont {
-                                font: font.clone(),
+                                font: asset_server.load(UI_FONT),
+                                font_size: UI_FONT_SIZE,
                                 ..default()
                             },
                         ));
