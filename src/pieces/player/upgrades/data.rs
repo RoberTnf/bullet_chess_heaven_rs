@@ -158,7 +158,15 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
                     TextSpan(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
                     TextColor(PRIMARY_COLOR),
                 ),
-                (TextSpan(" WIP".to_string()), TextColor::default()),
+                (TextSpan(" King ".to_string()), TextColor::default()),
+                (
+                    TextSpan("attacks twice".to_string()),
+                    TextColor(PRIMARY_COLOR),
+                ),
+                (
+                    TextSpan(": from the start and from the end of movement.".to_string()),
+                    TextColor::default(),
+                ),
             ],
             cost: (WHITE_KING_INFO.value as f32 * SHOP_PIECE_VALUE_GOLD_MULTIPLIER) as usize,
             rarity: Rarity::Common,

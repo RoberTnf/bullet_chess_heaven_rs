@@ -4,7 +4,7 @@ use bevy::{prelude::*, utils::HashSet};
 
 use crate::{
     board::position::BoardPosition,
-    globals::{ATTACK_ANIMATION_DURATION, TILE_SIZE},
+    globals::{ATTACK_ANIMATION_DURATION, TILE_SIZE, UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER},
     graphics::spritesheet::SpriteSheetAtlas,
     input::click_tile::send_attack_event,
     states::{game_state::GameState, pause_state::GamePauseState, turn_state::TurnState},
@@ -403,7 +403,7 @@ pub fn on_move_animation_end_attack_system(
 
             to_attack = true;
             let movement_types = upgrades.get_movement_types_set();
-            if !attack_from_tile(
+            let mut attacked = attack_from_tile(
                 &movement_types,
                 piece_position,
                 &all_pieces_positions,
@@ -413,7 +413,25 @@ pub fn on_move_animation_end_attack_system(
                 piece_entity,
                 damage,
                 &mut next_state,
-            ) {
+            );
+            if let Some(count) = upgrades.get_movement_types_count().get(&MovementType::King) {
+                if *count >= UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER {
+                    // king unique ability, attack from original position
+                    let attacked_2 = attack_from_tile(
+                        &HashSet::from([MovementType::King]),
+                        &event.origin,
+                        &all_pieces_positions,
+                        &enemy_pieces_positions,
+                        &pieces_query,
+                        &mut attack_event_writer,
+                        piece_entity,
+                        damage,
+                        &mut next_state,
+                    );
+                    attacked = attacked || attacked_2;
+                }
+            }
+            if !attacked {
                 *piece_state = PieceState::AttackEnded;
             }
         }

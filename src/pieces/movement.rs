@@ -51,6 +51,8 @@ pub fn move_piece(
 #[derive(Event)]
 pub struct MovePieceAnimationEndEvent {
     pub entity: Entity,
+    pub origin: BoardPosition,
+    pub destination: BoardPosition,
 }
 
 pub fn move_pieces_animation(
@@ -60,7 +62,7 @@ pub fn move_pieces_animation(
 ) {
     for (mut transform, mut state, entity) in pieces.iter_mut() {
         if let PieceState::Moving {
-            origin: _,
+            origin,
             destination,
         } = state.as_mut()
         {
@@ -71,8 +73,14 @@ pub fn move_pieces_animation(
             // if less than 1 pixel away, snap to destination
             if distance < 1.0 {
                 transform.translation = *destination;
+                move_piece_animation_end_events.send(MovePieceAnimationEndEvent {
+                    entity,
+                    origin: BoardPosition::from_world_position(origin.truncate())
+                        .expect("Invalid origin position"),
+                    destination: BoardPosition::from_world_position(destination.truncate())
+                        .expect("Invalid destination position"),
+                });
                 *state = PieceState::MoveEnded;
-                move_piece_animation_end_events.send(MovePieceAnimationEndEvent { entity });
             } else {
                 transform.translation = transform.translation.lerp(*destination, lerp_value);
             }
