@@ -38,7 +38,7 @@ pub fn apply_side_effect(
                 movement_type: generator_event.movement_type.clone(),
                 delay: generator_event.delay,
                 origin: generator_event.origin,
-                with_unique_upgrade: false,
+                upgrades_applied: true,
             });
         }
     }

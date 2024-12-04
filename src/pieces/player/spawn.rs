@@ -58,8 +58,10 @@ pub fn spawn_player(
             Health::new(globals::PLAYER_HEALTH),
             Attack::new(globals::PLAYER_DAMAGE),
             Upgrades(vec![
-                get_movement_upgrade(&MovementType::King),
-                get_movement_upgrade(&MovementType::King),
+                get_movement_upgrade(&MovementType::Queen),
+                get_movement_upgrade(&MovementType::Queen),
+                get_movement_upgrade(&MovementType::Knight),
+                get_movement_upgrade(&MovementType::Knight),
             ]),
             Team::Player,
             Player,

@@ -3,8 +3,8 @@ use limit::apply_movement_type_limit;
 
 use crate::{
     globals::{
-        CONVERT_ENEMY_TURNS_TO_CONVERT, UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER,
-        UNIQUE_UPGRADE_DAMAGE_MULTIPLIER,
+        ATTACK_ANIMATION_DURATION, CONVERT_ENEMY_TURNS_TO_CONVERT, QUEEN_UNIQUE_CHANCE,
+        UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER, UNIQUE_UPGRADE_DAMAGE_MULTIPLIER,
     },
     pieces::{attack::AttackPieceEvent, common::Team, movement_type::MovementType},
     states::{game_state::GameState, turn_state::TurnState},
@@ -51,6 +51,7 @@ pub fn apply_unique_upgrades(
     attack: &mut AttackPieceEvent,
     upgrades: &Upgrades,
     side_effect_event_writter: &mut EventWriter<SideEffect>,
+    commands: &mut Commands,
 ) {
     let movement_upgrades = upgrades.get_movement_types_count();
     if let Some(&count) = movement_upgrades.get(&attack.movement_type) {
@@ -58,11 +59,36 @@ pub fn apply_unique_upgrades(
             "Applying unique upgrade for movement type: {:?}, count: {}",
             attack.movement_type, count
         );
-        attack.damage += UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * (count - 1) as f32;
+        if !attack.upgrades_applied {
+            attack.damage += UNIQUE_UPGRADE_DAMAGE_MULTIPLIER * (count - 1) as f32;
+        }
 
         if count >= UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER {
             let side_effect = fetch_side_effect(attack);
             side_effect_event_writter.send(side_effect);
+        }
+    }
+
+    // Queen unique ability is a bit different,
+    // it has a chance to repeat any attack
+    if let Some(queen_count) = movement_upgrades.get(&MovementType::Queen) {
+        if *queen_count >= UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER {
+            let chance = QUEEN_UNIQUE_CHANCE;
+            let random_value = rand::random::<f32>();
+            let mut new_event = attack.clone();
+
+            if let Some(delay) = new_event.delay {
+                new_event.delay = Some(delay + ATTACK_ANIMATION_DURATION);
+            } else {
+                new_event.delay = Some(ATTACK_ANIMATION_DURATION);
+            }
+            new_event.upgrades_applied = true;
+
+            if random_value < chance {
+                commands.queue(move |world: &mut World| {
+                    world.send_event(new_event);
+                });
+            }
         }
     }
 }
@@ -93,7 +119,7 @@ fn fetch_side_effect(attack: &AttackPieceEvent) -> SideEffect {
             entity: attack.attacker,
         },
         MovementType::King => SideEffect::Nothing,
-        _ => todo!("Side effect for this movement type not implemented"),
+        MovementType::Queen => SideEffect::Nothing,
     }
 }
 

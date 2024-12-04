@@ -163,8 +163,7 @@ fn execute_ai(
                     sprite_index: None,
                     delay: None,
                     movement_type: movement_type.clone(),
-                    // for now, we don't want to apply unique upgrades to the AI
-                    with_unique_upgrade: false,
+                    upgrades_applied: false,
                     origin: *ally_pos,
                 });
                 has_attacked = true;

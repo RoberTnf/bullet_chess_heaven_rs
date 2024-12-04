@@ -71,7 +71,7 @@ pub fn apply_side_effect(
                     ),
                     movement_type: generator_event.movement_type.clone(),
                     delay: Some(delay),
-                    with_unique_upgrade: false,
+                    upgrades_applied: true,
                 };
                 attack_writer.send(new_attack_piece_event.clone());
                 if let Some(pierce_count) = pierce_count {

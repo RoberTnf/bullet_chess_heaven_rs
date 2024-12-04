@@ -13,7 +13,7 @@ use crate::{
 use super::{
     common::{Piece, PieceState, Team},
     damage::Attack,
-    health::PieceHealthChangeEvent,
+    health::{Health, PieceHealthChangeEvent},
     movement::MovePieceAnimationEndEvent,
     movement_type::MovementType,
     player::{
@@ -35,8 +35,9 @@ pub struct AttackPieceEvent {
     pub sprite_index: Option<usize>,
     pub movement_type: MovementType,
     pub delay: Option<f32>,
-    pub with_unique_upgrade: bool,
+    pub upgrades_applied: bool,
 }
+
 #[derive(Eq, PartialEq, Clone)]
 pub enum AttackPieceAnimationState {
     Delayed(Timer),               // Combines Start with timer
@@ -59,17 +60,29 @@ pub struct AttackingWithNewSprite {
 
 pub fn attack_piece_system(
     mut attack_event_reader: EventReader<AttackPieceEvent>,
-    mut pieces: Query<(&BoardPosition, &mut PieceState, &Upgrades), With<Piece>>,
+    mut pieces: Query<(&BoardPosition, &mut PieceState, &Upgrades, &Health), With<Piece>>,
     mut commands: Commands,
     mut side_effect_event_writer: EventWriter<SideEffect>,
 ) {
     for event in attack_event_reader.read() {
-        let (attacker_pos, mut attacker_state, upgrades) = pieces.get_mut(event.attacker).unwrap();
-        let mut event = (*event).clone();
-        if event.with_unique_upgrade {
-            // handle unique upgrades
-            apply_unique_upgrades(&mut event, upgrades, &mut side_effect_event_writer);
+        if let Ok((_, _, _, target_health)) = pieces.get_mut(event.target) {
+            if target_health.is_dead() {
+                continue;
+            }
+        } else {
+            continue;
         }
+
+        let (attacker_pos, mut attacker_state, upgrades, _) =
+            pieces.get_mut(event.attacker).unwrap();
+        let mut event = (*event).clone();
+        // handle unique upgrades
+        apply_unique_upgrades(
+            &mut event,
+            upgrades,
+            &mut side_effect_event_writer,
+            &mut commands,
+        );
 
         if let Some(sprite_index) = event.sprite_index {
             *attacker_state = PieceState::AttackingWithNewSprite;

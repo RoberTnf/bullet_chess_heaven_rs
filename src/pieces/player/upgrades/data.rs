@@ -1,9 +1,9 @@
 use super::stats::StatEffect;
 use crate::{
     globals::{
-        CONVERT_ENEMY_TURNS_TO_CONVERT, PRIMARY_COLOR, SHOP_PIECE_VALUE_GOLD_MULTIPLIER,
-        SPRITESHEET_WIDTH, UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER, UNIQUE_UPGRADE_DAMAGE_MULTIPLIER,
-        WIP_SPRITE_INDEX,
+        CONVERT_ENEMY_TURNS_TO_CONVERT, PRIMARY_COLOR, QUEEN_UNIQUE_CHANCE,
+        SHOP_PIECE_VALUE_GOLD_MULTIPLIER, SPRITESHEET_WIDTH, UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER,
+        UNIQUE_UPGRADE_DAMAGE_MULTIPLIER, WIP_SPRITE_INDEX,
     },
     pieces::{
         enemies::{
@@ -193,7 +193,16 @@ pub static UPGRADES_MOVEMENT: Lazy<Vec<Upgrade>> = Lazy::new(|| {
                     TextSpan(format!("Level {}+:", UNIQUE_ABILITY_UNLOCK_UPGRADE_NUMBER)),
                     TextColor(PRIMARY_COLOR),
                 ),
-                (TextSpan(" WIP".to_string()), TextColor::default()),
+                (
+                    TextSpan(" All attacks have a ".to_string()),
+                    TextColor::default(),
+                ),
+                (
+                    TextSpan(format!("{}%", QUEEN_UNIQUE_CHANCE * 100.0)),
+                    TextColor(PRIMARY_COLOR),
+                ),
+                (TextSpan(" chance to ".to_string()), TextColor::default()),
+                (TextSpan("repeat.".to_string()), TextColor(PRIMARY_COLOR)),
             ],
             cost: (WHITE_QUEEN_INFO.value as f32 * SHOP_PIECE_VALUE_GOLD_MULTIPLIER) as usize,
             rarity: Rarity::Common,
