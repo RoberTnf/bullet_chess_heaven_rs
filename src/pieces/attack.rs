@@ -56,6 +56,7 @@ pub struct AttackingWithNewSprite {
     pub sprite_index: usize,
     pub animation_state: AttackPieceAnimationState,
     pub piece_health_change_event: PieceHealthChangeEvent,
+    pub target: Entity,
 }
 
 pub fn attack_piece_system(
@@ -65,14 +66,6 @@ pub fn attack_piece_system(
     mut side_effect_event_writer: EventWriter<SideEffect>,
 ) {
     for event in attack_event_reader.read() {
-        if let Ok((_, _, _, target_health)) = pieces.get_mut(event.target) {
-            if target_health.is_dead() {
-                continue;
-            }
-        } else {
-            continue;
-        }
-
         let (attacker_pos, mut attacker_state, upgrades, _) =
             pieces.get_mut(event.attacker).unwrap();
         let mut event = (*event).clone();
@@ -99,6 +92,7 @@ pub fn attack_piece_system(
                         entity: event.target,
                         change: -event.damage,
                     },
+                    target: event.target,
                 },))
                 .id();
             commands.entity(event.attacker).add_child(entity);
@@ -184,7 +178,7 @@ struct AttackingSprite;
 
 fn attacking_with_new_sprite_animation_system(
     asset_server: Res<AssetServer>,
-    mut piece_query: Query<&Transform, With<PieceState>>,
+    mut piece_query: Query<(&Transform, &Health), With<PieceState>>,
     mut attacking_sprite_query: Query<(&mut AttackingWithNewSprite, &Parent, Entity)>,
     mut sprite_query: Query<&mut Transform, (With<AttackingSprite>, Without<PieceState>)>,
     mut commands: Commands,
@@ -194,13 +188,26 @@ fn attacking_with_new_sprite_animation_system(
     mut event_writer: EventWriter<PieceHealthChangeEvent>,
 ) {
     for (mut attacking_sprite, parent, entity) in attacking_sprite_query.iter_mut() {
-        let Ok(piece_transform) = piece_query.get_mut(parent.get()) else {
+        let should_end: bool =
+            if let Ok((_, target_health)) = piece_query.get(attacking_sprite.target) {
+                target_health.is_dead()
+            } else {
+                false
+            };
+
+        let Ok((piece_transform, _)) = piece_query.get_mut(parent.get()) else {
             continue;
         };
 
         match &mut attacking_sprite.animation_state {
             AttackPieceAnimationState::Delayed(ref mut timer) => {
                 timer.tick(time.delta());
+                if should_end {
+                    attacking_sprite.animation_state = AttackPieceAnimationState::Finished(
+                        Timer::new(Duration::from_secs_f32(0.0), TimerMode::Once),
+                    );
+                    continue;
+                }
                 if timer.finished() {
                     spawn_attack_sprite(
                         &mut commands,
